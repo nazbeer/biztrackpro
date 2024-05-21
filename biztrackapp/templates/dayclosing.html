@@ -1,0 +1,117 @@
+{% extends 'emp_base.html' %}
+
+{% block content %}
+<div class="container mb-5">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0 text-white">Day Closing</h4>
+        </div>
+        <div class="card-body">
+            {% if form.non_field_errors %}
+                <ul>
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% for field in form %}
+                {% if field.errors %}
+                    <ul>
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endfor %}
+            <form method="post" id="dayClosingForm">
+                {% csrf_token %}
+                <div class="row">
+                    
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" class="form-control" value="{{ current_date }}" readonly required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="employee">Employee:</label>
+                        <input type="hidden" name="employee" value="{% if employees %}{{employees.id}}{% endif %}">
+                        <input type="text" class="form-control text-capitalize" readonly value="{% if employees %}{{ employees.first_name }} {{ employees.second_name }}{% endif %}">
+                    </div>
+                </div>
+                
+            </div>
+                <div class="form-group">
+                    <label for="total_services">Total Services:</label>
+                    <input type="number" class="form-control" id="total_services" name="total_services" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="total_sales">Total Sales:</label>
+                    <input type="number" class="form-control" id="total_sales" name="total_sales" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="total_collection">Total Collection:</label>
+                    <input type="number" class="form-control" id="total_collection" name="total_collection" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="advance">Advance:</label>
+                    <input type="number" class="form-control" id="advance" name="advance" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="net_collection">Net Collection:</label>
+                    <input type="number" class="form-control" id="net_collection" name="net_collection" readonly required>
+                </div>
+                <input type="hidden" id="status" name="status" value="approved">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var currentDate = "{{ current_date }}";
+    document.getElementById("date").value = currentDate;
+
+    // Fetch data when the page loads
+    window.addEventListener("load", function() {
+        var employeeId = localStorage.getItem('employee_id');
+        if (employeeId) {
+            fetchEmployeeData(employeeId);
+        }
+    });
+
+    // Fetch data function
+    function fetchEmployeeData(employeeId) {
+        fetch('/fetch-data/' + employeeId + '/')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("total_services").value = data.total_services;
+                document.getElementById("total_sales").value = data.total_sales;
+                document.getElementById("total_collection").value = data.total_collection;
+
+                // Calculate net collection
+                var totalServices = parseFloat(data.total_services);
+                var totalSales = parseFloat(data.total_sales);
+                var totalCollection = parseFloat(data.total_collection);
+                var advance = parseFloat(document.getElementById("advance").value);
+                var netCollection = totalCollection - advance;
+
+                // Update net collection input field
+                document.getElementById("net_collection").value = netCollection.toFixed(2);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Update net collection when advance value changes
+    document.getElementById("advance").addEventListener("input", function() {
+        var totalCollection = parseFloat(document.getElementById("total_collection").value);
+        var advance = parseFloat(this.value);
+        var netCollection = totalCollection - advance;
+
+        // Update net collection input field
+        document.getElementById("net_collection").value = netCollection.toFixed(2);
+    });
+</script>
+{% endblock %}

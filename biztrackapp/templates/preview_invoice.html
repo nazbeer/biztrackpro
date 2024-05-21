@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana,sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+  }
+  .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h2 {
+    color: #333;
+    text-align: center;
+    padding: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    padding: 10px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+    color: #555;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  td {
+    color: #444;
+  }
+  .total {
+    font-weight: bold;
+    color: #333;
+  }
+  .footer {
+    text-align: center;
+    font-size: 14px;
+    padding:10px;
+        border:none;
+    background:#f2f2f2;
+  }
+  
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+
+        .invoice-details div {
+            padding:10px;
+        }
+
+        .invoice-details div span {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+</style>
+</head>
+<body>
+    <h2>Invoice</h2>
+        <div class="invoice-details">
+            <div>
+                <span>Invoice Id: </span> #{{id}}
+            </div>
+            <div>
+                <span>Date: </span> {{date}}
+            </div>
+            <div>
+                <span>Data Source: </span> {{data_source}}
+            </div>
+            <div>
+                <span>Payment Method: </span> {{payment_method}}
+            </div>
+        </div>
+
+  <div class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Unit Price (AED)</th>
+          <th>Total (AED)</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for detail in details %}
+      
+        <tr>
+          <td>{{detail.note}}</td>
+          <td>{{detail.quantity}}</td>
+          <td> {{detail.price}}</td>
+          <td> {{ detail.total }}</td>
+        </tr>
+      {% endfor %}
+
+      </tbody>
+      <tfoot>
+         <tr >
+          <td colspan="3" class="total">Sub Total</td>
+          <td class="total">{{sub_total}}</td>
+        </tr>
+         <tr >
+          <td colspan="3" class="total">Discount</td>
+          <td class="total">{{discount}}</td>
+        </tr>
+         <tr >
+          <td colspan="3" class="total">Vat</td>
+          <td class="total">{{VAT}}</td>
+        </tr>
+         <tr >
+          <td colspan="3" class="total">Total</td>
+          <td class="total">{{total_amount}}</td>
+        </tr>
+
+
+      </tfoot>
+    </table>
+    <p class="footer">Thank you.</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Role List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Role List</h4>
+    </div>
+    <div class="card-body">
+      
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Module(s)</th>
+          <th>Employee Status</th>
+          <th>Created On</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for role in roles %}
+          <tr>
+            <td>{{ role.id }}</td>
+            <td>{{ role.name }}</td>
+            <td width="420px">
+              {% for module in role.modules.all %}
+                {{ module.name }}
+                {% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ role.is_employee }}</td>
+            <td>{{ role.created_on }}</td>
+            <td>
+              <a href="{% url 'update_role' role.pk %}" class="btn btn-primary btn-sm">Edit</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<div class="card-footer">
+  <div class="form-group mb-0">
+    <a href="/role/create/"><button class="btn btn-warning" type="button">Add New Role</button></a>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

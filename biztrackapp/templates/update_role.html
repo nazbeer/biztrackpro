@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Role{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Update Role</h5>
+  </div>
+  <form method="post">
+    <div class="card-body">
+      <!-- Display form errors if any -->
+      {% if form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>Error:</strong> Please correct the following errors:
+        <ul>
+          {% for field, error_list in form.errors.items %}
+          {% for error in error_list %}
+          <li>{{ error }}</li>
+          {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="name">Role Name:</label>
+        <input type="text" id="name" name="name" class="form-control" value="{{ form.instance.name }}">
+      </div>
+      <div class="form-group">
+        <label for="modules">Module List:</label>
+        <select id="modules" name="modules" class="form-control" style="height:200px" multiple>
+          {% for module in modules %}
+          <option value="{{ module.id }}" {% if module in form.instance.modules.all %}selected{% endif %}>{{ module.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <input type="hidden" name="business_profile" value="{{ business_profile.id }}">
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="is_employee" name="is_employee" {% if form.instance.is_employee %}checked{% endif %}>
+        <label class="form-check-label" for="is_employee">Employee</label>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="d-flex justify-content-between align-items-center">
+        <button type="submit" class="btn btn-success">Update</button>
+        <a href="{% url 'role_list' %}" class="btn btn-secondary">Back to Role List</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

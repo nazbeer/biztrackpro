@@ -1,0 +1,73 @@
+<!-- receipt_transaction_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Receipt Transaction List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Receipt Transaction List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+      <table class="table table-bordered table-striped nowrap" id="rtlist">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date</th>
+            <th scope="col">Receipt Type</th>
+            <th scope="col">Received Amount</th>
+            <th scope="col">Narration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receipt_transaction in object_list %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ receipt_transaction.date }}</td>
+              <td>{{ receipt_transaction.receipt_type.name }}</td>
+              <td>{{ receipt_transaction.received_amount }}</td>
+              <td>{{ receipt_transaction.narration }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    </div>
+    <div class="card-footer text-right">
+      <a href="/receipt-transaction/create/" class="btn btn-warning">Create New receipt Transaction</a>
+    </div>
+  </div>
+</div>
+  
+<script>
+  new DataTable('#rtlist', {
+            responsive: true,
+            dom: 'lBfrtip',
+            
+            buttons: [
+                {
+                    text: 'Print',
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdf',
+                    
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    },
+          
+                }
+            ],
+            
+        });
+
+ </script>
+{% endblock %}

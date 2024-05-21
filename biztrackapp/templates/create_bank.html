@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Create Bank</h4>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="form">
+    <div class="card-body">
+      
+  
+ 
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="name">Bank Name:</label>
+      <input type="text" id="name" name="name" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="account_number">Account Number:</label>
+      <input type="text" id="account_number" name="account_number" class="form-control" required>
+      <input type="hidden" name="business_profile" value="{{ business_profile }}">
+    </div>
+    <div class="form-group">
+      <label for="opening_balance">Opening Balance:</label>
+      <input type="number" id="opening_balance" name="opening_balance" class="form-control" step="0.01" required>
+    </div>
+    
+  
+</div>
+<div class="card-footer">
+  <div class="form-group mb-0">
+    <button type="submit" class="btn btn-primary">Create Bank Deposit</button>
+  </div>
+</div>
+</form>
+
+</div>
+</div>
+{% endblock %}

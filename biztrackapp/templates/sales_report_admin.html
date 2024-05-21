@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Sales Report
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0 text-white">Sales Report - Sales By Staff Product & Service</h5>
+    </div>   
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="ssis">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee Details</th>
+                        {% comment %} <th>Product</th> {% endcomment %}
+                        <th>Particulars</th>
+                        <th>Product Total</th>
+                        {% comment %} <th>Service</th> {% endcomment %}
+                        <th>Service Total</th>
+                        <th>Sub Total</th>
+                        <th>Discount</th>
+                        <th>Total Amount</th>
+                        <th>Payment Method</th>
+                        <th>Data Source</th> <!-- Added column for data source -->
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in salesa %}
+                    <tr>
+                        <td>{{ sale.date }}</td>
+                        <td class="text-capitalize">{{ sale.employee.employee_id }} - {{ sale.employee.first_name }} {{ sale.employee.second_name }}</td>
+                        {% comment %} <td>{{ sale.product.name }}</td> {% endcomment %}
+                       <td>Product & Service</td>
+                        <td>{{ sale.itemtotal }}</td>
+                        {% comment %} <td>{{ sale.service.name }}</td> {% endcomment %}
+                        <td>{{ sale.servicetotal }}</td>
+                        <td>{{ sale.sub_total }}</td>
+                        <td>{{ sale.discount }}</td>
+                        <td>{{ sale.total_amount }}</td>
+                        <td class="text-capitalize">{{ sale.payment_method }}</td>
+                        <td>Staff</td> <!-- Indicate data source -->
+                        <td>
+                        <a href="{% url 'generate_invoice_pdf' sale.id 'salesbystaffitemservice' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                        </svg></a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Sales Report - Product</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{% url 'sales_report_admin' %}" id="item-filter-form" class="mb-1">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="date_range_item">Date Range:</label>
+                    <input type="text" id="date_range_item" name="date_range_item">
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <table id="item-sales-table" class="table table-bordered table-striped nowrap" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee Details</th>
+                        <th>Particulars</th>
+                        {% comment %} <th>Quantity</th>{% endcomment %}
+                        <th>Sub Total</th> 
+                        <th>Discount</th>
+                        <th>Total Amount</th>
+                        <th>Payment Method</th>
+                        <th>Data Source</th> <!-- Added column for data source -->
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale, data_source in sales %}
+                    <tr>
+                        <td>{{ sale.date }}</td>
+                        <td>{{ sale.employee.employee_id }} - {{ sale.employee.first_name }} {{ sale.employee.second_name }}</td>
+                        <td>Product</td>
+                            {% comment %} <td>{{ sale.quantity }}</td>
+                            <td>{{ sale.price }}</td> {% endcomment %}
+                        <td>{{ sale.total_amount|add:sale.discount|floatformat:"2" }}</td>
+
+                        <td>{{ sale.discount }}</td>
+                        <td>{{ sale.total_amount }}</td>
+                        <td>{{ sale.payment_method }}</td>
+                        <td>{{ data_source }}</td> <!-- Indicate data source -->
+                        <td>
+                    <a href="{% url 'generate_invoice_pdf' sale.id 'salebyadminproduct'|add:data_source %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                    </svg></a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">Sales Report - Service</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{% url 'sales_report_admin' %}" id="service-filter-form" class="mb-1">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="date_range_service">Date Range:</label>
+                    <input type="text" id="date_range_service" name="date_range_service">
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <table id="service-sales-table" class="table table-bordered table-striped nowrap" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee Details</th>
+                        <th>Particulars</th>
+                        {% comment %}  <th>Quantity</th>{% endcomment %}
+                        <th>Sub Total</th> 
+                        <th>Discount</th>
+                        <th>Total Amount</th>
+                        <th>Payment Method</th>
+                        <th>Data Source</th> <!-- Added column for data source -->
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale, data_source in service_sales %}
+                    <tr>
+                        <td>{{ sale.date }}</td>
+                        <td>{{ sale.employee.employee_id }} - {{ sale.employee.first_name }} {{ sale.employee.second_name }}</td>
+                        <td>Service</td>
+                        <td>{{ sale.total_amount|add:sale.discount|floatformat:"2" }}</td>
+                        <td>{{ sale.discount }}</td>
+                        <td>{{ sale.total_amount }}</td>
+                        <td>{{ sale.payment_method }}</td>
+                        <td>{{ data_source }}</td> <!-- Indicate data source -->
+                        <td>
+                    <a href="{% url 'generate_invoice_pdf' sale.id 'salebyadminservice'|add:data_source %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
+                    </svg></a>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // sales_report.js
+        $.noConflict();
+        
+        new DataTable('#item-sales-table', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [[0, 'desc']],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                       
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+      
+        new DataTable('#service-sales-table', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [[0, 'desc']],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#ssis', {
+              responsive: true,
+              dom: 'lBfrtip',
+              order: [[0, 'desc']],
+              buttons: [
+                  {
+                      text: 'Print',
+                      extend: 'print',
+                      exportOptions: {
+                          stripHtml: false,
+                         
+                      }
+                  },
+                  {
+                      text: 'Export PDF',
+                      extend: 'pdf',
+                      orientation:'landscape',
+                      exportOptions: {
+                          stripHtml: true,
+                         
+                      },
+            
+                  }
+              ],
+              
+          });
+
+        $("#date_range_item").on("apply.daterangepicker", function(ev, picker) {
+
+        tables.tables("#item-sales-table").draw();
+        
+        }); 
+        $("#date_range_service").on("apply.daterangepicker", function(ev, picker) {
+
+        tables.tables('#service-sales-table').draw();
+        }); 
+
+        jQuery(document).ready(function($) {
+            
+            // Initialize date range picker
+            $('#date_range_item').daterangepicker({
+                opens: 'left', drops:'auto',
+            }, function(start, end, label) {
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // Update item sales table data
+                updateItemSalesTable(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+            });
+    
+            $('#date_range_service').daterangepicker({
+                opens: 'up', drops:'auto',
+            }, function(start, end, label) {
+                console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                // Update service sales table data
+                updateServiceSalesTable(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
+            });
+    
+           
+    
+            // Function to update item sales table data via AJAX
+            function updateItemSalesTable(startDate, endDate) {
+                $.ajax({
+                    url: '{% url "update_item_sales_data" %}',
+                    type: 'GET',
+                    data: {
+                        start_date: startDate,
+                        end_date: endDate
+                    },
+
+                    success: function(data) {
+                        $('#item-sales-table tbody').empty();
+
+                        $.each(data, function(index, item) {
+                            var tableRow = '<tr>' +
+                                '<td>' + item.date + '</td>' +
+                                '<td>' + item.employee__first_name + ' ' + item.employee__second_name + ' (' + item.employee__id+') - '+ item.employee__employee_id+'</td>' +
+                                '<td>' + item.item__name + '</td>' +
+                                '<td>' + item.quantity + '</td>' +
+                                '<td>' + item.price + '</td>' +
+                                '<td>' + item.discount + '</td>' +
+                                '<td>' + item.total_amount + '</td>' +
+                                '<td>' + item.payment_method + '</td>' +
+                                '</tr>';
+
+                             $('#item-sales-table tbody').append(tableRow);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+    
+            // Function to update service sales table data via AJAX
+            function updateServiceSalesTable(startDate, endDate) {
+                $.ajax({
+                    url: '{% url "update_service_sales_data" %}',
+                    type: 'GET',
+                    data: {
+                        start_date: startDate,
+                        end_date: endDate
+                    },
+                    success: function(data) {
+                        $('#service-sales-table tbody').empty();
+
+                        $.each(data, function(index, item) {
+                            var tableRow = '<tr>' +
+                                '<td>' + item.date + '</td>' +
+                                '<td>' + item.employee__first_name + ' ' + item.employee__second_name + ' (' + item.employee__id+') - '+ item.employee__employee_id+'</td>' +
+                                '<td>' + item.service__name + '</td>' +
+                                '<td>' + item.quantity + '</td>' +
+                                '<td>' + item.price + '</td>' +
+                                '<td>' + item.discount + '</td>' +
+                                '<td>' + item.total_amount + '</td>' +
+                                '<td>' + item.payment_method + '</td>' +
+                                '</tr>';
+
+                             $('#service-sales-table tbody').append(tableRow);
+                        });
+                    },
+                   
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            
+        });
+        
+    </script>
+    
+{% endblock %}

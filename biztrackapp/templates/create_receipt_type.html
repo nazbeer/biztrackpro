@@ -1,0 +1,36 @@
+<!-- create_receipt_type.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Create Receipt Type{% endblock %}
+
+{% block content %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="mb-0">Create Receipt Type</h4>
+    </div>
+    <form method="POST">
+    <div class="card-body">
+        
+    
+   
+   
+        {% csrf_token %}
+    
+            <div class="form-group">
+        <label for="name" class="mb-3">Receipt Type Name:</label>
+        <input type="text" id="name" name="name" class="form-control mb-0" style="width:50%" required>
+    </div>
+   
+    
+
+
+    </div>
+<div class="card-footer">
+    <div class="form-group mb-0">
+    <button type="submit" value="Submit" class="btn btn-success">Save</button>
+</div>
+</div>
+</form>
+</div>
+{% endblock %}

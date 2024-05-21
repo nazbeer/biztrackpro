@@ -1,0 +1,77 @@
+<!-- bank_deposit_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Bank Deposit List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Bank Deposit List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+
+        <table class="table table-bordered table-striped nowrap" id="bdlist">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Deposit Date</th>
+              <th scope="col">Day Closing Date</th>
+              <th scope="col">Bank</th> <!-- New column for Bank -->
+              <th scope="col">Amount</th>
+              <th scope="col">Transaction Type</th>
+              <th scope="col">Narration</th>
+              
+            </tr>
+          </thead>
+          <tbody>
+            {% for bank_deposit in object_list %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ bank_deposit.date }}</td>
+                <td>{{ bank_deposit.deposit_date }}</td>
+                <td>{{ bank_deposit.bank.name }}</td> <!-- Display Bank name -->
+                <td>{{ bank_deposit.amount }}</td>
+                <td>{{ bank_deposit.transaction_type }}</td>
+                <td>{{ bank_deposit.narration }}</td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+  
+<script>
+  new DataTable('#bdlist', {
+            responsive: true,
+            dom: 'lBfrtip',
+            
+            buttons: [
+                {
+                    text: 'Print',
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdf',
+                    
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    },
+          
+                }
+            ],
+            
+        });
+
+ </script>
+{% endblock %}

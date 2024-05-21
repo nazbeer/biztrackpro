@@ -1,0 +1,109 @@
+<ul class="navbar-nav ml-auto pl-3" style="max-height: 400px; overflow-y: scroll;">
+    <li class="d-n"><a href="/home/">Home</a></li>
+    
+
+
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="saleDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Sales</a>
+        <div class="dropdown-menu" aria-labelledby="saleDropdown">
+        
+            <a class="dropdown-item" href="/sale/sales-by-admin-service/"  id="service-id"> Service</a>
+            <a class="dropdown-item" href="/sale/sales_by_admin_item/" id="product-id"> Product</a>
+            <a class="dropdown-item" href="/sale/sales-report-admin/"> Report</a>
+        </div>
+    </li>
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="paymentTransactionDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Payment</a>
+        <div class="dropdown-menu" aria-labelledby="paymentTransactionDropdown">
+           
+            <a class="dropdown-item" href="/payment-transaction/create/"> Add Payment Txn</a>
+            <a class="dropdown-item" href="/payment-transaction/"> Payment Txn List</a>
+        </div>
+    </li>
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="saleDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Day Closing</a>
+        <div class="dropdown-menu" aria-labelledby="saleDropdown">
+            
+            
+            <a class="dropdown-item" href="/dayclosing/admin" id="day-closing-id"> Day Closing</a>
+            <!-- <a class="dropdown-item" href="/sale/dayclosing/"><i class="fas fa-calendar-check"></i> Day Closing - Employee</a> -->
+            <!-- <a class="dropdown-item" href="/sale/day-closing-report/"><i class="fas fa-file-alt"></i> Day Closing Report</a> -->
+            <a class="dropdown-item" href="/sale/day-closing-admin-report/"> Report</a>
+            
+        </div>
+    </li>
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="dailySummaryDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Daily Summary</a>
+        <div class="dropdown-menu" aria-labelledby="dailySummaryDropdown">
+           
+            <a class="dropdown-item" href="/daily-summary/create/"> Add Daily Summary</a>
+            <a class="dropdown-item" href="/daily-summary/"> Daily Summary List</a>
+        </div>
+    </li>
+    
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="bankDepositDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Banking</a>
+        <div class="dropdown-menu" aria-labelledby="bankDepositDropdown">
+            <a class="dropdown-item" href="/bank/create/"> Add New Bank</a>
+            <a class="dropdown-item" href="/bank-deposit/create/"> Add Bank Deposit</a>
+            <a class="dropdown-item" href="/banks/"> Bank List</a>
+            <a class="dropdown-item" href="/bank-deposit/"> Bank Deposit List</a>
+            
+        </div>
+    </li>
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="serviceDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Product &amp; Service</a>
+        <div class="dropdown-menu" aria-labelledby="serviceDropdown">
+            
+            <a class="dropdown-item" href="/product/create/"> Add Product</a>
+            <a class="dropdown-item" href="/service/create/"> Add Service</a>
+            <a class="dropdown-item" href="/product/"> Product List</a>
+            <a class="dropdown-item" href="/service/"> Service List</a>
+            
+        </div>
+    </li>
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="receiptTransactionDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Receipt</a>
+        <div class="dropdown-menu" aria-labelledby="receiptTransactionDropdown">
+            <a class="dropdown-item" href="/receipt-type/create/"> Add Receipt Type</a>
+            <a class="dropdown-item" href="/receipt-transaction/create/"> Add Receipt Txn</a>
+            <a class="dropdown-item" href="/receipt-transaction/"> Receipt Txn List</a>
+            <a class="dropdown-item" href="/receipt-type/"> Receipt Type List</a>
+            
+        </div>
+    </li>
+ 
+    <li class="dropdown d-n">
+        <a href="#" class="dropdown-toggle" id="expenseTypeDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Expense</a>
+        <div class="dropdown-menu" aria-labelledby="expenseTypeDropdown">
+            <a class="dropdown-item" href="/expense-type/create/"> Add Expense</a>
+            <a class="dropdown-item" href="/expense-type/"> Expense List</a>
+            
+        </div>
+    </li>
+
+<li class="nav-item" ><a class="nav-link" href="/notifications/"> Notifications</a></li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+    </li>
+</ul>
+
+   <script>
+        fetch('/get-employee-transaction-window/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.employee_transaction_window == true) {
+                    document.getElementById('product-id').style.display = 'block';
+                    document.getElementById('service-id').style.display = 'block';
+                    document.getElementById('day-closing-id').style.display = 'block';
+
+                } else {
+                    document.getElementById('product-id').style.display = 'none';
+                    document.getElementById('service-id').style.display = 'none';
+                    document.getElementById('day-closing-id').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    </script>

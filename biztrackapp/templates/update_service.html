@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Service{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Update Service</h4>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="hidden" name="business_profile" value="{{ service.business_profile }}">
+          <label for="id_name">Name:</label>
+          <input type="text" name="name" id="id_name" class="form-control" value="{{ service.name }}" required>
+        </div>
+        <div class="form-group">
+          <label for="id_duration">Duration (in Mins):</label>
+          <input type="text" name="duration" id="id_duration" class="form-control" value="{{ service.duration }}" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="id_amount">Amount:</label>
+          <input type="text" name="amount" id="id_amount" class="form-control" value="{{ service.amount }}" required>
+        </div>
+        <div class="form-group">
+          <label for="id_max_discount_allowed">Max Discount Allowed:</label>
+          <input type="text" name="max_discount_allowed" id="id_max_discount_allowed" class="form-control" value="{{ service.max_discount_allowed }}" required>
+        </div>
+        <div class="col-md-4 pl-1">
+        <div class="form-group">
+            <div class="d-inline-flex justify-content-between gap-3">
+            <label for="id_vat" class="pr-3">VAT:</label>
+            <input type="checkbox" name="vat" id="id_vat" {% if service.vat %}checked{% endif %}>
+        </div>
+          </div>
+        <div class="form-group">
+            <div class="d-inline-flex justify-content-between  gap-3">
+          <label for="id_status">Status:</label>
+          <input type="checkbox" name="status" id="id_status" {% if service.status %}checked{% endif %}>
+        </div>
+    </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

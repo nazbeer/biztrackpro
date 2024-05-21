@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Create Shop</h2>
+  <div class="card">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" class="">
+        {% csrf_token %}
+        <div class="row " style="border-bottom:1px solid #ccc;">
+          <div class="col-md-5">
+            <div class="mb-3">
+              <label for="name" class="form-label">Shop Name</label>
+              {{ form.name }}
+            </div>
+            
+            <div class="mb-3">
+              {{ form.license_number.label_tag }}
+              {{ form.license_number }}
+            </div>
+            
+            <div class="mb-3">
+              <label for="num_users" class="form-label">Number of Users</label>
+              {{ form.num_users }}
+          </div>
+          
+          </div>
+          <div class="col-md-7 d-block justify-content-between align-items-center">
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="vat-remainder" name="vat_remainder">
+              <label class="form-check-label" for="vat-remainder">VAT Reminder</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="employee-transaction-window" name="employee_transaction_window">
+              <label class="form-check-label" for="employee-transaction-window">Employee Transaction Window</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="license-expiration-reminder" name="license_expiration_reminder">
+              <label class="form-check-label" for="license-expiration-reminder">License Expiration Reminder</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="employee-visa-expiration-reminder" name="employee_visa_expiration_reminder">
+              <label class="form-check-label" for="employee-visa-expiration-reminder">Employee Visa Expiration Reminder</label>
+            </div>
+            
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="employee-passport-expiration-reminder" name="employee_passport_expiration_reminder">
+              <label class="form-check-label" for="employee-passport-expiration-reminder">Employee Passport Expiration Reminder</label>
+            </div>
+          </div>
+        </div>
+        <!-- Other fields for shop settings -->
+        
+        <div id="user-forms" class="mt-3">
+          <!-- User profile forms will be dynamically added here -->
+        </div>
+           <!-- User profile form template (hidden) -->
+      <div id="user-form-template" >
+        <div class="user-form mb-3">
+          <h4>Admin User Profile</h4>
+          <div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email">
+          </div>
+          <div>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username">
+          </div>
+          <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password">
+          </div>
+        </div>
+      </div>
+        <!-- <button type="button" id="add-user" class="btn btn-primary">Add User</button> -->
+        <button type="submit" class="btn btn-primary">Create Shop</button>
+      </form>
+
+   
+    </div>
+  </div>
+
+  <script>
+    // Counter for user forms
+    let userFormCount = 1;
+    let maxUserForms = parseInt('{{ form.num_users.value }}') || 1; // Set the maximum number of user forms dynamically
+
+    // Function to add user form
+    // function addUserForm() {
+    //   if (userFormCount < maxUserForms) {
+    //     const userFormTemplate = $('#user-form-template').html();
+    //     const userFormHtml = userFormTemplate.replace(/__prefix__/g, userFormCount);
+    //     $('#user-forms').append(userFormHtml);
+    //     userFormCount++;
+    //   } else {
+    //     alert("You've reached the maximum number of user profiles allowed.");
+    //   }
+    // }
+
+    // // Add user form on button click
+    // $('#add-user').click(addUserForm);
+
+    // // Add initial user form
+    // addUserForm();
+</script>
+
+{% endblock %}

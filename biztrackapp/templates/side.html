@@ -1,0 +1,16 @@
+{% block content %}
+<ul id="font-c" style="max-height: 400px; overflow-y: scroll;">
+    <li><a href="/employee-dashboard/"><i class="fas fa-home"></i> Home</a></li>
+    
+    {% for module in active_modules %}
+        <li>
+            <a href="{{ module.url }}">{{ module.name }}</a>
+            <ul>
+                {% for view in module.views.all %}
+                    <li>{{ view.name }} - {{ view.code }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

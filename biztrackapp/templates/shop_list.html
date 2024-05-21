@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Shop List</h2>
+  <div class="card table-responsive">
+    <table id="shopTable" class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Shop Name</th>
+          <th>License Number</th>
+          <th>Number of Users</th>
+          <th>VAT Reminder</th>
+          <th>Employee Transaction Window</th>
+          <th>License Expiration Reminder</th>
+          <th>Employee Visa Expiration Reminder</th>
+          <th>Employee Passport Expiration Reminder</th>
+          <th>User Email</th>
+          <th>User Username</th>
+          
+          <th>Shop Created On</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for shop in object_list %}
+          <tr>
+            <td>{{ shop.name }}</td>
+            <td>{{ shop.license_number }}</td>
+            <td>{{ shop.num_users }}</td>
+            <td>{{ shop.vat_remainder }}</td>
+            <td>{{ shop.employee_transaction_window }}</td>
+            <td>{{ shop.license_expiration_reminder }}</td>
+            <td>{{ shop.employee_visa_expiration_reminder }}</td>
+            <td>{{ shop.employee_passport_expiration_reminder }}</td>
+            
+                <td>{{ shop.email }}</td>
+                <td>{{ shop.username }}</td>
+                
+            
+           
+             
+            <td>{{ shop.created_on }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Initialize DataTable
+    $(document).ready(function() {
+      $('#shopTable').DataTable();
+    });
+  </script>
+{% endblock %}

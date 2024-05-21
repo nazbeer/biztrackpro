@@ -1,0 +1,51 @@
+{% extends 'emp_base.html' %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="row">
+        <!-- Employee Details Card -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Employee Details
+                </div>
+                <div class="card-body">
+                    <p><strong>Employee ID:</strong> {{ employee.id }}</p>
+                    <p><strong>Employee Company ID:</strong> {{ employee.employee_id }}</p>
+                    <p><strong>Username:</strong> {{ employee.username }}</p>
+                    <p class="text-capitalize"><strong>Full Name:</strong> {{ employee.first_name }} {{ employee.second_name }}</p>
+                    <p><strong>Nationality:</strong> {{ employee.nationality }}</p>
+                    <p><strong>Mobile No:</strong> {{ employee.mobile_no }}</p>
+                    <p><strong>Passport No:</strong> {{ employee.passport_no }}</p>
+                    <p><strong>Passport Expiration Date:</strong> {{ employee.passport_expiration_date }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- End of Employee Details Card -->
+
+        <!-- Employment Details Card -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Employment Details
+                </div>
+                <div class="card-body">
+                    
+                    <p><strong>Emirates ID:</strong> {{ employee.emirates_id }}</p>
+                    <p><strong>ID Expiration Date:</strong> {{ employee.id_expiration_date }}</p>
+                    <p><strong>Basic Pay:</strong> {{ employee.basic_pay }}</p>
+                    <p><strong>House Allowance:</strong> {{ employee.house_allowance }}</p>
+                    <p><strong>Transportation Allowance:</strong> {{ employee.transportation_allowance }}</p>
+                    <p><strong>Commission Percentage:</strong> {{ employee.commission_percentage }}</p>
+                    <p><strong>Joining Date:</strong> {{ employee.joining_date }}</p>
+                    <p><strong>Job Role:</strong> {{ employee.job_role }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- End of Employment Details Card -->
+    </div>
+</div>
+<script>
+    localStorage.setItem('employee_id', '{{ request.session.employee_id }}');
+</script>
+{% endblock %}

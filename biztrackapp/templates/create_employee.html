@@ -1,0 +1,263 @@
+<!-- create_employee.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    input, select{
+        background-color: #fff !important;
+        border: 1px solid #b1b5c3 !important;
+        height: 50px !important;
+        color: #260944 !important;
+        font-size: 15px !important;
+        padding: 10px 20px !important;
+        width: 100% !important;
+        transition: all ease .5s !important;
+        border-radius: 10px !important;
+        line-height: 1.5em !important;
+    }
+    input:read-only{
+        background-color: #a9a9c87a !important;
+        cursor: not-allowed !important;
+    }
+</style>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Create Employee</h5>
+        </div>
+        <div class="card-body">
+            
+    
+    {% if error_occurred %}
+    <div class="alert alert-danger" role="alert">
+        An error occurred while saving the form. Please try again.
+    </div>
+    {% endif %}
+    {% if num_users_created >= max_users_allowed %}
+    <div class="alert alert-warning" role="alert">
+        Maximum number of users allowed has been reached for this shop.
+        Number of users created is  {{ num_users_created }}
+    </div>
+{% endif %}
+    <!-- Display form errors if any -->
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {% for field, error in form.errors.items %}
+            <strong>{{ field|title }}:</strong> {{ error|join:", " }}<br>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+        <div class="row">
+        <div class="col-md-6">
+            
+        <div class="form-group">
+            <label for="business_profile">Business Profile:</label>
+            
+            {% for business_profile in business_profiles %}
+            <input type="text" id="business_profile" name="business_profile" value="{{ business_profile.name }}" class="form-control" readonly>
+            <input type="hidden" id="business_profile_id" name="business_profile_id" value="{{ business_profile.id }}">
+            {% endfor %}
+        </div>
+        
+        </div>
+        <div class="col-md-6">
+
+            <div class="form-group">
+                <label for="employee_id">Employee ID:</label>
+                {{ form.employee_id }}
+            </div>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="job_role">Mobile Number:</label>
+                    <input  type="tel" id="mobile_no" 
+                    placeholder="971xxxxxxxxx" name="mobile_no"  oninput="validatePhoneNumber(this)" maxlength="12" required>
+                    
+                </div>
+
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    {{ form.first_name }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="nationality">Nationality:</label>
+                    <select id="nationality" name="nationality" class="form-control">
+                        {% for nationality in nationalities %}
+                            <option value="{{ nationality }}">{{ nationality }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+               
+                <div class="form-group">
+                    <label for="emirates_id">Emirates ID:</label>
+                    <input type="number" id="emirates_id" name="emirates_id" required min="100000000000000" max="999999999999999" inputmode="numeric">
+                </div>
+                
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="passport_no">Passport No:</label>
+                    {{ form.passport_no }}
+                </div>
+                <div class="form-group">
+                    <label for="second_name">Last Name:</label>
+                    {{ form.second_name }}
+                </div>
+                <div class="form-group">
+                    <label for="passport_expiration_date">Passport Expiration Date:</label>
+                    <input type="date" id="passport_expiration_date" name="passport_expiration_date" value="{{ form.passport_expiration_date.value }}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="id_expiration_date">ID Expiration Date:</label>
+                    <input type="date" id="id_expiration_date" name="id_expiration_date" value="{{ form.id_expiration_date.value }}" class="form-control">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="basic_pay">Basic Pay:</label>
+                    {{ form.basic_pay }}
+                </div>
+                <div class="form-group">
+                    <label for="house_allowance">House Allowance:</label>
+                    {{ form.house_allowance }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="transportation_allowance">Transportation Allowance:</label>
+                    {{ form.transportation_allowance }}
+                </div>
+                <div class="form-group">
+                    <label for="commission_percentage">Commission Percentage:</label>
+                    {{ form.commission_percentage }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="joining_date">Joining Date:</label>
+                    <input type="date" id="joining_date" value="{{ form.joining_date.value }}"  name="joining_date" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="job_role">Job Role:</label>
+                    <select id="job_role" name="job_role" class="form-control">
+                        <option value="">Select Job Role</option>
+                        {% for role in roles %}
+                            <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+        </div>
+        <div class="form-group">
+            <label for="username">Username:</label>
+           
+            {{ form.username }}
+            <div id="usernameAvailability" class="text-success"></div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control"  required>
+            
+        </div>
+        <div class="form-group">
+            <input type="hidden" id="is_employee" name="is_employee"  value="true" checked>
+            
+        </div>
+        <button type="submit" class="btn btn-primary" {% if error_occurred or num_users_created >= max_users_allowed %}disabled{% endif %}>Submit</button>
+    </form>
+
+
+</div>
+</div>
+</div>
+<script>
+    // Function to display alert if the number of employees exceeds the maximum limit
+    function showAlertIfLimitExceeded() {
+        var numUsersCreated = parseInt("{{ num_users_created }}");
+        var maxUsersAllowed = parseInt("{{ max_users_allowed }}");
+
+        if (numUsersCreated >= maxUsersAllowed) {
+            alert("Cannot create more employees. Maximum number of users reached for this shop.");
+            return false; // Prevent form submission
+        }
+        return true; // Continue with form submission
+    }
+    function validatePhoneNumber(input) {
+    const inputValue = input.value.trim();
+    
+    // Check if the first three digits match the expected prefix "971"
+    if (inputValue.length >= 3 && inputValue.substring(0, 3) !== "971") {
+        alert("Phone number must start with '971'.");
+        // Clear the input field
+        input.value = '';
+        return;
+    }
+
+    // Define the regular expression pattern for the expected phone number format
+    const phoneNumberPattern = /^971\d{0,9}$/;
+
+    // Check if the entered phone number matches the expected format
+    if (inputValue.length >= 3 && !phoneNumberPattern.test(inputValue)) {
+        // Display an alert if the entered phone number does not match the expected format
+        alert("Invalid phone number format. Please enter a valid phone number starting with '971' followed by up to 9 digits.");
+        // Remove invalid characters from the input value
+        input.value = inputValue.replace(/[^0-9]/g, '');
+    }
+
+    // Prevent further input if the length exceeds 12 characters
+    if (inputValue.length >= 12) {
+        // Truncate the input value to 12 characters
+        input.value = inputValue.slice(0, 12);
+    }
+}
+
+
+    document.getElementById("emirates_id").addEventListener("input", function() {
+        const input = this.value.trim();
+        const digitsOnly = input.replace(/\D/g, ""); // Remove non-digit characters
+        if (digitsOnly.length > 15) {
+            // If the input contains more than 15 digits, truncate it
+            this.value = digitsOnly.slice(0, 15);
+        } else {
+            // Otherwise, update the input value with the digits-only version
+            this.value = digitsOnly;
+        }
+    });
+
+
+    function checkUsernameAvailability() {
+        var username = document.getElementById('id_username').value;
+        if (username.trim() !== '') {
+            // Make an AJAX request to check username availability
+            fetch('/check-username-availability/?username=' + username)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available) {
+                        document.getElementById('usernameAvailability').textContent = 'Username is available';
+                    } else {
+                        document.getElementById('usernameAvailability').textContent = 'Username already exists';
+                    }
+                });
+        }
+    }
+
+    // Attach the function to the input event of the username field
+    document.getElementById('id_username').addEventListener('input', checkUsernameAvailability);
+
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!-- receipt_type_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Receipt Type List{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Receipt Type List</h4>
+      
+    </div>
+    <div class="card-body">
+      
+  
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+         <th scope="col">Name</th>
+        <th scope="col">Created On</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+     {% for receipt_type in object_list %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ receipt_type.name }}</td>
+          <td>{{ receipt_type.created_on }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+<div class="card-footer text-right">
+  <a href="/receipt-type/create/" class="btn btn-warning">Create New Reciept Type</a>
+</div>
+</div>
+</div>
+{% endblock %}

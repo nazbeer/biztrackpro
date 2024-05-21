@@ -1,0 +1,88 @@
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+
+class Shop(models.Model):
+    name = models.CharField(max_length=255, verbose_name='Shop Name')
+    license_number = models.CharField(max_length=50, unique=True)
+    num_users = models.PositiveIntegerField(verbose_name='Number of Users')
+    vat_remainder = models.BooleanField(default=True, verbose_name='VAT Reminder')
+    employee_transaction_window = models.BooleanField(default=True)
+    license_expiration_reminder = models.BooleanField(default=True, verbose_name='License Expiration Reminder')
+    employee_visa_expiration_reminder = models.BooleanField(default=True, verbose_name='Employee Visa Expiration Reminder')
+    employee_passport_expiration_reminder = models.BooleanField(default=True, verbose_name='Employee Passport Expiration Reminder')
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"Shop {self.name} - Licence Number {self.license_number}"
+
+class User(AbstractUser):
+    email = models.EmailField(max_length=254, unique=True)
+    username = models.CharField(max_length=100, unique=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    country_code = models.CharField(max_length=10)
+    phone_number = models.CharField(max_length=20)
+    is_admin = models.BooleanField(default=True)
+
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
+
+    def __str__(self):
+        return f"{self.email}"
+
+class ShopAdmin(models.Model):
+    shop = models.ForeignKey(Shop,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Shop {self.shop.name} - user {self.user.username}"
+
+
+class BusinessProfile(models.Model):
+    name = models.CharField(max_length=64, blank=False, default=None, null=True)
+    shop = models.ForeignKey(Shop,on_delete=models.CASCADE)
+    license_number = models.CharField(max_length=255)
+    license_expiration = models.DateField(null=True)
+    license_upload = models.FileField(upload_to='licenses')
+    shop_phone_number = models.CharField(max_length=25)
+    vat_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    vat_number = models.CharField(max_length=255)
+    vat_submission_date_1 = models.DateField(null=True)
+    vat_submission_date_2 = models.DateField(null=True)
+    vat_submission_date_3 = models.DateField(null=True)
+    vat_certificate_upload = models.FileField(upload_to='vat_certificates')
+    address = models.TextField()
+    license_expiration_reminder_days = models.PositiveIntegerField(verbose_name='License Expiration Reminder (days)')
+    vat_submission_date_reminder_days = models.PositiveIntegerField(verbose_name='VAT Submission Date Reminder (days)')
+    employee_visa_expiration_reminder_days = models.PositiveIntegerField(verbose_name='Employee Visa Expiration Reminder (days)')
+    employee_passport_expiration_reminder_days = models.PositiveIntegerField(verbose_name='Employee Passport Expiration Reminder (days)')
+    business_start_time = models.TimeField(null=True, blank=True)
+    business_end_time = models.TimeField(null=True, blank=True)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+
+    def __str__(self):
+        return f"{self.shop} - {self.name}"
+
+class Employee(models.Model):
+    employee_id = models.CharField(max_length=10, unique=True)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    nationality = models.CharField(max_length=255)
+    mobile_no = models.CharField(max_length=20, blank=True, null=True)
+    passport_no = models.CharField(max_length=20, unique=True)
+    passport_expiration_date = models.DateField()
+    emirates_id = models.CharField(max_length=20, unique=True)
+    id_expiration_date = models.DateField()
+    basic_pay = models.DecimalField(max_digits=10, decimal_places=2)
+    house_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    transportation_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    joining_date = models.DateField()
+    job_role = models.CharField(max_length=50)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.employee_id} - {self.first_name} {self.last_name}"
+    

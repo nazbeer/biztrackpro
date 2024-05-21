@@ -1,0 +1,63 @@
+//           customize: function (doc) {
+					// 	//Remove the title created by datatTables
+					// 	doc.content.splice(0,1);
+					// 	//Create a date string that we use in the footer. Format is dd-mm-yyyy
+					// 	var now = new Date();
+					// 	var jsDate = now.getDate()+'-'+(now.getMonth()+1)+'-'+now.getFullYear();
+						
+					// 	// A documentation reference can be found at
+					// 	// https://github.com/bpampuch/pdfmake#getting-started
+					// 	// Set page margins [left,top,right,bottom] or [horizontal,vertical]
+					// 	// or one number for equal spread
+					// 	// It's important to create enough space at the top for a header !!!
+					// 	doc.pageMargins = [20,60,20,30];
+					// 	// Set the font size fot the entire document
+					// 	doc.defaultStyle.fontSize = 10;
+					// 	// Set the fontsize for the table header
+					// 	doc.styles.tableHeader.fontSize = 10;
+					// 	// Create a header object with 3 columns
+					// 	// Left side: Logo
+					// 	// Middle: brandname
+					// 	// Right side: A document title
+					// 	doc['header']=(function() {
+					// 		return {
+					// 			columns: [
+					// 				// {
+					// 				// 	image: logo,
+					// 				// 	width: 32,
+          //         //   margin:[10,5,10,5]
+					// 				// },
+					// 				{
+					// 					alignment: 'center',
+					// 					bold: true,
+					// 					text: 'Service List',
+					// 					fontSize: 18,
+					// 					margin: [10,0,0,0]
+					// 				},
+					// 				// {
+					// 				// 	alignment: 'right',
+					// 				// 	fontSize: 14,
+					// 				// 	text: 'Service List 2024'
+					// 				// }
+					// 			],
+					// 			pageSize: 'A4',
+
+          //       // by default we use portrait, you can change it to landscape if you wish
+          //       pageOrientation: 'portrait',
+
+          //       // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
+          //       //pageMargins: [ 40, 60, 40, 60 ],
+					// 		}
+					// 	});
+					// 	// Create a footer object with 2 columns
+					// 	// Left side: report creation date
+					// 	// Right side: current page and total pages
+          //   var objLayout = {};
+					// 	objLayout['hLineWidth'] = function(i) { return .5; };
+					// 	objLayout['vLineWidth'] = function(i) { return .5; };
+					// 	objLayout['hLineColor'] = function(i) { return '#aaa'; };
+					// 	objLayout['vLineColor'] = function(i) { return '#aaa'; };
+					// 	objLayout['paddingLeft'] = function(i) { return 4; };
+					// 	objLayout['paddingRight'] = function(i) { return 4; };
+					// 	doc.content[0].layout = objLayout;
+          // }

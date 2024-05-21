@@ -1,0 +1,70 @@
+<!-- daily_summary_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Daily Summary List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Daily Summary List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+      <table class="table table-bordered table-striped nowrap " id="dailysummary">
+        <thead>
+          <tr>
+            <!-- <th scope="col">#</th> -->
+            <th scope="col">Date</th>
+            <th scope="col">Opening Balance</th>
+            <th scope="col">Total Received</th>
+            <th scope="col">Total Expense</th>
+            <th scope="col">Total Bank Deposit</th>
+            <th scope="col">Balance</th>
+            <th scope="col">Narration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for summary in object_list %}
+            <tr>
+              <!-- <th scope="row">{{ forloop.counter }}</th> -->
+              <td>{{ summary.date }}</td>
+              <td>{{ summary.opening_balance }}</td>
+              <td>{{ summary.total_received_amount }}</td>
+              <td>{{ summary.total_expense_amount }}</td>
+              <td>{{ summary.total_bank_deposit }}</td>
+              <td>{{ summary.balance }}</td>
+              <td>{{ summary.narration }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+</div>
+  
+ <script>
+  new DataTable('#dailysummary', {
+            responsive: true,
+            dom: 'lBfrtip',
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+
+ </script>
+{% endblock %}

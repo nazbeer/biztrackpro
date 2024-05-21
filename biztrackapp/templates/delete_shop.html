@@ -1,0 +1,11 @@
+<!-- delete_shop.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Delete Shop</h2>
+  <p>Are you sure you want to delete the shop "{{ object.name }}"?</p>
+  <form method="post" action="{% url 'delete_shop' pk=object.pk %}">
+    {% csrf_token %}
+    <button type="submit">Delete Shop</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>EzShop</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Nasbeer Ahammed | CTO | Mite Solutions LLC | www.nasbeer.com">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="{% static 'js/style.css' %}">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Bootstrap background color */
+        }
+
+        label {
+            font-size: 20px;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .card {
+            min-width: 500px;
+        }
+
+        @media screen and (max-width: 767px) {
+            .card {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid" style="background: url('https://mitesolutions.com/images/slider/Build-banner-2.jpg');background-size: cover;">
+    <div class="main-content d-flex flex-column px-0">
+        <div class="m-auto  py-4">
+            <div class="row">
+                <div class="text-center align-items-center justify-content-center gap-4 mb-2">
+                    <h4 class="fs-3 mb-2 text-white">Get ready to track your business.</h4>
+                    <p class="mb-2 mt-1 text-white font-weight-400">Grow your business with us.</p>
+                </div>
+            </div>
+            <div class="card border-0 rounded-10 mb-4"
+                 style="background-color: #ffffff96;box-shadow: 0px 0px 16px 8px #184c7c19;">
+                <div class="card-header bg-light" >
+                    <div class="row text-center align-items-center m-auto justify-content-center mb-3">
+                        <img src="{% static 'assets/logo.png' %}" style="max-width: 150px;">
+                    </div>
+                </div>
+                <div class="card-body p-5 bg-white">
+                    {% for message in messages %}
+                        <div class="alert alert-danger text-center" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    <!-- Error page content -->
+                    <h1 class="text-center">Page Not Found</h1>
+                    <p class="text-center">The requested resource was not found on this server.</p>
+                    <!-- End of error page content -->
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="form-group text-center mb-0" >
+                        <a href="/home"><button class="btn btn-info" type="button">Back to Home</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function resetSessionTimeout() {
+        // Send an AJAX request to the server to update the session
+        fetch('/reset_session_timeout/')
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to reset session timeout');
+                }
+            })
+            .catch(error => {
+                console.error('Failed to reset session timeout:', error);
+            });
+    }
+
+    // Call resetSessionTimeout function when the page is loaded
+    window.addEventListener('load', resetSessionTimeout);
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>

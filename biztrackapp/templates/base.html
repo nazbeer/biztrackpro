@@ -1,0 +1,480 @@
+<!-- base.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Nasbeer Ahammed | CTO | Mite Solutions LLC | www.nasbeer.com">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://templates.hibootstrap.com/farol/assets/css/style.css" rel="stylesheet">
+    <!-- <link href="https://admin.pixelstrap.net/dunzo/assets/css/responsive.css" rel="stylesheet"> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <!-- Your head content goes here -->
+    
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- <script src="https://code.jquery.com/jquery-3.7.1.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
+<!-- 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"> -->
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.bootstrap5.css">
+<!-- Include DataTables Responsive JS -->
+<script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.0/js/responsive.bootstrap5.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.0/css/responsive.bootstrap5.css">
+
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
+
+    <title>{% block title %}EZShop{% endblock %}</title>
+
+    <style>
+    body, p, h1, h2, h3, h4, h5, h6, a, li, label, input, div, span, small{
+        font-family: "Open Sans", sans-serif !important;
+    }
+    button:focus, button{
+        outline: none !important;
+    border: none;
+    }
+    body, p, a, li, li>a{
+        font-size:14px !important;
+    }
+    #font-c>li>a{
+        font-size:14px !important;
+    }
+    h4{
+        color: #fff !important;
+    }
+    #font-c>li>div>a{
+        font-size:14px !important;
+        text-wrap: balance;
+    }
+    .daterangepicker .calendar-table th{
+        background-color: #184b7c !important;
+        border-radius: 0px !important;
+    }
+    .daterangepicker .calendar-table .next span, .daterangepicker .calendar-table .prev span {
+        color: #fff;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        border-radius: 0;
+        display: inline-block;
+        padding: 3px;
+    }
+    div.dt-length, div.dt-buttons {
+        float: left !important;
+        margin-top: 5px !important;
+        padding-right: 15px !important;
+    }
+    div.dt-buttons {
+        float: left !important;
+        margin-top: 8px !important;
+        
+    }
+    div.dt-search {
+        float: right !important;
+    }
+    
+    div.dt-info {
+        float: left !important;
+        margin-top: 0.8em !important;
+    }
+    
+    div.dt-paging {
+        float: right !important;
+        margin-top: 1em !important;
+    }
+    @media screen and (min-width:760px) {
+        #font-c>li>div{
+        max-width:40px !important;
+    } 
+    }
+    button:disabled {
+        cursor: not-allowed;
+        pointer-events: all !important;
+    }
+    
+    body {
+        padding-top: 56px;
+        background-color:  #ffffff !important;
+    }
+
+    .navbar-light {
+        border-bottom: 0.1em solid #f5f5f5;
+        box-shadow: 1px -2px 5px 4px #ccc;
+    }
+    table thead{
+        border-radius: 5px !important;
+    }
+    table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+        background-color: #184b7c !important;
+        color: #fff !important;
+        
+    }
+    tbody{
+        border-bottom: 0px !important;
+        background-color: #f5f5f5 !important;
+    }
+    tbody>tr>td{
+        background-color: #f5f5f5 !important;
+    }
+    thead>tr>th>a{
+        color:#fff;
+    }
+    thead>tr>th>a:hover{
+        color:#a1b5ff;
+        text-decoration: none;
+    }
+    button.navbar-toggler {
+        margin-right: 10px;
+    }
+    #sidebar {
+        height: 100%;
+        width: 200px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #fff;
+        padding-top: 36px;
+        border-right:1px solid #ccc;
+    }
+
+    .form-control{
+        line-height: 1.25 !important;
+    }
+    textarea {
+        overflow: auto;
+        resize: vertical;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    table{
+        border:1px !important;
+    }
+    #content {
+        margin-left: 200px;
+        padding: 15px;
+    }
+
+    #sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    #sidebar ul li {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #sidebar ul li a {
+        text-decoration: none;
+        color: #000;
+    }
+
+    #sidebar ul li a:hover {
+        color: #000;
+    }
+
+    .navbar-brand {
+        margin-left: 4%;
+    }
+    @media screen and (min-width:769px) {
+        .d-n{
+            display: none !important;
+        }
+    }
+    @media (max-width: 768px) {
+        .navbar-light{
+            background-color: #184b7c !important;
+        }
+        #sidebar {
+            margin-left: -200px;
+            transition: margin-left 0.3s;
+        }
+        .navbar-brand {
+            margin-left: 4%;
+            width:70%;
+        }
+        .navbar-brand>img{
+            width:50px !important;
+        }
+        #content {
+            margin-left: 0;
+        }
+
+        #sidebar.active {
+            margin-left: 0;
+        }
+
+        .menuBar,
+        .navbar-collapse {
+            list-style: none;
+        }
+
+        .menuBar {
+            margin-top: 10px;
+            margin-left: 0px;
+            padding-left: 15px !important;
+        }
+
+        .menuBar>li {
+            border-bottom: 1px solid #ddd;
+            margin: 0;
+        }
+
+        .menuBar>li>a {
+            color: #fff;
+            font-size: 20px !important;
+            text-decoration: none;
+            padding-bottom: 5px;
+        }
+    }
+    div>.table-responsive, table, table>thead{
+        border-radius: 10px !important;
+    }
+    .card{
+        border:0px !important;
+        margin-top:15px;
+        margin-bottom:15px;
+        box-shadow: 0px 2px 6px -1px #ccc;
+    }
+    .card-body{
+        background-color: #f5f5f5 !important;
+    }
+    .card-header{
+        background-color: #184b7c !important;
+        color:#fff !important;
+    
+    }
+    .card-header>a, .card-header>h5{
+        color:#fff !important;
+    }
+    a{
+        text-decoration: none !important;
+    }
+    .bg-dark{
+        background-color: #343a40 !important;
+    }
+    .btn-primary {
+        --bs-btn-color: #fff;
+        --bs-btn-bg: #00B69B;
+        --bs-btn-border-color: #00B69B;
+        --bs-btn-hover-color: #000;
+        --bs-btn-hover-bg: #26c1aa;
+        --bs-btn-hover-border-color: #1abda5;
+        --bs-btn-focus-shadow-rgb: 0, 155, 132;
+        --bs-btn-active-color: #000;
+        --bs-btn-active-bg: #33c5af;
+        --bs-btn-active-border-color: #1abda5;
+        --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        --bs-btn-disabled-color: #000;
+        --bs-btn-disabled-bg: #00B69B;
+        --bs-btn-disabled-border-color: #00B69B;
+    }
+    .dropdown-toggle::after {
+        display: inline-block;
+        margin-left: 0.355em;
+        margin-top: 1.1em;
+        vertical-align: 0.255em;
+        content: "";
+        border-top: 0.3em solid;
+        border-right: 0.3em solid transparent;
+        border-bottom: 0;
+        border-left: 0.3em solid transparent;
+    }
+    .list-group{
+        border:1px solid #184b7c;
+        /* box-shadow: 0px 2px 6px -1px #ccc; */
+    }
+    .list-group-item:hover{
+        background-color: #005bb252;
+    }
+        .logo{
+            filter: brightness(0) invert(1);
+            margin:0px;
+        }
+        @media screen and (max-width:769px) {
+            .logo{
+                filter: brightness(0) invert(1);
+                margin:0px;
+                width: 56px;
+            }
+            .bg-dark{
+                background-color: #184b7c !important;
+            }
+            .navbar-nav.ml-auto a {
+                color: #fff !important;
+                margin-right: 15px;
+                font-size: 22px;
+                text-decoration: none;
+            }
+        }
+    /* Add new styles for the logout link */
+    .navbar-nav.ml-auto {
+        margin-right: 15px;
+    }
+
+    .navbar-nav.ml-auto a {
+        color: #fff;
+        margin-right: 15px;
+    }
+
+    .navbar-nav.ml-auto a:hover {
+        color: #000;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        margin-bottom: 0.5rem; /* Adjusted margin */
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .dropdown-menu {
+        background-color: #e2e2e2; /* Background color */
+    }
+
+    .dropdown-item {
+        color: #000; /* Text color */
+    }
+
+    .dropdown-item:hover {
+        background-color: #fff; /* Hover background color */
+    }
+    #user-forms{
+        display: grid;
+        grid-template-columns: repeat(3, 2fr);
+        grid-auto-rows: auto;
+        grid-gap: 10px;
+
+        
+    }
+    .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        background-color: #343a40; /* Adjust background color as needed */
+        color: #fff; /* Adjust text color as needed */
+        padding: 10px 0; /* Adjust padding as needed */
+    }
+        div.dt-container .dt-search input {
+            
+            height: 37px !important;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        div.dt-container .dt-paging .dt-paging-button{
+            padding:0px !important;
+        }
+        div.dt-container .dt-paging .dt-paging-button:active{
+            background-color: #495057 !important;
+        }
+        .pagination .page-item .page-link{
+            background-color: #fff !important;
+            color:#000 !important;
+            box-shadow: 0px transparent !important;
+        }
+        div.dt-container div.dt-length select {
+            width: auto;
+            display: inline-block;
+            margin-right: 0.5em;
+            background-color: #fff !important;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <a class="navbar-brand text-left" href="/home/">
+        <!-- <img src="{% static '/ezshopapp/mite.png' %}" alt="Mite Solutions" width="5%"> -->
+         <img src="https://mitesolutions.com/images/logo.png"  alt="Mite Solutions" width="5%"> 
+         <!-- <img src="{% static 'assets/logo.png' %}" alt="BizTrackPro" class="logo" width="5%"> -->
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        {% include 'sidebar_mobile.html' %}
+    </div>
+</nav>
+<div id="sidebar">
+    <hr/>
+    {% include 'sidebar.html' %}
+    
+</div>
+
+<div id="content">
+    {% block content %}{% endblock %}
+</div>
+<footer class="footer mt-auto py-3 bg-light d-none">
+    <div class="container text-center ">
+        <span class="text-muted">&copy; 2024 Mite Solutions LLC</span>
+    </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+        });
+    });
+</script>
+
+
+</body>
+</html>

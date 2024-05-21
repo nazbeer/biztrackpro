@@ -1,0 +1,74 @@
+<!-- payment_transaction_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Payment Transaction List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Payment Transaction List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+
+        <table class="table table-bordered table-striped nowrap" id="ptlist">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Date</th>
+              <th scope="col">Expense Type</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Narration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment_transaction in object_list %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ payment_transaction.date }}</td>
+                <td>{{ payment_transaction.expense_type.name }}</td>
+                <td>{{ payment_transaction.amount }}</td>
+                <td>{{ payment_transaction.narration }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer text-right">
+      <a href="/payment-transaction/create/" class="btn btn-warning">Create New Payment Transaction</a>
+    </div>
+  </div>
+</div>
+  
+<script>
+  new DataTable('#ptlist', {
+            responsive: true,
+            dom: 'lBfrtip',
+            
+            buttons: [
+                {
+                    text: 'Print',
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdf',
+                    
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    },
+          
+                }
+            ],
+            
+        });
+
+ </script>
+{% endblock %}

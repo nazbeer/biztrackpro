@@ -1,0 +1,138 @@
+<!-- edit_business_profile.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Edit Business Profile{% endblock %}
+
+{% block content %}
+<style>
+  .form-control[type=file]{
+    line-height: 1.75em !important;
+  }
+</style>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Edit Business Profile</h4>
+    </div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="id_name">Name:</label>
+              <input type="text" id="id_name" class="form-control" name="name" value="{{ business_profile.name }}" readonly>
+            </div>
+            <div class="form-group">
+              <label for="id_license_expiration">License Expiration:</label>
+              <input type="date" id="id_license_expiration" class="form-control" name="license_expiration" value="{{ business_profile.license_expiration|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+              <label for="id_shop_phone_number">Shop Phone Number:</label>
+              <input type="text" id="id_shop_phone_number" class="form-control" name="shop_phone_number" value="{{ business_profile.shop_phone_number }}" readonly>
+            </div>
+            <div class="form-group">
+              <label for="id_vat_percentage">VAT Percentage:</label>
+              <input type="number" id="id_vat_percentage" class="form-control" name="vat_percentage" value="{{ business_profile.vat_percentage }}">
+            </div>
+            <div class="form-group">
+              <label for="id_vat_submission_date_1">VAT Submission Date 1:</label>
+              <input type="date" id="id_vat_submission_date_1" class="form-control" name="vat_submission_date_1" value="{{ business_profile.vat_submission_date_1|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+              <label for="id_vat_submission_date_2">VAT Submission Date 2:</label>
+              <input type="date" id="id_vat_submission_date_2" class="form-control" name="vat_submission_date_2" value="{{ business_profile.vat_submission_date_2|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+              <label for="id_vat_submission_date_3">VAT Submission Date 3:</label>
+              <input type="date" id="id_vat_submission_date_3" class="form-control" name="vat_submission_date_3" value="{{ business_profile.vat_submission_date_3|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group">
+              <label for="id_address">Address:</label>
+              <textarea id="id_address" class="form-control" name="address">{{ business_profile.address }}</textarea>
+            </div>
+            
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="id_license_number">License Number:</label>
+              <input type="text" id="id_license_number" class="form-control" name="license_number" value="{{ business_profile.license_number }}" readonly>
+            </div>
+            <div class="form-group">
+              <label for="id_current_license">License (Only PDF): <a href="{{ business_profile.license_upload.url }}" target="_blank">{{ business_profile.license_upload.name }}</a></label>
+           
+            
+              <input type="file" id="id_new_license" class="form-control" name="license_upload" accept=".pdf">
+            </div>
+            <div class="form-group">
+              <label for="id_vat_number">VAT Number:</label>
+              <input type="text" id="id_vat_number" class="form-control" name="vat_number" value="{{ business_profile.vat_number }}">
+            </div>
+            <div class="form-group">
+              <label for="id_current_vat_certificate"> VAT Certificate (Only PDF): <a href="{{ business_profile.vat_certificate_upload.url }}" target="_blank">{{ business_profile.vat_certificate_upload.name }}</a>
+              </label>
+              
+              
+              <input type="file" id="id_new_vat_certificate" class="form-control" name="vat_certificate_upload" accept=".pdf">
+              <div id="vat-certificate-file-error" style="color: red;"></div>
+            </div>
+            <div class="form-group">
+              <label for="id_license_expiration_reminder_days">License Expiration Reminder (days):</label>
+              <input type="number" id="id_license_expiration_reminder_days" class="form-control" name="license_expiration_reminder_days" value="{{ business_profile.license_expiration_reminder_days }}">
+            </div>
+            <div class="form-group">
+              <label for="id_vat_submission_date_reminder_days">VAT Submission Date Reminder (days):</label>
+              <input type="number" id="id_vat_submission_date_reminder_days" class="form-control" name="vat_submission_date_reminder_days" value="{{ business_profile.vat_submission_date_reminder_days }}">
+            </div>
+            <div class="form-group">
+              <label for="id_employee_visa_expiration_reminder_days">Employee Visa Expiration Reminder (days):</label>
+              <input type="number" id="id_employee_visa_expiration_reminder_days" class="form-control" name="employee_visa_expiration_reminder_days" value="{{ business_profile.employee_visa_expiration_reminder_days }}">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+   document.getElementById('license-upload').addEventListener('change', function() {
+        var fileInput = document.getElementById('license-upload');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.pdf|\.jpg|\.jpeg)$/i;
+
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('license-file-error').innerHTML = 'Only PDF, JPG, or JPEG files are allowed!';
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('license-file-error').innerHTML = '';
+        }
+    });
+
+    document.getElementById('vat-certificate-upload').addEventListener('change', function() {
+        var fileInput = document.getElementById('vat-certificate-upload');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.pdf|\.jpg|\.jpeg)$/i;
+
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('vat-certificate-file-error').innerHTML = 'Only PDF, JPG, or JPEG files are allowed!';
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('vat-certificate-file-error').innerHTML = '';
+        }
+    });
+    function validatePhoneNumber(input) {
+        if (!/^[0-9+\-]*$/.test(input.value)) {
+            // Display an alert if invalid characters are entered
+            alert("Invalid characters detected. Please enter only numbers, plus (+), or minus (-) signs.");
+            // Remove invalid characters from the input value
+            input.value = input.value.replace(/[^0-9+\-]/g, '');
+        }
+    }
+</script>
+{% endblock %}

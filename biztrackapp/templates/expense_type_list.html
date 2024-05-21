@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense Type List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Expense Type List</h4>
+    </div>
+    <div class="card-body">
+      
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Type Name</th>
+        <th scope="col">Created On</th>
+        <th scope="col">Actions</th>  <!-- New column for actions -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for expense_type in object_list %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ expense_type.name }}</td>
+          <td>{{ expense_type.created_on }}</td>
+          <td>
+            <a href="{% url 'edit_expense_type' expense_type.id %}" class="btn btn-primary btn-sm">Edit</a>
+            <form action="{% url 'delete_expense_type' expense_type.id %}" method="post" style="display: inline;">
+              {% csrf_token %}
+              <!-- <button type="submit" class="btn btn-danger btn-sm">Delete</button> -->
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

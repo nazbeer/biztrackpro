@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .highcharts-figure,
+.highcharts-data-table table {
+    min-width: 320px;
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+</style>
+<div class="container mt-3">
+    <!-- Analytics Section -->
+    <div class=" mb-3 d-none" >
+        <div class="card bg-light  ">
+            <div class="card-header">
+                <h5 class="mb-0 text-white">
+                    Shop Details
+                </h5>
+            </div>
+            <div class="card-body mb-0">
+    {% if shop %}
+        <div class="col-md-6">
+        <p class="mb-0"><strong>Shop Name:</strong> {{ shop.name }} - ({{shop.id}})</p>
+        </div>
+        <div class="col-md-6">
+            <p class="mb-0"><strong>License Number:</strong> {{ shop.license_number }}</p>
+        </div>
+        <div class="col-md-6">
+            <p class="mb-0"><strong>Email ID:</strong> {{ shop.admin_email }}</p>
+        </div>
+        
+    {% else %}
+        <p>No shop associated with the current user.</p>
+    {% endif %}
+</div>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header"><h5 class="card-title mb-0">Total Services ({{ current_month_year }})</h5></div>
+                <div class="card-body text-center">
+                    
+                    <p class="card-text">{{ total_services_this_month }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header"><h5 class="card-title mb-0">Total Sales ({{ current_month_year }})</h5></div>
+                <div class="card-body text-center">
+                    
+                    <p class="card-text">{{ total_sales_this_month }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-header"> <h5 class="card-title mb-0">Total Advance Given ({{ current_month_year }})</h5></div>
+                <div class="card-body text-center">
+                   
+                    <p class="card-text">{{ total_advance_given_this_month }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Analytics Section -->
+    <div class="row mt-0">
+        <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-1 mt-1 text-white">
+                    Last 10 Days Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="transactionChart" class="custom-graph" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+        <div class="col-md-6">
+            <div class="card" id="piechartemp">
+                <div class="card-header">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div class="col-md-7">
+                            <h5 class="mb-0 text-white">Employee Statistics</h5>
+                        </div>
+                        <div class="col-md-5">
+                            <select name="employee" class="mt-0 mb-0" style="font-size:16px;padding-bottom:2px;padding-top:1px;padding-left:0px !important;" id="employee-select">
+                                
+                                {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.first_name }} {{ employee.second_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0" >
+                    <figure class="highcharts-figure p-0 m-0">
+                        <div id="container" style="height:330px;margin-top:0px !important;margin-bottom:0px !important;"></div>
+                    </figure>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Categories Section -->
+    
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header"><h5 class="mb-0 text-white">{{ category.name }}</h5></div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for link in category.links %}
+                        <a href="{% url link.url_name %}" style="border-radius:5px;"><li class="list-group-item">{{ link.label }}</li></a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- End of Categories Section -->
+   
+</div>
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    // JavaScript code for rendering the bar chart using Chart.js
+    var chart_data_json = JSON.parse('{{ chart_data_json|escapejs }}');
+
+    var chart_labels = [];
+    var total_services_data = [];
+    var total_sales_data = [];
+    var total_advance_data = [];
+
+    // Extracting data for chart
+    chart_data_json.forEach(function(item) {
+        chart_labels.push(item.date);
+        total_services_data.push(item.total_services);
+        total_sales_data.push(item.total_sales);
+        total_advance_data.push(item.advance);
+    });
+
+    // Drawing the chart
+    var ctx = document.getElementById('transactionChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chart_labels,
+            datasets: [{
+                label: 'Total Services',
+                data: total_services_data,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Total Sales',
+                data: total_sales_data,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Total Advance',
+                data: total_advance_data,
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: calculateStepSize() // Adjust the step size as needed to increase the gap between y-axis values
+                    }
+                }
+            }
+        }
+    });
+    function calculateStepSize() {
+    // Combine all data arrays to find the highest value
+    const allData = total_services_data.concat(total_sales_data, total_advance_data);
+    const highestValue = Math.max(...allData);
+    
+    // Calculate the step size based on the highest value
+    const stepSize = Math.ceil(highestValue / 4); // Adjust the divisor as needed
+
+    return stepSize;
+}
+// Pie chart code
+    // JavaScript code for rendering the pie chart using Highcharts
+    var employee_data_json = JSON.parse('{{ employee_json|escapejs }}');
+    console.log(employee_data_json);
+    var employee_labels = [];
+    var employeeId = [];
+    var employee_total_services_data = [];
+    var employee_total_sales_data = [];
+    var employee_total_advance_data = [];
+
+    // Extracting data for chart
+    employee_data_json.forEach(function(item) {
+        employee_labels.push(item.date);
+        employeeId.push(item.employee);
+        employee_total_services_data.push(item.employee_total_services);
+        employee_total_sales_data.push(item.employee_total_sales);
+        employee_total_advance_data.push(item.employee_total_advance);
+    });
+    
+    // Drawing the chart
+    Highcharts.chart('container', {
+        chart: {
+            type: 'pie'
+        },
+        accessibility: {
+                    enabled: false
+                },
+        title: {
+            text: 'Employee Statistics'},
+        xAxis: {
+            categories: employee_labels
+        },
+        series: [{
+            name: 'Employee Total Services',
+            data: [100,100,100]
+        }, {
+            name: 'Employee Total Sales',
+            data: employee_total_sales_data
+        }, {
+            name: 'Employee Total Advance',
+            data: employee_total_advance_data
+        }]
+    });
+
+    // Function to redraw the pie chart based on selected employee
+    document.getElementById('employee-select').addEventListener('change', function() {
+        var employeeId = this.value;
+
+        if (employeeId) {
+            drawPieChart(employeeId);
+        }
+    });
+
+    // Function to draw initial pie chart with the first employee if available
+    var firstEmployeeId = document.getElementById('employee-select').value;
+    
+    if (firstEmployeeId) {
+        drawPieChart(firstEmployeeId);
+    }
+    function getEmployeeData(employeeId) {
+        // Initialize an empty array to store the employee data
+        employeeId = parseInt(employeeId);
+        console.log("data in geted:" + employeeId);
+        var employeeData = [];
+        var employee_data_json = JSON.parse('{{ employee_json|escapejs }}');
+        var employee_labels = [];
+        var employeeIds = []; // Rename to employeeIds to avoid shadowing
+        var employee_total_services_data = [];
+        var employee_total_sales_data = [];
+        var employee_total_advance_data = [];
+
+        // Extracting data for chart
+        employee_data_json.forEach(function(item) {
+            employee_labels.push(item.date);
+            employeeIds.push(item.employee); // Use employeeIds instead of employeeId
+            employee_total_services_data.push(item.employee_total_services);
+            employee_total_sales_data.push(item.employee_total_sales);
+            employee_total_advance_data.push(item.employee_total_advance);
+        });
+
+        // Iterate over the employee_data_json array to find the data for the selected employee
+        for (var i = 0; i < employee_data_json.length; i++) {
+            // Check if the current item's employee ID matches the selected employee ID
+            if (employee_data_json[i].employee === employeeId) {
+                console.log("value in forloop: " + employee_data_json.length);
+                // If it matches, push the item to the employeeData array
+                employeeData.push(employee_data_json[i]);
+            }
+        }
+
+        // Return the array containing data for the selected employee
+        return employeeData;
+    }
+
+
+    function drawPieChart(employeeId) {
+        // Fetch data for the selected employee
+        var employeeData = getEmployeeData(employeeId);
+
+        // Check if data is available
+        if (employeeData.length > 0) {
+            // Extract necessary information
+            var employeeLabels = [];
+            var employeeTotalServicesData = [];
+            var employeeTotalSalesData = [];
+            var employeeTotalAdvanceData = [];
+
+            // Iterate over the employeeData to extract the required data
+            employeeData.forEach(function(item) {
+                employeeLabels.push(item.date);
+                employeeTotalServicesData.push(item.employee_total_services);
+                employeeTotalSalesData.push(item.employee_total_sales);
+                employeeTotalAdvanceData.push(item.employee_total_advance);
+            });
+
+            // Update the series data of the chart
+            var pieChart = Highcharts.chart('container', {
+                chart: {
+                    type: 'column',
+                    backgroundColor:'transparent'
+                },
+                title: {
+                    text: '',
+                    enabled:false
+                },
+                accessibility: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                xAxis: {
+                    categories: employeeLabels,
+                    lineColor:'#ccc',
+                    lineWidth: 1
+                },
+                yAxis: {
+                    
+                    title: {
+                        text: ''
+                    },
+                    tickInterval: calculateStepSize(),
+                    lineColor:'#ccc',
+                    lineWidth: 1
+
+                },
+                legend: {
+                    align: 'center', // Align legend to center
+                    verticalAlign: 'top', // Align legend to top
+                    layout: 'horizontal', // Display legend items horizontally
+                    itemMarginTop: 0, // Adjust top margin between legend items
+                    itemMarginBottom: 0 // Adjust bottom margin between legend items
+                },
+                series: [{
+                    name: 'Total Services',
+                    data: employeeTotalServicesData,
+                    color:'#ffc0cb78',
+                    borderColor:'pink',
+                    borderWidth:2,
+                }, {
+                    name: 'Total Sales',
+                    data: employeeTotalSalesData,
+                    color:'#c9e5f7',
+                    borderColor:'#57b4ed',
+                    borderWidth:2,
+                }, {
+                    name: 'Total Advance',
+                    data: employeeTotalAdvanceData,
+                    color:'#f7eed5',
+                    borderColor:'#fbdb87',
+                    borderWidth:2,
+                }]
+            });
+        } else {
+            // If no data available, display a message
+            document.getElementById('container').innerHTML = '<div class="text-center">No data available for selected employee.</div>';
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

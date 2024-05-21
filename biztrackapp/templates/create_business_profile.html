@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create Business Profile
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0 text-white">Create Business Profile</h4>
+        </div>
+        <div class="card-body">
+            
+            {% if business_profile_form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for error in business_profile_form.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if disable_submit %}
+            <div class="alert alert-warning">
+                Only One Business Profile can be created under a Shop. You have exceeded the limit!
+            </div> {% endif %}
+            <form method="post" enctype="multipart/form-data" id="business-profile-form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Shop Name (Read-only) -->
+                        <div class="form-group">
+                            <label for="shop_name">Shop Name:</label>
+                            <input type="text" id="name" name="name" class="form-control" value="{{ shop_details }}" readonly >
+
+                        </div>
+                        <!-- Shop Phone Number -->
+                        {{ business_profile_form.shop_phone_number.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.shop_phone_number.id_for_label }}">Shop Phone Number:</label>
+                            <input type="tel" id="{{ business_profile_form.shop_phone_number.id_for_label }}" name="shop_phone_number" class="form-control"  maxlength="12" placeholder="971xxxxxxxxx" oninput="validatePhoneNumber(this)" >
+                        </div>
+                        <!-- Upload License (PDF only) -->
+                        {{ business_profile_form.license_upload.errors }}
+                        <div class="form-group mt-0">
+                            <label for="{{ business_profile_form.license_upload.id_for_label }}">Upload License: <small class="text-muted">(JPEG/PDF only Allowed)</small></label>
+                            <input type="file" id="{{ business_profile_form.license_upload.id_for_label }}"  style="line-height: 1.5em !important;
+                            padding-top: 12px;" name="license_upload" accept="application/pdf,image/jpeg,image/jpg" class="form-control" required>
+                            <div id="license-file-error" style="color: red;"></div>
+                        </div>
+                        <!-- VAT Number -->
+                        {{ business_profile_form.vat_number.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.vat_number.id_for_label }}">VAT Number:</label>
+                            <input type="text" id="{{ business_profile_form.vat_number.id_for_label }}" name="vat_number" class="form-control" >
+                        </div>
+                        <!-- VAT Submission Date 1 -->
+                        {{ business_profile_form.vat_submission_date_1.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.vat_submission_date_1.id_for_label }}">VAT Submission Date 1:</label>
+                            <input type="date" id="{{ business_profile_form.vat_submission_date_1.id_for_label }}" name="vat_submission_date_1" class="form-control" required>
+                        </div>
+                        <!-- VAT Submission Date 2 -->
+                        {{ business_profile_form.vat_submission_date_2.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.vat_submission_date_2.id_for_label }}">VAT Submission Date 2:</label>
+                            <input type="date" id="{{ business_profile_form.vat_submission_date_2.id_for_label }}" name="vat_submission_date_2" class="form-control" required>
+                        </div>
+                        <!-- VAT Submission Date 3 -->
+                        {{ business_profile_form.vat_submission_date_3.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.vat_submission_date_3.id_for_label }}">VAT Submission Date 3:</label>
+                            <input type="date" id="{{ business_profile_form.vat_submission_date_3.id_for_label }}" name="vat_submission_date_3" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- License Number (Read-only) -->
+                        <div class="form-group">
+                            <label for="license_number">License Number:</label>
+                            <input type="text" id="license_number" name="license_number" class="form-control" value="{{ license_number }}" readonly required>
+                        </div>
+                        <!-- License Expiration -->
+                        {{ business_profile_form.license_expiration.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.license_expiration.id_for_label }}">License Expiration:</label>
+                            <input type="date" id="{{ business_profile_form.license_expiration.id_for_label }}" name="license_expiration" class="form-control" required>
+                        </div>
+                        <!-- Upload VAT Certificate (PDF only) -->
+                        {{ business_profile_form.vat_certificate_upload.errors }}
+                        <div class="form-group mt-3">
+                            <label for="vat_certificate_upload" class="mt-2">Upload VAT Certificate: <small class="text-muted">(JPEG/PDF only Allowed)</small></label>
+                            <input type="file" id="vat_certificate_upload" name="vat_certificate_upload" 
+                            style="line-height: 1.5em !important;
+                            padding-top: 12px; "
+                            accept="application/pdf,image/jpeg,image/jpg" class="form-control" required>
+                            <div id="vat-certificate-file-error" style="color: red;"></div>
+                        </div>
+                        <!-- VAT Percentage -->
+                        {{ business_profile_form.vat_percentage.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.vat_percentage.id_for_label }}">VAT Percentage:</label>
+                            <input type="number" id="{{ business_profile_form.vat_percentage.id_for_label }}" name="vat_percentage" class="form-control" >
+                        </div>
+                        <!-- License Expiration Reminder Days -->
+                        {{ business_profile_form.license_expiration_reminder_days.errors }}
+                        <div class="form-group mb-1">
+                            <label class="mb-2" for="{{ business_profile_form.license_expiration_reminder_days.id_for_label }}">License Expiration Reminder Days:</label>
+                            <input type="number" id="{{ business_profile_form.license_expiration_reminder_days.id_for_label }}" name="license_expiration_reminder_days" class="form-control" >
+                        </div>
+                        <!-- VAT Submission Date Reminder Days -->
+                        {{ business_profile_form.vat_submission_date_reminder_days.errors }}
+                        <div class="form-group mb-2">
+                            <label class="mt-1" for="{{ business_profile_form.vat_submission_date_reminder_days.id_for_label }}">VAT Submission Date Reminder Days:</label>
+                            <input type="number" id="{{ business_profile_form.vat_submission_date_reminder_days.id_for_label }}" name="vat_submission_date_reminder_days" class="form-control" >
+                        </div>
+                        <!-- Employee Visa Expiration Reminder Days -->
+                        {{ business_profile_form.employee_visa_expiration_reminder_days.errors }}
+                        <div class="form-group mt-1">
+                            <label class="mb-2" for="{{ business_profile_form.employee_visa_expiration_reminder_days.id_for_label }}">Employee Visa (Emirates ID) Expiration Reminder Days:</label>
+                            <input type="number" id="{{ business_profile_form.employee_visa_expiration_reminder_days.id_for_label }}" name="employee_visa_expiration_reminder_days" class="form-control" >
+                        </div>
+                        <!-- Add other additional fields for the main business profile here -->
+                    </div>
+                    <div class="col-md-12">
+                        <!-- Address -->
+                        {{ business_profile_form.address.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.address.id_for_label }}">Address:</label>
+                            <textarea id="{{ business_profile_form.address.id_for_label }}" name="address" class="form-control" rows="6" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" {% if disable_submit %}disabled{% endif %}>Submit</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateLicenseNumber(select) {
+        var selectedOption = select.options[select.selectedIndex];
+        var licenseNumberInput = document.getElementById('license_number');
+        var licenseNumber = selectedOption.label.split('-')[1];
+        licenseNumberInput.value = licenseNumber;
+    }
+    document.getElementById('license-upload').addEventListener('change', function() {
+        var fileInput = document.getElementById('license-upload');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.pdf|\.jpg|\.jpeg)$/i;
+
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('license-file-error').innerHTML = 'Only PDF, JPG, or JPEG files are allowed!';
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('license-file-error').innerHTML = '';
+        }
+    });
+
+    document.getElementById('vat-certificate-upload').addEventListener('change', function() {
+        var fileInput = document.getElementById('vat-certificate-upload');
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.pdf|\.jpg|\.jpeg)$/i;
+
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('vat-certificate-file-error').innerHTML = 'Only PDF, JPG, or JPEG files are allowed!';
+            fileInput.value = '';
+            return false;
+        } else {
+            document.getElementById('vat-certificate-file-error').innerHTML = '';
+        }
+    });
+    function validatePhoneNumber(input) {
+    const inputValue = input.value.trim();
+    
+    // Check if the first three digits match the expected prefix "971"
+    if (inputValue.length >= 3 && inputValue.substring(0, 3) !== "971") {
+        alert("Phone number must start with '971'.");
+        // Clear the input field
+        input.value = '';
+        return;
+    }
+
+    // Define the regular expression pattern for the expected phone number format
+    const phoneNumberPattern = /^971\d{0,9}$/;
+
+    // Check if the entered phone number matches the expected format
+    if (inputValue.length >= 3 && !phoneNumberPattern.test(inputValue)) {
+        // Display an alert if the entered phone number does not match the expected format
+        alert("Invalid phone number format. Please enter a valid phone number starting with '971' followed by up to 9 digits.");
+        // Remove invalid characters from the input value
+        input.value = inputValue.replace(/[^0-9]/g, '');
+    }
+
+    // Prevent further input if the length exceeds 12 characters
+    if (inputValue.length >= 12) {
+        // Truncate the input value to 12 characters
+        input.value = inputValue.slice(0, 12);
+    }
+}
+
+
+
+</script>
+{% endblock %}

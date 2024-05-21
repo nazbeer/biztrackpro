@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Sales</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Service</th>
+            <th>Particular</th>
+            <th>Amount</th>
+            <th>Discount</th>
+            <th>Tip</th>
+            <th>Net Amount</th>
+            <th>Payment Method</th>
+            <th>Emirates ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.date }}</td>
+            <td>{{ sale.service.name }}</td>
+            <td>{{ sale.particular }}</td>
+            <td>{{ sale.amount }}</td>
+            <td>{{ sale.discount }}</td>
+            <td>{{ sale.tip }}</td>
+            <td>{{ sale.net_amount }}</td>
+            <td>{{ sale.payment_method }}</td>
+            <td>{{ sale.emirates_id }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

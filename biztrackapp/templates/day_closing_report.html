@@ -1,0 +1,107 @@
+{% extends 'emp_base.html' %}
+
+{% block content %}
+<div class="container mb-5">
+    <!-- Day Closing Report -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h4 class="mb-0 text-white">Day Closing Report</h4>
+        </div>
+        <div class="card-body">
+            <!-- <div class="pagination mb-3" style="float:right;">
+                <span class="step-links">
+                    {% if day_closings.has_previous %}
+                        <a href="?page=1">&laquo; First</a>
+                        <a href="?page={{ day_closings.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="current">
+                        Page {{ day_closings.number }} of {{ day_closings.paginator.num_pages }}.
+                    </span>
+                    {% if day_closings.has_next %}
+                        <a href="?page={{ day_closings.next_page_number }}">next</a>
+                        <a href="?page={{ day_closings.paginator.num_pages }}">Last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div> -->
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped nowrap" id="dayclosingemp">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee</th>
+                        <th>Total Services</th>
+                        <th>Total Sales</th>
+                        <th>Total Collection</th>
+                        <th>Advance</th>
+                        <th>Net Collection</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for day_closing in day_closings %}
+                    <tr>
+                        <td>{{ day_closing.date }}</td>
+                        <td>{{ day_closing.employee.id }}</td>
+                        <td>{{ day_closing.total_services }}</td>
+                        <td>{{ day_closing.total_sales }}</td>
+                        <td>{{ day_closing.total_collection }}</td>
+                        <td>{{ day_closing.advance }}</td>
+                        <td>{{ day_closing.net_collection }}</td>
+                        <td class="text-capitalize">{{ day_closing.status }}</td>
+                        <td>
+                            <div class="d-flex justify-content-between align-items-center gap-3">
+                                {% if day_closing.status == 'pending' %}
+                                    <a href="{% url 'approve_day_closing' day_closing.id %}" class="btn btn-success btn-sm">Approve</a>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>Approved</button>
+                                {% endif %}
+                                <!-- {% if day_closing.status != 'approved' %}
+                                    <span class="pl-3"><a href="{% url 'edit_day_closing' day_closing.id %}" class="btn btn-primary btn-sm">Edit</a></span>
+                                {% else %}
+                                    <span class="pl-3"><button class="btn btn-primary btn-sm" disabled>Edit</button></span>
+                                {% endif %} -->
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    // Store employee_id in local session storage
+    localStorage.setItem('employee_id', '{{ request.session.employee_id }}');
+  
+    new DataTable('#dayclosingemp', {
+              responsive: true,
+              dom: 'lBfrtip',
+              
+              buttons: [
+                  {
+                      text: 'Print',
+                      extend: 'print',
+                      exportOptions: {
+                          stripHtml: false,
+                          columns: [0, 1, 2, 3, 4]
+                      }
+                  },
+                  {
+                      text: 'Export PDF',
+                      extend: 'pdf',
+                      
+                      exportOptions: {
+                          stripHtml: true,
+                         
+                      },
+            
+                  }
+              ],
+              
+          });
+  
+   </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+<!-- delete_role.html -->
+{% extends 'base.html' %}
+
+{% block title %}Delete Role{% endblock %}
+
+{% block content %}
+  <h2>Delete Role</h2>
+  <p>Are you sure you want to delete "{{ object.name }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger btn-sm">Yes, delete</button>
+  </form>
+  <a href="{% url 'role_list' %}">Cancel</a>
+{% endblock %}

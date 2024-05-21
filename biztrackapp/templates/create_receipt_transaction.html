@@ -1,0 +1,51 @@
+<!-- create_receipt_transaction.html -->
+{% extends 'base.html' %}
+{% block title %}Create Receipt Transaction{% endblock %}
+{% block content %}
+<div class="container">
+   <div class="card">
+      <div class="card-header">
+         <h4 class="mb-0 text-white">Create Receipt Transaction</h4>
+      </div>
+      <form method="post">
+         <div class="card-body">
+            {% csrf_token %}
+            <div class="form-group">
+               <label for="id_date">Date:</label>
+               <input type="date" id="id_date" name="date" class="form-control">
+            </div>
+           <input type="hidden" name="business_profile" value="{{ business_profile }}">
+            <div class="form-group">
+               <label for="id_receipt_type">Receipt Type:</label>
+               {{ form.receipt_type }}
+            </div>
+            <div class="form-group">
+               <label for="id_received_amount">Received Amount:</label>
+              
+               <input type="number" id="received_amount" name="received_amount" class="form-control" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+               <label for="id_narration">Narration:</label>
+               <textarea class="form-control" name="narration" id="narration" rows="3" required placeholder="Short note on the transaction details."></textarea>
+               <!-- {{ form.narration }} -->
+            </div>
+         </div>
+         <div class="card-footer">
+            <div class="form-group mb-0 d-flex flex-wrap justify-content-between align-items-center">
+               <button type="submit" class="btn btn-success">Create</button>
+               <a href="/receipt-type/create/"> <button type="button" class="btn btn-warning">New Receipt Type</button></a>
+               <a href="{% url 'receipt_transaction_list' %}" class="btn btn-info">Receipt Transaction List</a>
+            </div>
+         </div>
+      </form>
+   </div>
+</div>
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+       // Get today's date in YYYY-MM-DD format
+       var today = new Date().toISOString().slice(0,10);
+       // Set the value of the date input field to today's date
+       document.getElementById('id_date').value = today;
+   });
+</script>
+{% endblock %}

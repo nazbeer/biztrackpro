@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Product List{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Product List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped nowrap" id="productlist">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">VAT</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Max Discount Allowed</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th> <!-- New column for actions -->
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in object_list %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ product.name }}</td>
+                <td>{{ product.vat }}</td>
+                <td>{{ product.amount }}</td>
+                <td>{{ product.max_discount_allowed }}</td>
+                <td>{{ product.status }}</td>
+                <td> <!-- Actions column -->
+                  <a href="{% url 'update_product' pk=product.pk %}" class="btn btn-primary">Edit</a> <!-- Edit button linked to update_product URL -->
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="7">No products found.</td> <!-- Colspan to span across all columns -->
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        
+    </div>
+  </div>
+  <div class="card-footer text-right">
+    <a href="/product/create/" class="btn btn-warning">Create New Product</a>
+  </div>
+</div>
+</div>
+<script>
+  new DataTable('#productlist', {
+    responsive: true,
+    dom: 'lBfrtip',
+    buttons: [
+      {
+        text: 'Print',
+        extend: 'print',
+        exportOptions: {
+          stripHtml: false,
+        },
+        customize: function (win) {
+        $(win.document.body).find('thead tr th').css({
+            'color': '#000 !important', // Black color
+            'font-weight': 'bold !important' // Bold font weight
+        });
+    }
+      },
+      {
+        text: 'Export PDF',
+        extend: 'pdf',
+        exportOptions: {
+          stripHtml: true,
+        },
+        customize: function(doc) {
+            // Set page margins
+            doc.pageMargins = [100, 40];
+            // Set the font size for the entire document
+            doc.defaultStyle.fontSize = 12; // Increased font size
+            // Set the fontsize for the table header
+            doc.styles.tableHeader.fontSize = 14; // Increased font size for header
+            // Center the table
+            doc.content[0].alignment = 'center';
+            // Create a header object with the title
+            doc['header'] = function() {
+                return {
+                    text: 'Product List',
+                    fontSize: 22,
+                    bold:true,
+                    alignment: 'center',
+                    margin: [0, 20, 0, 20]
+                };
+            };
+         
+        }
+      }
+    ]
+  });
+</script>
+
+ 
+{% endblock %}

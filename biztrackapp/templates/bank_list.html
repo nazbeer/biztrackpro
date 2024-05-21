@@ -1,0 +1,71 @@
+<!-- bank_list.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0 text-white">Bank List</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+
+        <table class="table table-bordered table-striped nowrap" id="banklist">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Account Number</th>
+              <th>Opening Balance</th>
+              <th>Created On</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for bank in object_list %}
+            <tr>
+              <td>{{ bank.id }}</td>
+              <td>{{ bank.name }}</td>
+              <td>{{ bank.account_number }}</td>
+              <td>{{ bank.opening_balance }}</td>
+              <td>{{ bank.created_on }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<script>
+  new DataTable('#banklist', {
+            responsive: true,
+            dom: 'lBfrtip',
+            
+            buttons: [
+                {
+                    text: 'Print',
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdf',
+                    
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    },
+          
+                }
+            ],
+            
+        });
+
+ </script>
+{% endblock %}

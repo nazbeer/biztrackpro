@@ -44,9 +44,8 @@
             <label for="narration">Narration:</label>
             <textarea name="narration" id="narration" class="form-control" rows="3" required></textarea>
         </div>
-    <input type="hidden" name="business_profile" value="{{ business_profile }}">
         <!-- <p id="value1"> value</p> -->
-        <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
 </div>
@@ -83,19 +82,6 @@
                 document.getElementById("balance").value = data.balance;
             })
             .catch(error => console.error('Error:', error));
-
-             fetch(`/get-daily-summary-exist/${selectedDate}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.data_exists) {
-                    document.getElementById("submitButton").disabled = true;
-                } else {
-                    document.getElementById("submitButton").disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
     });
 </script>
 {% endblock %}

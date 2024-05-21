@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-
-from .models import User
+from django import forms
+from .models import *
 
 class CustomUserCreationForm(UserCreationForm):
 
@@ -15,3 +15,48 @@ class CustomUserChangeForm(UserChangeForm):
         # fields = ('email',)
         fields = ('email','country_code','phone_number','is_admin')
 
+
+class BusinessProfileForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        # Get the user from the form kwargs
+        user = kwargs.pop('user', None)
+        super(BusinessProfileForm, self).__init__(*args, **kwargs)
+        if user and not user.is_superuser:
+            # Filter shop choices based on the currently logged-in user's associated shop
+            self.fields['shop'].queryset = Shop.objects.filter(admin_user=user)
+
+    class Meta:
+        model = BusinessProfile
+        fields = '__all__'
+
+
+
+class SupplierForm(forms.ModelForm):
+    class Meta:
+        model = Supplier
+        fields = ['name', 'outstanding', 'location', 'business_profile', 'status']
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['name', 'outstanding', 'location', 'business_profile', 'status']
+
+class ExpenseTypeForm(forms.ModelForm):
+    class Meta:
+        model = ExpenseType
+        fields = '__all__'
+
+class ReceiptTypeForm(forms.ModelForm):
+    class Meta:
+        model = ReceiptType
+        fields = '__all__'
+
+class BankForm(forms.ModelForm):
+    class Meta:
+        model = Bank
+        fields = '__all__'
+
+class ModeofTransactionForm(forms.ModelForm):
+    class Meta:
+        model = TransactionMode
+        fields = '__all__'

@@ -14,7 +14,7 @@ class Shop(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"Shop {self.name} - Licence Number {self.license_number}"
+        return f"{self.name}"
 
 class User(AbstractUser):
     email = models.EmailField(max_length=254, unique=True)
@@ -41,7 +41,7 @@ class ShopAdmin(models.Model):
 
 class BusinessProfile(models.Model):
     name = models.CharField(max_length=64, blank=False, default=None, null=True)
-    shop = models.ForeignKey(Shop,on_delete=models.CASCADE)
+    # shop = models.ForeignKey(Shop,on_delete=models.CASCADE)
     license_number = models.CharField(max_length=255)
     license_expiration = models.DateField(null=True)
     license_upload = models.FileField(upload_to='licenses')
@@ -63,11 +63,12 @@ class BusinessProfile(models.Model):
 
 
     def __str__(self):
-        return f"{self.shop} - {self.name}"
+        return f" {self.name}"
 
 class Employee(models.Model):
     employee_id = models.CharField(max_length=10, unique=True)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    # business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     nationality = models.CharField(max_length=255)
@@ -84,64 +85,66 @@ class Employee(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.employee_id} - {self.first_name} {self.last_name}"
+        return f"{self.business_profile} - {self.employee_id} - {self.first_name} {self.last_name}"
     
 class ExpenseType(models.Model):
     name = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 class ReceiptType(models.Model):
     name = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 class Bank(models.Model):
     name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=50)
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 class TransactionMode(models.Model):
     name = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
+    status = models.BooleanField(default=False)  # BooleanField to represent True or False
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 
 class Supplier(models.Model):
     name = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
+    status = models.BooleanField(default=True)  # BooleanField to represent True or False
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.name}"
+        return f"{self.business_profile} - {self.name}"
 
 
 class DailySummary(models.Model):
@@ -159,7 +162,7 @@ class DailySummary(models.Model):
     expense = models.DecimalField(max_digits=10, decimal_places=2)
     bank_deposit = models.DecimalField(max_digits=10, decimal_places=2)
     closing_balance = models.DecimalField(max_digits=10, decimal_places=2)
-    business_profile = models.ForeignKey(BusinessProfile ,on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     status = models.CharField(max_length=20, choices=CHOICES)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now_add=True, null=True)

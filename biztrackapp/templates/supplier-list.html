@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Supplier List{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Supplier List</h5>
+            <a href="{% url 'create_supplier' %}" class="btn btn-primary float-right">Create Supplier</a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Outstanding</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Created On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td>{{ supplier.name }}</td>
+                        <td>{{ supplier.outstanding }}</td>
+                        <td>{{ supplier.location }}</td>
+                        <td>{{ supplier.status }}</td>
+                        <td>{{ supplier.created_on }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -73,6 +73,11 @@
                             <label for="{{ business_profile_form.vat_submission_date_3.id_for_label }}">VAT Submission Date 3:</label>
                             <input type="date" id="{{ business_profile_form.vat_submission_date_3.id_for_label }}" name="vat_submission_date_3" class="form-control" required>
                         </div>
+                        {{ business_profile_form.business_start_time.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.business_start_time.id_for_label }}">Business Start Time:</label>
+                            <input type="time" id="{{ business_profile_form.business_start_time.id_for_label }}" name="business_start_time" class="form-control" >
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <!-- License Number (Read-only) -->
@@ -119,6 +124,14 @@
                         <div class="form-group mt-1">
                             <label class="mb-2" for="{{ business_profile_form.employee_visa_expiration_reminder_days.id_for_label }}">Employee Visa (Emirates ID) Expiration Reminder Days:</label>
                             <input type="number" id="{{ business_profile_form.employee_visa_expiration_reminder_days.id_for_label }}" name="employee_visa_expiration_reminder_days" class="form-control" >
+                        </div>
+                        <!-- Business Start Time -->
+                       
+                        <!-- Business End Time -->
+                        {{ business_profile_form.business_end_time.errors }}
+                        <div class="form-group">
+                            <label for="{{ business_profile_form.business_end_time.id_for_label }}">Business End Time:</label>
+                            <input type="time" id="{{ business_profile_form.business_end_time.id_for_label }}" name="business_end_time" class="form-control" >
                         </div>
                         <!-- Add other additional fields for the main business profile here -->
                     </div>

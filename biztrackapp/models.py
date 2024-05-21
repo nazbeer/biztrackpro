@@ -29,7 +29,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ["email"]
 
     def __str__(self):
-        return f"{self.email}"
+        return f"{self.username}"
 
 class ShopAdmin(models.Model):
     shop = models.ForeignKey(Shop,on_delete=models.CASCADE)
@@ -86,3 +86,83 @@ class Employee(models.Model):
     def __str__(self):
         return f"{self.business_profile.name} - {self.employee_id} - {self.first_name} {self.last_name}"
     
+class ExpenseType(models.Model):
+    name = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+class ReceiptType(models.Model):
+    name = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+class Bank(models.Model):
+    name = models.CharField(max_length=255)
+    account_number = models.CharField(max_length=50)
+    opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+class TransactionMode(models.Model):
+    name = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+
+
+class Customer(models.Model):
+    name = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    outstanding = models.DecimalField(max_digits=10, decimal_places=2)
+    location = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+
+class Supplier(models.Model):
+    name = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
+    outstanding = models.DecimalField(max_digits=10, decimal_places=2)
+    location = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.name}"
+
+
+class DailySummary(models.Model):
+    CHOICES = [
+        ('completed', 'Completed'),
+        ('ongoing', 'On going'),
+    ]
+    date = models.DateField()
+    opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    sales = models.DecimalField(max_digits=10, decimal_places=2)
+    credit_collection = models.DecimalField(max_digits=10, decimal_places=2)
+    miscellaneous_income = models.DecimalField(max_digits=10, decimal_places=2)
+    purchase = models.DecimalField(max_digits=10, decimal_places=2)
+    supplier_payment = models.DecimalField(max_digits=10, decimal_places=2)
+    expense = models.DecimalField(max_digits=10, decimal_places=2)
+    bank_deposit = models.DecimalField(max_digits=10, decimal_places=2)
+    closing_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    business_profile = models.ForeignKey(BusinessProfile ,on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=CHOICES)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    updated_on = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.date} {self.status}"

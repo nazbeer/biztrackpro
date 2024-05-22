@@ -75,11 +75,11 @@ class HomeView(LoginRequiredMixin, TemplateView):
             },
             {
                 'name': 'Employee Management',
-                # 'links': [
-                #         {'label': 'Create Employee', 'url_name': 'create_employee'},
-                #     {'label': 'Employee List', 'url_name': 'employee_list'},
+                'links': [
+                        # {'label': 'Create Employee', 'url_name': 'create_employee'},
+                        # {'label': 'Employee List', 'url_name': 'employee_list'},
                   
-                # ]
+                ]
             },
         ]
 
@@ -222,13 +222,12 @@ def customer_list(request):
         shop_admin = ShopAdmin.objects.get(user=request.user)
         shop = shop_admin.shop
         business = BusinessProfile.objects.get(license_number=shop.license_number)
-        print(business)
     except ShopAdmin.DoesNotExist:
         return redirect('login')
     except BusinessProfile.DoesNotExist:
         business = None
         
-    customers = Customer.objects.filter(business_profile=business.id)
+    customers = Customer.objects.filter(business_profile=business.id).order_by('-created_on')
     return render(request, 'customer-list.html', {'customers': customers})
 
 
@@ -242,7 +241,7 @@ def supplier_list(request):
     except BusinessProfile.DoesNotExist:
         business = None
         
-    suplliers = Supplier.objects.filter(business_profile=business.id)
+    suplliers = Supplier.objects.filter(business_profile=business.id).order_by('-created_on')
     return render(request, 'supplier-list.html', {'suppliers': suplliers})
 
 
@@ -310,12 +309,11 @@ def create_receipt_type(request):
         form = ReceiptTypeForm(request.POST)
         if form.is_valid():
             receipt_type= form.save(commit=False)
-            receipt_type.business_profile = business_profile.id
             receipt_type.save()
-            return redirect('create_receipt_transaction')  
+            return redirect('receipt_type_list')  
     else:
         form = ReceiptTypeForm()
-    return render(request, 'create_receipt_type.html', {'form': form})
+    return render(request, 'create_receipt_type.html', {'form': form,'business_profile':business_profile.id})
 
 
 
@@ -332,6 +330,12 @@ def receipt_type_list(request):
     
     # Render the template with the receipt types
     return render(request, 'receipt_type_list.html', {'object_list': receipt_types})
+
+class ReceiptTypeUpdateView(UpdateView):
+    model = ReceiptType 
+    form_class = ReceiptTypeForm
+    template_name = 'update_receipt_type.html'
+    success_url = reverse_lazy('receipt_type_list')
 
 
 def create_bank(request):
@@ -420,3 +424,31 @@ class ModeOfTransaction(ListView):
     
         # Return the queryset of Bank objects filtered by business profile and sorted by created_on date in descending order
         return TransactionMode.objects.filter(business_profile=business_profile.id).order_by('-created_on')
+
+class ModeofTransactionUpdateView(UpdateView):
+    model = TransactionMode 
+    form_class = ModeofTransactionForm
+    template_name = 'update_mode_of_transaction.html'
+    success_url = reverse_lazy('mode_of_transaction_list')
+
+
+def create_employee(request):
+    try:
+        # Get the current shop admin
+        shop_admin = ShopAdmin.objects.get(user=request.user)
+        # Get the associated shop
+        shop = shop_admin.shop
+        # Get the business profile associated with the shop
+        business_profile = BusinessProfile.objects.get(name=shop.name)
+    except BusinessProfile.DoesNotExist:
+        messages.error(request, "Business profile is not created. Please create a business profile first.")
+        return redirect('create_business_profile')  # Redirect to the view where you create a business profile
+
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('expense_type_list')
+    else:
+        form = EmployeeForm()
+    return render(request, 'create_employee.html', {'form': form,'business_profile':business_profile.id})

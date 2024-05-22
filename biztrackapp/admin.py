@@ -70,3 +70,8 @@ class SupplierAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('name', 'location')
     readonly_fields = ('created_on',)
+
+
+@admin.register(Bank)
+class BankAdmin(admin.ModelAdmin):
+    list_display = ['name','account_number','opening_balance', 'business_profile','created_on']

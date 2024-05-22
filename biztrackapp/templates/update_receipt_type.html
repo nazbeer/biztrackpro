@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Receipt Type{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Update Receipt Type</h4>
+    </div>
+    <div class="card-body">
+      
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+
+</div>
+</div>
+</div>
+{% endblock %}

@@ -48,6 +48,8 @@
         {% endfor %}
     </div>
     {% endif %}
+
+
     
     <form method="post" enctype="multipart/form-data" class="form">
         {% csrf_token %}
@@ -86,15 +88,16 @@
                     {{ form.first_name }}
                 </div>
                 
-                <div class="form-group">
+            <div class="form-group">
                     <label for="nationality">Nationality:</label>
-                    <select id="nationality" name="nationality" class="form-control">
+                    {{ form.nationality }}
+
+                    {% comment %} <select id="nationality" name="nationality" class="form-control">
                         {% for nationality in nationalities %}
                             <option value="{{ nationality }}">{{ nationality }}</option>
                         {% endfor %}
-                    </select>
+                    </select> {% endcomment %}
                 </div>
-                
                
                 <div class="form-group">
                     <label for="emirates_id">Emirates ID:</label>
@@ -108,8 +111,8 @@
                     {{ form.passport_no }}
                 </div>
                 <div class="form-group">
-                    <label for="second_name">Last Name:</label>
-                    {{ form.second_name }}
+                    <label for="last_name">Last Name:</label>
+                    {{ form.last_name }}
                 </div>
                 <div class="form-group">
                     <label for="passport_expiration_date">Passport Expiration Date:</label>
@@ -137,10 +140,14 @@
                     <label for="transportation_allowance">Transportation Allowance:</label>
                     {{ form.transportation_allowance }}
                 </div>
-                <div class="form-group">
+                  <div class="form-group">
+                    <label for="commission_percentage">Job Role:</label>
+                    {{ form.job_role}}
+                </div>
+                {% comment %} <div class="form-group">
                     <label for="commission_percentage">Commission Percentage:</label>
                     {{ form.commission_percentage }}
-                </div>
+                </div> {% endcomment %}
             </div>
         </div>
         <div class="row">
@@ -150,7 +157,7 @@
                     <input type="date" id="joining_date" value="{{ form.joining_date.value }}"  name="joining_date" class="form-control">
                 </div>
             </div>
-            <div class="col-md-6">
+            {% comment %} <div class="col-md-6">
                 <div class="form-group">
                     <label for="job_role">Job Role:</label>
                     <select id="job_role" name="job_role" class="form-control">
@@ -160,24 +167,23 @@
                         {% endfor %}
                     </select>
                 </div>
-            </div>
+            </div> {% endcomment %}
             
         </div>
-        <div class="form-group">
+        {% comment %} <div class="form-group">
             <label for="username">Username:</label>
            
             {{ form.username }}
             <div id="usernameAvailability" class="text-success"></div>
-        </div>
-        <div class="form-group">
+        </div> {% endcomment %}
+        {% comment %} <div class="form-group">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" class="form-control"  required>
             
-        </div>
-        <div class="form-group">
+        </div> {% endcomment %}
+        {% comment %} <div class="form-group">
             <input type="hidden" id="is_employee" name="is_employee"  value="true" checked>
-            
-        </div>
+        </div> {% endcomment %}
         <button type="submit" class="btn btn-primary" {% if error_occurred or num_users_created >= max_users_allowed %}disabled{% endif %}>Submit</button>
     </form>
 

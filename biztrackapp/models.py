@@ -69,6 +69,7 @@ class Employee(models.Model):
     employee_id = models.CharField(max_length=10, unique=True)
     # business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
     business_profile = models.CharField(max_length=255, null=True)
+    business_profile_id = models.IntegerField(null=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     nationality = models.CharField(max_length=255)

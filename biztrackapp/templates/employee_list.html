@@ -39,7 +39,7 @@
         <th>Business Profile</th>
         <th><a href="?sort=first_name">First Name</a></th>
         <th><a href="?sort=second_name">Last Name</a></th>
-        <th>Username</th>
+        {% comment %} <th>Username</th> {% endcomment %}
         {% comment %} <th>Password</th> {% endcomment %}
         <th>Nationality</th>
         <th>Mobile No</th>
@@ -50,7 +50,7 @@
         <th>Basic Pay</th>
         <th>House Allowance</th>
         <th>Transportation Allowance</th>
-        <th>Commission Percentage</th>
+        {% comment %} <th>Commission Percentage</th> {% endcomment %}
         <th>Joining Date</th>
         <th>Job Role</th>
         
@@ -64,8 +64,8 @@
           <td>{{ employee.employee_id }}</td>
           <td>{{ employee.business_profile }}</td>
           <td>{{ employee.first_name }}</td>
-          <td>{{ employee.second_name }}</td>
-          <td>{{ employee.username}}</td>
+          <td>{{ employee.last_name }}</td>
+          {% comment %} <td>{{ employee.username}}</td> {% endcomment %}
           {% comment %} <td>{{ employee.password}}</td> {% endcomment %}
           <td>{{ employee.nationality }}</td>
           <td>{{ employee.mobile_no }}</td>
@@ -76,13 +76,13 @@
           <td>{{ employee.basic_pay }}</td>
           <td>{{ employee.house_allowance }}</td>
           <td>{{ employee.transportation_allowance }}</td>
-          <td>{{ employee.commission_percentage }}</td>
+          {% comment %} <td>{{ employee.commission_percentage }}</td> {% endcomment %}
           <td>{{ employee.joining_date }}</td>
-          <td>{{ employee.job_role.name }}</td>
+          <td>{{ employee.job_role }}</td>
            <td>
             <div class="d-flex justify-content-between align-items-center gap-3">
             <a href="{% url 'employee_edit' employee.pk %}" class="btn btn-primary btn-sm">Edit</a>&nbsp;
-            <!-- <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-danger btn-sm">Delete</a> -->
+             {% comment %} <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-danger btn-sm">Delete</a> {% endcomment %}
           </div>
           </td>
           <!-- Add more columns as needed -->

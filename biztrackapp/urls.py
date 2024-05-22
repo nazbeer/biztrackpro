@@ -25,7 +25,6 @@ urlpatterns = [
     path('receipt-type/', receipt_type_list, name='receipt_type_list'),
     path('receipt-type/<int:pk>/edit/', ReceiptTypeUpdateView.as_view(), name='edit_receipt_type'),
 
-
     path('mode-transaction/', ModeOfTransaction.as_view(), name='mode_of_transaction_list'),
     path('mode-transaction/create/', create_mode_of_transaction, name='create_mode_of_transaction'),
     path('mode-transaction/<int:pk>/edit/', ModeofTransactionUpdateView.as_view(), name='edit_mode_of_transaction'),
@@ -34,6 +33,10 @@ urlpatterns = [
 
     path('bank/create/', create_bank, name='create_bank'),
     path('banks/', BankListView.as_view(), name='bank_list'),
+
+    path('employee/', employee_list, name='employee_list'),
+    path('employee/create/', create_employee, name='create_employee'),
+    path('employees/<int:pk>/edit/', employee_edit, name='employee_edit'),
 
 
     path('create-supplier/', create_supplier, name='create_supplier'),

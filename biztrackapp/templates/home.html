@@ -66,8 +66,15 @@
                 <p class="mb-0"><strong>License Number:</strong> {{ shop.license_number }}</p>
             </div>
             <div class="col-md-6">
-                <p class="mb-0"><strong>Email ID:</strong> {{ shop.admin_email }}</p>
+                <p class="mb-0"><strong>Admin</strong> : {{ user.first_name }} {{ user.last_name }}</p>
             </div>
+            <div class="col-md-6">
+                <p class="mb-0"><strong>Email</strong> : {{ user.email }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-0"><strong>Username</strong> : {{ user.username }}</p>
+            </div>
+    
         {% else %}
             <p>No shop associated with the current user.</p>
         {% endif %}

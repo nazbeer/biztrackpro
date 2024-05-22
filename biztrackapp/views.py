@@ -8,6 +8,8 @@ from django.urls import reverse,reverse_lazy
 from .forms import *
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.db.models import Count, Sum, Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def index(request):
@@ -53,11 +55,22 @@ class HomeView(LoginRequiredMixin, TemplateView):
             try:
                 shop_admin = ShopAdmin.objects.get(user=self.request.user)
                 context['shop'] = shop_admin.shop
+                context['user'] = shop_admin.user
+
+
             except ShopAdmin.DoesNotExist:
                 # Render the template with a message
                 context['error_message'] = "No shop associated with the current user."
                 
         categories = [
+            {
+                'name': 'Shop & Profile Management',
+                'links': [
+                    {'label': 'Profile', 'url_name': 'home'},
+                    {'label': 'Shop', 'url_name': 'home'},
+                   
+                ]
+            },
             {
                 'name': 'Shop Management',
                 'links': [
@@ -66,18 +79,10 @@ class HomeView(LoginRequiredMixin, TemplateView):
                 ]
             },
             {
-                'name': 'Role Management',
-                # 'links': [
-                #     {'label': 'Create Role', 'url_name': 'create_role'},
-                #     {'label': 'Role List', 'url_name': 'role_list'},
-                   
-                # ]
-            },
-            {
                 'name': 'Employee Management',
                 'links': [
-                        # {'label': 'Create Employee', 'url_name': 'create_employee'},
-                        # {'label': 'Employee List', 'url_name': 'employee_list'},
+                        {'label': 'Create Employee', 'url_name': 'create_employee'},
+                        {'label': 'Employee List', 'url_name': 'employee_list'},
                   
                 ]
             },
@@ -433,22 +438,120 @@ class ModeofTransactionUpdateView(UpdateView):
 
 
 def create_employee(request):
+    error_occurred = False  
     try:
         # Get the current shop admin
         shop_admin = ShopAdmin.objects.get(user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
-        business_profile = BusinessProfile.objects.get(name=shop.name)
+        BusinessProfile.objects.get(name=shop.name)
     except BusinessProfile.DoesNotExist:
         messages.error(request, "Business profile is not created. Please create a business profile first.")
         return redirect('create_business_profile')  # Redirect to the view where you create a business profile
 
+    # Fetch the shop details associated with the logged-in user
+    try:
+        shop_admin = ShopAdmin.objects.get(user=request.user)
+        shop = shop_admin.shop
+    except ShopAdmin.DoesNotExist:
+        shop = None
+
+    if shop:
+        num_users = shop.num_users
+        # Check the number of users created under this shop
+        num_users_created = Employee.objects.filter(business_profile=shop).count()
+        
+        # Pass the maximum allowed users count to the template
+        max_users_allowed = num_users
+        # context = {
+        #     'num_users_created': num_users_created,
+        #     'max_users_allowed': max_users_allowed,
+        #     'business_profile_id': shop.id  # Pass the business_profile_id to the template context
+        # }
+    business_profiles = BusinessProfile.objects.filter(name=shop)
+        
+        # Filter roles based on the business profile
+    # roles = Role.objects.filter(business_profile=business_profile)
     if request.method == 'POST':
         form = EmployeeForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('expense_type_list')
+            if num_users_created >= max_users_allowed:
+                # If the maximum limit is reached, display an error message
+                error_occurred = True
+                messages.error(request, "Max User Registration limit is reached.")
+            else:
+                try:
+                    employee = form.save(commit=False)
+                    # employee.business_profile_id = request.POST.get('business_profile_id')  # Set business_profile_id from POST data
+                    employee.save()
+                    return HttpResponse('employee_list') 
+                except Exception as e:
+                    # print("An error occurred while saving the form:", e)
+                    error_occurred = True  
+                    messages.error(request, "An error occurred while saving the form.")
     else:
         form = EmployeeForm()
-    return render(request, 'create_employee.html', {'form': form,'business_profile':business_profile.id})
+
+    # Filter Business Profiles based on the shop associated with the logged-in user
+    
+
+    context = {
+    'form': form,
+    # 'roles':roles,
+    'business_profiles': business_profiles,
+    'error_occurred': error_occurred,
+    'num_users_created': num_users_created,
+    'max_users_allowed': max_users_allowed,
+    'business_profile_id': shop.id,
+    # 'nationalities': NATIONALITIES,  # Pass NATIONALITIES to the template context
+    }
+
+    return render(request, 'create_employee.html', context)
+
+
+
+def employee_list(request):
+    # Get the shop admin user
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
+    # Get the shop associated with the shop admin
+    shop = shop_admin.shop
+
+    # Get the business profile associated with the shop
+    business_profile = shop
+
+    query = request.GET.get('q')
+    if query:
+        employees = Employee.objects.filter(
+            Q(employee_id__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query),
+            business_profile=business_profile,
+            # shop=shop
+        )
+    else:
+        employees = Employee.objects.filter(business_profile=business_profile)
+
+    paginator = Paginator(employees, 10)
+    page = request.GET.get('page')
+    try:
+        employees = paginator.page(page)
+    except PageNotAnInteger:
+        employees = paginator.page(1)
+    except EmptyPage:
+        employees = paginator.page(paginator.num_pages)
+
+    return render(request, 'employee_list.html', {'employees': employees})
+
+
+def employee_edit(request, pk):
+    employee = get_object_or_404(Employee, pk=pk)
+    if request.method == 'POST':
+        form = EmployeeForm(request.POST, instance=employee)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_list')
+    else:
+        form = EmployeeForm(instance=employee)
+    return render(request, 'employee_edit.html', {'form': form})

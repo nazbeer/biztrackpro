@@ -45,3 +45,33 @@ class BusinessProfileAdmin(admin.ModelAdmin):
 admin.site.register(BusinessProfile, BusinessProfileAdmin)
 
 
+@admin.register(ExpenseType)
+class ExpenseTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'created_on']
+
+@admin.register(ReceiptType)
+class ReceiptTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'created_on']
+
+@admin.register(TransactionMode)
+class TransactionModeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'business_profile','created_on']
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ('name','outstanding', 'location', 'business_profile', 'status', 'created_on')
+    list_filter = ('status',)
+    search_fields = ('name', 'location')
+    readonly_fields = ('created_on',)
+
+@admin.register(Supplier)
+class SupplierAdmin(admin.ModelAdmin):
+    list_display =('name','outstanding', 'location', 'business_profile', 'status', 'created_on')
+    list_filter = ('status',)
+    search_fields = ('name', 'location')
+    readonly_fields = ('created_on',)
+
+
+@admin.register(Bank)
+class BankAdmin(admin.ModelAdmin):
+    list_display = ['name','account_number','opening_balance', 'business_profile','created_on']

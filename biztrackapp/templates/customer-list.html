@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer List{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Customer List</h5>
+            <a href="{% url 'create_customer' %}" class="btn btn-primary float-right">Create Customer</a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Outstanding</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Created On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ customer.outstanding }}</td>
+                        <td>{{ customer.location }}</td>
+                        <td>{{ customer.status }}</td>
+                        <td>{{ customer.created_on }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -52,7 +52,10 @@
               <label for="id_address">Address:</label>
               <textarea id="id_address" class="form-control" name="address">{{ business_profile.address }}</textarea>
             </div>
-            
+            <div class="form-group">
+              <label for="id_start_time">Business Start Time:</label>
+              <input type="time" id="id_start_time" class="form-control" name="start_time" value="{{ business_profile.start_time|date:'H:i' }}">
+            </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
@@ -88,6 +91,11 @@
             <div class="form-group">
               <label for="id_employee_visa_expiration_reminder_days">Employee Visa Expiration Reminder (days):</label>
               <input type="number" id="id_employee_visa_expiration_reminder_days" class="form-control" name="employee_visa_expiration_reminder_days" value="{{ business_profile.employee_visa_expiration_reminder_days }}">
+            </div>
+            
+            <div class="form-group">
+              <label for="id_end_time">Business End Time:</label>
+              <input type="time" id="id_end_time" class="form-control" name="end_time" value="{{ business_profile.end_time|date:'H:i' }}">
             </div>
           </div>
         </div>

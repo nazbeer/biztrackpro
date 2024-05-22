@@ -7,8 +7,8 @@
         <a href="#" class="dropdown-toggle" id="saleDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Sales</a>
         <div class="dropdown-menu" aria-labelledby="saleDropdown">
         
-            <a class="dropdown-item" href="/sale/sales-by-admin-service/"  id="service-id"> Service</a>
-            <a class="dropdown-item" href="/sale/sales_by_admin_item/" id="product-id"> Product</a>
+            <a class="dropdown-item" href="/sale/sales-by-admin-service/"> Service</a>
+            <a class="dropdown-item" href="/sale/sales_by_admin_item/"> Product</a>
             <a class="dropdown-item" href="/sale/sales-report-admin/"> Report</a>
         </div>
     </li>
@@ -25,7 +25,7 @@
         <div class="dropdown-menu" aria-labelledby="saleDropdown">
             
             
-            <a class="dropdown-item" href="/dayclosing/admin" id="day-closing-id"> Day Closing</a>
+            <a class="dropdown-item" href="/dayclosing/admin"> Day Closing</a>
             <!-- <a class="dropdown-item" href="/sale/dayclosing/"><i class="fas fa-calendar-check"></i> Day Closing - Employee</a> -->
             <!-- <a class="dropdown-item" href="/sale/day-closing-report/"><i class="fas fa-file-alt"></i> Day Closing Report</a> -->
             <a class="dropdown-item" href="/sale/day-closing-admin-report/"> Report</a>
@@ -87,23 +87,3 @@
         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
     </li>
 </ul>
-
-   <script>
-        fetch('/get-employee-transaction-window/')
-            .then(response => response.json())
-            .then(data => {
-                if (data.employee_transaction_window == true) {
-                    document.getElementById('product-id').style.display = 'block';
-                    document.getElementById('service-id').style.display = 'block';
-                    document.getElementById('day-closing-id').style.display = 'block';
-
-                } else {
-                    document.getElementById('product-id').style.display = 'none';
-                    document.getElementById('service-id').style.display = 'none';
-                    document.getElementById('day-closing-id').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    </script>

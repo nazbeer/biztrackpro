@@ -2,41 +2,42 @@
 {% extends 'base.html' %}
 
 {% block title %}Receipt Type List{% endblock %}
-{% block content %}
 
+{% block content %}
 <div class="container">
   <div class="card">
-    <div class="card-header">
-      <h4 class="mb-0">Receipt Type List</h4>
-      
-    </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Receipt Type List</h5>
+      <a href="{% url 'create_receipt_type' %}" class="btn btn-primary float-right">Create Receipt Type List</a>
+  </div>  
     <div class="card-body">
-      
-  
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-         <th scope="col">Name</th>
-        <th scope="col">Created On</th>
-        
-      </tr>
-    </thead>
-    <tbody>
-     {% for receipt_type in object_list %}
-        <tr>
-          <th scope="row">{{ forloop.counter }}</th>
-          <td>{{ receipt_type.name }}</td>
-          <td>{{ receipt_type.created_on }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Created On</th>
+            <th scope="col">Actions</th>
 
-</div>
-<div class="card-footer text-right">
-  <a href="/receipt-type/create/" class="btn btn-warning">Create New Reciept Type</a>
-</div>
-</div>
+          </tr>
+        </thead>
+        <tbody>
+          {% for receipt_type in object_list %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ receipt_type.name }}</td>
+              <td>{{ receipt_type.created_on }}</td>
+              <td>
+                <a href="{% url 'edit_receipt_type' receipt_type.id %}" class="btn btn-primary btn-sm">Edit</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-right">
+      {% comment %} <a href="/receipt-type/create/" class="btn btn-warning">Create New Receipt Type</a> {% endcomment %}
+    </div>
+  </div>
 </div>
 {% endblock %}

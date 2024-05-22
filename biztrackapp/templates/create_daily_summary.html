@@ -8,13 +8,29 @@
     <div class="card-header">
       <h5 class="mb-0">Create Daily Summary</h5>
     </div>
+    <form method="post">
     <div class="card-body">
-      <form method="post">
+      
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="{% url 'daily_summary_list' %}" class="btn btn-secondary">Cancel</a>
-      </form>
+        <!-- {{ form.as_p }} -->
+        <div class="row">
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="id_date">Date:</label>
+                    <input type="date" name="date" required class="form-control" id="id_date" tabindex="-1">   
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="id_date">Cash on Hand:</label>
+                    <input type="number" name="cash_on_hand" required class="form-control" id="id_cash_on_hand" tabindex="0">   
+                </div>
+            </div>
+
+        </div>
+       
+      
       <!-- Buttons to trigger various modals -->
       <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
       <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
@@ -23,7 +39,16 @@
       <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
       <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
       <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
+    
     </div>
+    <div class="card-footer mb-0">
+        <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-warning">Save</button>
+            <a href="{% url 'daily_summary_list' %}" class="btn btn-secondary">Reset</a>
+        </div>
+    </div>
+    </form>
   </div>
 </div>
 
@@ -86,7 +111,7 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer bg-white ">
           <button type="submit" class="btn btn-primary" tabindex="6">Save</button>
         </div>
       </form>

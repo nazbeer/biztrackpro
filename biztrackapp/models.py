@@ -83,6 +83,7 @@ class Employee(models.Model):
     transportation_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     joining_date = models.DateField()
     job_role = models.CharField(max_length=50)
+    status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -91,6 +92,7 @@ class Employee(models.Model):
 class ExpenseType(models.Model):
     name = models.CharField(max_length=255)
     business_profile = models.CharField(max_length=255, null=True)
+    status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -99,6 +101,7 @@ class ExpenseType(models.Model):
 class ReceiptType(models.Model):
     name = models.CharField(max_length=255)
     business_profile = models.CharField(max_length=255, null=True)
+    status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -109,6 +112,7 @@ class Bank(models.Model):
     account_number = models.CharField(max_length=50)
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
     business_profile = models.CharField(max_length=255, null=True)
+    status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -117,6 +121,7 @@ class Bank(models.Model):
 class TransactionMode(models.Model):
     name = models.CharField(max_length=255)
     business_profile = models.CharField(max_length=255, null=True)
+    status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -129,7 +134,7 @@ class Customer(models.Model):
     business_profile = models.CharField(max_length=255, null=True)
     outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
-    status = models.BooleanField(default=False)  # BooleanField to represent True or False
+    status = models.BooleanField(default=True)  # BooleanField to represent True or False
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):

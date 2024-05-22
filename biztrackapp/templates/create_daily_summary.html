@@ -1,87 +1,172 @@
-<!-- create_daily_summary.html -->
 {% extends 'base.html' %}
 
-{% block title %}
-    Daily Summary Form
-{% endblock %}
+{% block title %}Create Daily Summary{% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="mb-0 text-white">Create Daily Summary</h4>
-        </div>
-        <div class="card-body">
-            
-    
-    <form method="post" id="dailySummaryForm" action="#" >
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Create Daily Summary</h5>
+    </div>
+    <div class="card-body">
+      <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="date">Date:</label>
-            <input type="date" name="date" id="date" class="form-control" required min="{{ min_date }}">
-        </div>
-        <div class="form-group">
-            <label for="opening_balance">Opening Balance:</label>
-            <input type="number" name="opening_balance" id="opening_balance" class="form-control" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="total_received_amount">Total Received Amount:</label>
-            <input type="number" name="total_received_amount" id="total_received_amount" class="form-control" step="0.01" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="total_expense_amount">Total Expense Amount:</label>
-            <input type="number" name="total_expense_amount" id="total_expense_amount" class="form-control" step="0.01" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="total_bank_deposit">Total Bank Deposit:</label>
-            <input type="number" name="total_bank_deposit" id="total_bank_deposit" class="form-control" step="0.01" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="balance">Closing Balance:</label>
-            <input type="number" name="balance" id="balance" class="form-control" step="0.01" required readonly>
-        </div>
-        <div class="form-group">
-            <label for="narration">Narration:</label>
-            <textarea name="narration" id="narration" class="form-control" rows="3" required></textarea>
-        </div>
-        <!-- <p id="value1"> value</p> -->
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-
-</div>
-</div>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'daily_summary_list' %}" class="btn btn-secondary">Cancel</a>
+      </form>
+      <!-- Buttons to trigger various modals -->
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Miscellaneous Income</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#purchaseModal">Add Purchase</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
+      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
+    </div>
+  </div>
 </div>
 
-<script>
-    var currentDate = new Date();
-    var formattedDate = currentDate.toISOString().split('T')[0];
-    document.getElementById("date").value = formattedDate;
+<!-- Bank Sale -->
+<div class="modal fade" id="bankSaleModal" tabindex="-1" aria-labelledby="bankSaleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title text-white" id="bankSaleModalLabel">Add Bank Sale</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="bankSaleForm" method="post" action="{% url 'create_bank_sale' %}">
+        <div class="modal-body">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="id_customer">Customer</label>
+                <select id="id_customer" name="customer" class="form-control" tabindex="0">
+                  <option>-- Select Customer --</option>
+                  {% for customer in bank_sale_form.customer.field.queryset %}
+                    <option value="{{ customer.id }}">{{ customer.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="id_amount">Amount</label>
+                <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
+              </div>
+              <div class="form-group">
+                <label for="id_cheque_date">Cheque Date</label>
+                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="id_mode_of_transaction">Mode of Transaction</label>
+                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
+                  <option>-- Mode of Transaction --</option>
+                  {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
+                    <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="id_bank">Bank</label>
+                <select id="id_bank" name="bank" class="form-control" tabindex="3">
+                  <option>-- Select Bank --</option>
+                  {% for bank in bank_sale_form.bank.field.queryset %}
+                    <option value="{{ bank.id }}">{{ bank.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="id_cheque_no">Cheque Number</label>
+                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" tabindex="6">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-    // Date validation script
-    document.getElementById("date").addEventListener("change", function() {
-        var selectedDate = new Date(this.value);
-        var currentDate = new Date();
-        
-        if (selectedDate > currentDate) {
-            alert("Selected date cannot be in the future.");
-            this.value = formattedDate; // Reset the value to the current date
-        }
-    });
 
-    // Fetch summary data based on the selected date
-    document.getElementById("date").addEventListener("change", function() {
-        var selectedDate = this.value;
-        fetch(`/fetch-summary-data/${selectedDate}/`)
-            .then(response => response.json())
-            .then(data => {
-                // document.getElementById("value1").value=data.value1;
-                document.getElementById("opening_balance").value = data.opening_balance;
-                document.getElementById("total_received_amount").value = data.total_received_amount;
-                document.getElementById("total_expense_amount").value = data.total_expense_amount;
-                document.getElementById("total_bank_deposit").value = data.total_bank_deposit;
-                document.getElementById("balance").value = data.balance;
-            })
-            .catch(error => console.error('Error:', error));
-    });
-</script>
+<!-- Credit Collection Modal -->
+<div class="modal fade" id="creditCollectionModal" tabindex="-1" aria-labelledby="creditCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title text-white" id="creditCollectionModalLabel">Add Credit Collection</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="creditCollectionForm" method="post" action="{% url 'create_credit_collection' %}">
+          <div class="modal-body">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="id_customer">Customer</label>
+                  <select id="id_customer" name="customer" class="form-control" tabindex="0">
+                    <option>-- Select Customer --</option>
+                    {% for customer in credit_collection_form.customer.field.queryset %}
+                      <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="id_amount">Amount</label>
+                  <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
+                </div>
+                <div class="form-group">
+                  <label for="id_cheque_date">Cheque Date</label>
+                  <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="id_payment_mode">Payment Mode</label>
+                  <select id="id_payment_mode" name="payment_mode" class="form-control" tabindex="1">
+                    <option>-- Select Payment Mode --</option>
+                    {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
+                      <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="id_bank">Bank</label>
+                  <select id="id_bank" name="bank" class="form-control" tabindex="3">
+                    <option>-- Select Bank --</option>
+                    {% for bank in credit_collection_form.bank.field.queryset %}
+                      <option value="{{ bank.id }}">{{ bank.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="id_cheque_no">Cheque Number</label>
+                  <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" tabindex="6">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<!-- Repeat similar structure for other modals: Credit Collection, Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

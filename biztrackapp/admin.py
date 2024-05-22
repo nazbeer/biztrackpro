@@ -33,8 +33,13 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(User, CustomUserAdmin)
 
-admin.site.register(Shop)
-admin.site.register(ShopAdmin)
+@admin.register(Shop)
+class NewShopAdmin(admin.ModelAdmin):
+    list_display = ['name','license_number', 'num_users','vat_remainder', 'employee_transaction_window', 'license_expiration_reminder', 'employee_visa_expiration_reminder', 'employee_passport_expiration_reminder', 'created_on']
+
+@admin.register(ShopAdmin)
+class ShopAdminAdmin(admin.ModelAdmin):
+    list_display = ['shop', 'user']
 
 class BusinessProfileAdmin(admin.ModelAdmin):
     list_display = ('name', 'license_number', 'license_expiration', 'shop_phone_number', 'vat_percentage', 'vat_number', 'created_on')
@@ -79,3 +84,11 @@ class BankAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Employee)
+admin.site.register(DailySummary)
+
+@admin.register(BankSale)
+class BankSaleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'created_on', 'updated_on']
+
+admin.site.register(CreditCollection)
+

@@ -120,6 +120,7 @@ def create_business_profile(request):
         try:
             shop_admin = ShopAdmin.objects.get(user=request.user)
             shop_name = shop_admin.shop.name
+            print(shop_name)
             context['shop_details'] = shop_admin.shop
             context['license_number'] = shop_admin.shop.license_number
 
@@ -555,3 +556,61 @@ def employee_edit(request, pk):
     else:
         form = EmployeeForm(instance=employee)
     return render(request, 'employee_edit.html', {'form': form})
+
+
+def daily_summary_list(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    daily_summaries = DailySummary.objects.filter(business_profile=business_profile.id)
+    return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries})
+
+
+
+def create_daily_summary(request):
+    if request.method == 'POST':
+        form = DailySummaryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('daily_summary_list')
+    else:
+        form = DailySummaryForm()
+        bank_sale_form = BankSaleForm()
+        credit_collection_form = CreditCollectionForm()
+    return render(request, 'create_daily_summary.html', {'form': form, 'bank_sale_form': bank_sale_form, 'credit_collection_form':credit_collection_form})
+
+def create_bank_sale(request):
+    if request.method == 'POST':
+        form = BankSaleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')  
+    return redirect('create_daily_summary')
+
+def create_credit_collection(request):
+    if request.method == 'POST':
+        form = CreditCollectionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')
+    return redirect('create_daily_summary')
+
+def edit_daily_summary(request, id):
+    summary = get_object_or_404(DailySummary, id=id)
+    if request.method == 'POST':
+        form = DailySummaryForm(request.POST, instance=summary)
+        if form.is_valid():
+            form.save()
+            return redirect('daily_summary_list')
+    else:
+        form = DailySummaryForm(instance=summary)
+    return render(request, 'create_daily_summary.html', {'form': form})
+
+def delete_daily_summary(request, id):
+    summary = get_object_or_404(DailySummary, id=id)
+    if request.method == 'POST':
+        summary.delete()
+        return redirect('daily_summary_list')
+    return render(request, 'daily_summary_confirm_delete.html', {'summary': summary})

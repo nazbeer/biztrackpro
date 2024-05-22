@@ -17,13 +17,13 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class BusinessProfileForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        # Get the user from the form kwargs
-        user = kwargs.pop('user', None)
-        super(BusinessProfileForm, self).__init__(*args, **kwargs)
-        if user and not user.is_superuser:
-            # Filter shop choices based on the currently logged-in user's associated shop
-            self.fields['shop'].queryset = Shop.objects.filter(admin_user=user)
+    # def __init__(self, *args, **kwargs):
+    #     # Get the user from the form kwargs
+    #     user = kwargs.pop('user', None)
+    #     super(BusinessProfileForm, self).__init__(*args, **kwargs)
+    #     if user and not user.is_superuser:
+    #         # Filter shop choices based on the currently logged-in user's associated shop
+    #         self.fields['shop'].queryset = Shop.objects.filter(admin_user=user)
 
     class Meta:
         model = BusinessProfile
@@ -66,3 +66,21 @@ class EmployeeForm(forms.ModelForm):
     class Meta:
         model = Employee
         fields ='__all__'
+
+class DailySummaryForm(forms.ModelForm):
+    class Meta:
+        model = DailySummary
+        fields = '__all__'
+
+
+class BankSaleForm(forms.ModelForm):
+    class Meta:
+        model = BankSale
+        fields = '__all__'
+
+
+class CreditCollectionForm(forms.ModelForm):
+    class Meta:
+        model = CreditCollection
+        fields = '__all__'
+        # fields = ['customer', 'payment_mode', 'amount', 'bank', 'cheque_date', 'cheque_no']

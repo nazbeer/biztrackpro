@@ -46,7 +46,12 @@ urlpatterns = [
 
     path('sale/success/', success_view, name='success'),
 
-
+    path('daily-summary/', daily_summary_list, name='daily_summary_list'),
+    path('daily-summary/create/', create_daily_summary, name='create_daily_summary'),
+    path('daily-summary/edit/<int:id>/', edit_daily_summary, name='edit_daily_summary'),
+    path('daily-summary/delete/<int:id>/', delete_daily_summary, name='delete_daily_summary'),
+    path('bank-sale/create/', create_bank_sale, name='create_bank_sale'),
+    path('create-credit-collection/', create_credit_collection, name='create_credit_collection'),
 
 ]
 if settings.DEBUG:

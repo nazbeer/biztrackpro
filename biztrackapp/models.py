@@ -94,7 +94,7 @@ class ExpenseType(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile} - {self.name}"
+        return f"{self.name}"
 
 class ReceiptType(models.Model):
     name = models.CharField(max_length=255)
@@ -102,7 +102,7 @@ class ReceiptType(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile} - {self.name}"
+        return f"{self.name}"
 
 class Bank(models.Model):
     name = models.CharField(max_length=255)
@@ -112,7 +112,7 @@ class Bank(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile} - {self.name}"
+        return f"{self.name}"
 
 class TransactionMode(models.Model):
     name = models.CharField(max_length=255)
@@ -120,7 +120,7 @@ class TransactionMode(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile} - {self.name}"
+        return f"{self.name}"
 
 
 
@@ -133,7 +133,7 @@ class Customer(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.business_profile} - {self.name}"
+        return f"{self.name}"
 
 
 class Supplier(models.Model):
@@ -170,3 +170,29 @@ class DailySummary(models.Model):
 
     def __str__(self):
         return f"{self.date} {self.status}"
+    
+class BankSale(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.customer.name} - {self.amount}"
+
+class CreditCollection(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    payment_mode = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.customer.name} - {self.amount}"

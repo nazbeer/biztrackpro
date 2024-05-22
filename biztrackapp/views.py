@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.db.models import Count, Sum, Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from datetime import datetime
 
 def index(request):
     print('re',request.user)
@@ -579,7 +579,20 @@ def create_daily_summary(request):
         form = DailySummaryForm()
         bank_sale_form = BankSaleForm()
         credit_collection_form = CreditCollectionForm()
-    return render(request, 'create_daily_summary.html', {'form': form, 'bank_sale_form': bank_sale_form, 'credit_collection_form':credit_collection_form})
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+     # Get the current date and format it as needed
+    # current_date = datetime.now().date()
+    # Debugging: print current date
+    # print("current_date_str:", current_date)
+    
+    # Query for bank sales created on the current date
+    bank_sales = BankSale.objects.filter(business_profile=business_profile.id)
+    # print(bank_sales)
+    return render(request, 'create_daily_summary.html', {'form': form, 'bank_sale_form': bank_sale_form, 'credit_collection_form':credit_collection_form, 'bank_sales':bank_sales})
 
 def create_bank_sale(request):
     if request.method == 'POST':
@@ -588,6 +601,11 @@ def create_bank_sale(request):
             form.save()
             return redirect('create_daily_summary')  
     return redirect('create_daily_summary')
+
+def list_bank_sales(request):
+    bank_sales = BankSale.objects.all()
+    print(bank_sales)
+    return render(request, 'create_daily_summary.html', {'bank_sales': bank_sales})
 
 def create_credit_collection(request):
     if request.method == 'POST':

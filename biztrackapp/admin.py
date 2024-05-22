@@ -42,7 +42,7 @@ class ShopAdminAdmin(admin.ModelAdmin):
     list_display = ['shop', 'user']
 
 class BusinessProfileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'license_number', 'license_expiration', 'shop_phone_number', 'vat_percentage', 'vat_number', 'created_on')
+    list_display = ('id', 'name', 'license_number', 'license_expiration', 'shop_phone_number', 'vat_percentage', 'vat_number', 'created_on')
     search_fields = ('name', 'license_number', 'vat_number')
     list_filter = ('license_expiration', 'vat_submission_date_1', 'vat_submission_date_2', 'vat_submission_date_3')
     readonly_fields = ('created_on',)

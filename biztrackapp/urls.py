@@ -50,7 +50,9 @@ urlpatterns = [
     path('daily-summary/create/', create_daily_summary, name='create_daily_summary'),
     path('daily-summary/edit/<int:id>/', edit_daily_summary, name='edit_daily_summary'),
     path('daily-summary/delete/<int:id>/', delete_daily_summary, name='delete_daily_summary'),
+    
     path('bank-sale/create/', create_bank_sale, name='create_bank_sale'),
+    path('bank-sales/', list_bank_sales, name='list_bank_sales'),
     path('create-credit-collection/', create_credit_collection, name='create_credit_collection'),
 
 ]

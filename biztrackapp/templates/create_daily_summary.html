@@ -3,7 +3,159 @@
 {% block title %}Create Daily Summary{% endblock %}
 
 {% block content %}
-<div class="container">
+<style>
+    .bg-white{
+        background-color: #fff !important;
+    }
+    .br-5{
+        border-radius: 5px !important;
+    }
+</style>
+<div class="container ">
+    <div class="card  ">
+        <div class="card-header">
+            <h5 class="mb-0">Create Daily Summary</h5>
+          </div>
+          <form method="post">
+        <div class="card-body ">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-body bg-white br-5">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_date">Date:</label>
+                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_date">Cash on Hand:</label>
+                                <input type="number" name="cash_on_hand" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-center ">Sale</h3>
+                    <div class="row ">
+                        <div class="col-md-4">
+                            <label>Cash Sale</label>
+                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1"> 
+                            
+                        </div>
+                        <div class="col-md-4">
+                            <label>Credit Sale</label>
+                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="2"> 
+                        </div>
+                        <div class="col-md-4">
+                            <label>Card Sale</label>
+                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3"> 
+                        </div>
+                    </div>
+                    <div class="row mb-3 mt-2">
+                        <div class="col-md-4 ">
+                            <label>Bank</label>
+                            <div class="bg-light p-2 rounded">58500.00</div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Customer</th>
+                                <th>Transaction Mode</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in bank_sales %}
+                            <tr>
+                                <td>{{ sale.customer.name }}</td>
+                                <td>{{ sale.mode_of_transaction.name }}</td>
+                                <td>{{ sale.bank.name }}</td>
+                                <td>{{ sale.amount }}</td>
+                                <td>{{ sale.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ sale.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ sale.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card  mt-4">
+                <div class="card-body bg-white  br-5">
+                    <h3 class="text-center">Credit Collection</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label>Cash</label>
+                            <div class="bg-light p-2 rounded">16750.00</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Card</label>
+                            <div class="bg-light p-2 rounded">15000.00</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Bank</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Type</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                <th>Bank</th>
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cheque</td>
+                                <td>ADIB</td>
+                                <td>10000.00</td>
+                                <td>12/06/24</td>
+                                <td>12/05/24</td>
+                                <td>Al Hilal</td>
+                                <td>154632</td>
+                            </tr>
+                            <tr>
+                                <td>Cash</td>
+                                <td>ADCB</td>
+                                <td>8500.00</td>
+                                <td>23/05/24</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer mb-0">
+            <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-warning">Save</button>
+                <a href="{% url 'daily_summary_list' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+<div class="container d-none">
   <div class="card">
     <div class="card-header">
       <h5 class="mb-0">Create Daily Summary</h5>

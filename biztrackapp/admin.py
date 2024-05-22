@@ -75,3 +75,7 @@ class SupplierAdmin(admin.ModelAdmin):
 @admin.register(Bank)
 class BankAdmin(admin.ModelAdmin):
     list_display = ['name','account_number','opening_balance', 'business_profile','created_on']
+
+
+
+admin.site.register(Employee)

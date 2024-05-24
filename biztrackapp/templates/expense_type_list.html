@@ -16,6 +16,7 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col">Type Name</th>
+        <th scope="col">Status</th>
         <th scope="col">Created On</th>
         <th scope="col">Actions</th>  <!-- New column for actions -->
       </tr>
@@ -25,6 +26,7 @@
         <tr>
           <th scope="row">{{ forloop.counter }}</th>
           <td>{{ expense_type.name }}</td>
+          <td>{{ expense_type.status }}</td>
           <td>{{ expense_type.created_on }}</td>
           <td>
             <a href="{% url 'edit_expense_type' expense_type.id %}" class="btn btn-primary btn-sm">Edit</a>

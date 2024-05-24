@@ -29,6 +29,10 @@ class BusinessProfileForm(forms.ModelForm):
         model = BusinessProfile
         fields = '__all__'
 
+class BusinessTimingForm(forms.ModelForm):
+    class Meta:
+        model = BusinessTiming
+        fields = '__all__'
 
 
 class SupplierForm(forms.ModelForm):
@@ -89,4 +93,14 @@ class CreditCollectionForm(forms.ModelForm):
 class MiscellaneousIncomeForm(forms.ModelForm):
     class Meta:
         model = MiscellaneousIncome
+        fields = '__all__'
+
+class PurchaseForm(forms.ModelForm):
+    class Meta:
+        model = Purchase
+        fields = '__all__'
+
+class SupplierPaymentForm(forms.ModelForm):
+    class Meta:
+        model = SupplierPayments
         fields = '__all__'

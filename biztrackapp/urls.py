@@ -17,11 +17,8 @@ urlpatterns = [
     path('expense-type/create/', create_expense_type, name='create_expense_type'),
     path('expense-type/<int:pk>/edit/', ExpenseTypeUpdateView.as_view(), name='edit_expense_type'),
     path('expense-type/<int:pk>/delete/', ExpenseTypeDeleteView.as_view(), name='delete_expense_type'),
-    # path('receipt-type/create/', create_receipt_type, 
-    # name='create_receipt_type'),
-    path('receipt-type/create/', create_receipt_type, 
-    name='create_receipt_type'),
-    # path('receipt-type/', ReceiptTypeListView.as_view(), name='receipt_type_list'),
+ 
+    path('receipt-type/create/', create_receipt_type, name='create_receipt_type'),
     path('receipt-type/', receipt_type_list, name='receipt_type_list'),
     path('receipt-type/<int:pk>/edit/', ReceiptTypeUpdateView.as_view(), name='edit_receipt_type'),
 
@@ -29,7 +26,8 @@ urlpatterns = [
     path('mode-transaction/create/', create_mode_of_transaction, name='create_mode_of_transaction'),
     path('mode-transaction/<int:pk>/edit/', ModeofTransactionUpdateView.as_view(), name='edit_mode_of_transaction'),
 
-
+    path('create-business-timing/', create_business_timing, name='create_business_timing'),
+    path('business-timing-list/', business_timing_list, name='business_timing_list'),
 
     path('bank/create/', create_bank, name='create_bank'),
     path('banks/', BankListView.as_view(), name='bank_list'),
@@ -48,15 +46,24 @@ urlpatterns = [
 
     path('daily-summary/', daily_summary_list, name='daily_summary_list'),
     path('daily-summary/create/', create_daily_summary, name='create_daily_summary'),
-    path('daily-summary/edit/<int:id>/', edit_daily_summary, name='edit_daily_summary'),
-    path('daily-summary/delete/<int:id>/', delete_daily_summary, name='delete_daily_summary'),
     
     path('bank-sale/create/', create_bank_sale, name='create_bank_sale'),
     path('bank-sales/', list_bank_sales, name='list_bank_sales'),
 
     path('create-credit-collection/', create_credit_collection, name='create_credit_collection'),
     path('credit-collections/', list_credit_collection, name='list_credit_collection'),
+
     path('create-misc-income/', create_misc_income, name='create_misc_income'),
+    path('misc-income/', list_msc_income, name='list_msc_income'),
+
+    path('create_purchase/', create_purchase, name='create_purchase'),
+    path('purchases/', list_purchases, name='list_purchases'),
+
+
+    path('create_supplier_payment/', create_supplier_payment, name='create_supplier_payment'),
+    path('supplier_payments/', list_supplier_payment, name='list_supplier_payment'),
+
+    
 
 ]
 if settings.DEBUG:

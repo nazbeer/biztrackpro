@@ -1,25 +1,25 @@
-<div class="modal fade" id="miscIncomeModal" tabindex="-1" aria-labelledby="miscIncomeModalLabel" aria-hidden="true">
+<div class="modal fade" id="expenseModal" tabindex="-1" aria-labelledby="expenseModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white bg-primary">
-                <h5 class="modal-title text-white" id="miscIncomeModalLabel">Add Miscellaneous Income</h5>
+                <h5 class="modal-title text-white" id="expenseModalLabel">Add Expense</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="miscIncomeForm" method="post" action="{% url 'create_misc_income' %}">
+            <form id="addexpenseForm" method="post" action="{% url 'create_misc_income' %}">
                 <div class="modal-body">
                     {% csrf_token %}
-                    <div id="miscIncomeErrors" class="alert alert-danger d-none"></div>
+                    <div id="addexpenseErrors" class="alert alert-danger d-none"></div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="id_receipt_type">Income Type</label>
+                                <label for="id_expense_type">Expense Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
-                                <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="0">
-                                    <option>-- Select Income Type --</option>
-                                    {% for receipt_type in msc_income_form.receipt_type.field.queryset %}
-                                        <option value="{{ receipt_type.id }}">{{ receipt_type.name }}</option>
+                                <select id="id_expense_type" name="expense_type" class="form-control" tabindex="0">
+                                    <option>-- Select Expense Type --</option>
+                                    {% for expense_type in msc_income_form.expense_type.field.queryset %}
+                                        <option value="{{ expense_type.id }}">{{ expense_type.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="miscIncomeErrors" class="text-danger"></div>
+                    <div id="addexpenseErrors" class="text-danger"></div>
                 </div>
                 <div class="modal-footer bg-white">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

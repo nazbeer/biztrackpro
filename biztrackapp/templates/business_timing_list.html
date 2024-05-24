@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer List{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Business Timing</h5>
+            <a href="{% url 'create_business_timing' %}" class="btn btn-primary float-right">Create Business Timing</a>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Business Profile</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Created On</th>
+                        <th>Updated On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for business_timing in business_timings %}
+                    <tr>
+                        <td>{{ business_timing.business_profile.name }}</td>
+                        <td>{{ business_timing.business_start_time}}</td>
+                        <td>{{ business_timing.business_end_time}}</td>
+                        <td>{{ business_timing.created_on}}</td>
+                        <td>{{ business_timing.updated_on}}</td>
+                       
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

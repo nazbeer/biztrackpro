@@ -19,9 +19,6 @@ def index(request):
     business = ShopAdmin.objects.get(user = user)
     return HttpResponse(f"{user}  {business}")
 
-
-
-
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -466,11 +463,7 @@ def create_employee(request):
         
         # Pass the maximum allowed users count to the template
         max_users_allowed = num_users
-        # context = {
-        #     'num_users_created': num_users_created,
-        #     'max_users_allowed': max_users_allowed,
-        #     'business_profile_id': shop.id  # Pass the business_profile_id to the template context
-        # }
+      
     business_profiles = BusinessProfile.objects.filter(name=shop)
         
         # Filter roles based on the business profile
@@ -569,6 +562,29 @@ def daily_summary_list(request):
     return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries})
 
 
+def create_business_timing(request):
+    if request.method == 'POST':
+        form = BusinessTimingForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('business_timing_list')
+    else:
+        form = BusinessTimingForm()
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    return render(request, 'create_business_timing.html', {'form': form, 'business_profile':business_profile.id})
+
+def business_timing_list(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    business_timings = BusinessTiming.objects.filter(business_profile=business_profile.id)
+    return render(request, 'business_timing_list.html', {'business_timings': business_timings})
 
 def create_daily_summary(request):
     if request.method == 'POST':
@@ -581,6 +597,8 @@ def create_daily_summary(request):
         bank_sale_form = BankSaleForm()
         credit_collection_form = CreditCollectionForm()
         msc_income_form = MiscellaneousIncomeForm()
+        purchase_form = PurchaseForm()
+        supplier_payments_form = SupplierPaymentForm()
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     
@@ -589,10 +607,12 @@ def create_daily_summary(request):
     
     # Query for bank sales created on the current date
     expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
+    receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    purchases = Purchase.objects.filter(business_profile=business_profile.id)
+    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html',
         {
             
@@ -602,11 +622,16 @@ def create_daily_summary(request):
             'bank_sale_form': bank_sale_form,
             'credit_collection_form': credit_collection_form,
             'msc_income_form': msc_income_form,
+            'purchase_form':purchase_form,
+            'supplier_payments_form':supplier_payments_form,
             #listings
             'msc_income': msc_income,
             'credit_collections':credit_collections,
             'bank_sales': bank_sales,
             'expense_type':expense_type,
+            'receipt_type':receipt_type,
+            'purchases':purchases,
+            'supplier_payments':supplier_payments,
         }
     )
 
@@ -664,6 +689,39 @@ def list_msc_income(request):
     # print(bank_sales)
     return render(request, 'create_daily_summary.html', {'msc_income': msc_income})
 
+def create_purchase(request):
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')
+    return redirect('create_daily_summary')
+
+def list_purchases(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    purchases = Purchase.objects.filter(business_profile=business_profile.id)
+    return render(request, 'create_daily_summary.html', {'purchases': purchases})
+
+def create_supplier_payment(request):
+    if request.method == 'POST':
+        form = SupplierPaymentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')
+    return redirect('create_daily_summary')
+
+def list_supplier_payment(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
+    return render(request, 'create_daily_summary.html', {'supplier_payments': supplier_payments})
 
 
 def edit_daily_summary(request, id):

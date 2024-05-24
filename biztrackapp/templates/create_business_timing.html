@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Business Timing{% endblock %}
+
+{% block content %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="mb-0">Create Business Timing</h4>
+    </div>
+    <form method="POST">
+    <div class="card-body">
+        {% csrf_token %}
+        <div class="row">
+        <div class="col-md-6">
+        <div class="form-group">
+            <label for="business_start_time" class="mb-3">Business Start Time:</label>
+            <input type="time" id="business_start_time" name="business_start_time" class="form-control mb-3" required>
+            <input type="hidden" name="business_profile" value="{{ business_profile }}">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="business_end_time" class="mb-3">Business End Time:</label>
+            <input type="time" id="business_end_time" name="business_end_time" class="form-control mb-3" required>
+        </div>
+    </div>
+</div>
+</div>
+    <div class="card-footer">
+        <div class="form-group mb-0">
+            <button type="submit" value="Submit" class="btn btn-success">Create Business Timing</button>
+        </div>
+    </div>
+    </form>
+</div>
+{% endblock %}

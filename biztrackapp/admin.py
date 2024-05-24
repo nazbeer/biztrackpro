@@ -92,4 +92,7 @@ class BankSaleAdmin(admin.ModelAdmin):
 
 admin.site.register(CreditCollection)
 admin.site.register(MiscellaneousIncome)
+admin.site.register(Purchase)
+admin.site.register(SupplierPayments)
+admin.site.register(BusinessTiming)
 

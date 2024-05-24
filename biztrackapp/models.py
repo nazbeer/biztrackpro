@@ -54,9 +54,9 @@ class BusinessProfile(models.Model):
     vat_certificate_upload = models.FileField(upload_to='vat_certificates')
     address = models.TextField()
     license_expiration_reminder_days = models.PositiveIntegerField(verbose_name='License Expiration Reminder (days)')
-    vat_submission_date_reminder_days = models.PositiveIntegerField(verbose_name='VAT Submission Date Reminder (days)')
-    employee_visa_expiration_reminder_days = models.PositiveIntegerField(verbose_name='Employee Visa Expiration Reminder (days)')
-    employee_passport_expiration_reminder_days = models.PositiveIntegerField(verbose_name='Employee Passport Expiration Reminder (days)')
+    vat_submission_date_reminder_days = models.PositiveIntegerField(null=True, verbose_name='VAT Submission Date Reminder (days)')
+    employee_visa_expiration_reminder_days = models.PositiveIntegerField(null=True, verbose_name='Employee Visa Expiration Reminder (days)')
+    employee_passport_expiration_reminder_days = models.PositiveIntegerField(null=True, verbose_name='Employee Passport Expiration Reminder (days)')
     business_start_time = models.TimeField(null=True, blank=True)
     business_end_time = models.TimeField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
@@ -75,7 +75,7 @@ class Employee(models.Model):
     nationality = models.CharField(max_length=255)
     mobile_no = models.CharField(max_length=20, blank=True, null=True)
     passport_no = models.CharField(max_length=20, unique=True)
-    passport_expiration_date = models.DateField()
+    passport_expiration_date = models.DateField(null=True)
     emirates_id = models.CharField(max_length=20, unique=True)
     id_expiration_date = models.DateField()
     basic_pay = models.DecimalField(max_digits=10, decimal_places=2)
@@ -88,6 +88,15 @@ class Employee(models.Model):
 
     def __str__(self):
         return f"{self.business_profile} - {self.employee_id} - {self.first_name} {self.last_name}"
+    
+class BusinessTiming(models.Model):
+    business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE, null=True)
+    business_start_time = models.TimeField(null=True, blank=True)
+    business_end_time = models.TimeField(null=True, blank=True)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    updated_on = models.DateTimeField(auto_now_add=True, null=True)
+    def __str__(self):
+        return f"{self.business_profile} - {self.business_start_time} - {self.business_end_time}"
     
 class ExpenseType(models.Model):
     name = models.CharField(max_length=255)
@@ -126,8 +135,6 @@ class TransactionMode(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-
-
 
 class Customer(models.Model):
     name = models.CharField(max_length=255)
@@ -204,9 +211,8 @@ class CreditCollection(models.Model):
     def __str__(self):
         return f"{self.customer.name} - {self.amount}"
 
-
 class MiscellaneousIncome(models.Model):
-    expense_type = models.ForeignKey(ExpenseType, on_delete=models.CASCADE)
+    receipt_type = models.ForeignKey(ReceiptType, on_delete=models.CASCADE)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
@@ -218,3 +224,35 @@ class MiscellaneousIncome(models.Model):
 
     def __str__(self):
         return f"{self.amount}"
+
+class Purchase(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    opening_outstanding = models.DecimalField(max_digits=10, decimal_places=2)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    invoice_date = models.DateField()
+    invoice_no = models.CharField(max_length=255)
+    invoice_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Invoice {self.invoice_no} - {self.supplier.name}"
+
+class SupplierPayments(models.Model):
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    opening_outstanding = models.DecimalField(max_digits=10, decimal_places=2)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Amount {self.amount} - {self.supplier.name}"

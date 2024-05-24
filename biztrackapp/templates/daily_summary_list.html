@@ -11,7 +11,7 @@
     </div>
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-bordered table-striped nowrap" id="dailysummary">
+        <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -68,24 +68,45 @@
 
 <script>
   new DataTable('#dailysummary', {
-    responsive: true,
-    dom: 'lBfrtip',
-    buttons: [
-      {
-        extend: 'print',
-        exportOptions: {
-          stripHtml: false,
-          columns: ':visible'
-        }
-      },
-      {
-        extend: 'pdf',
-        exportOptions: {
-          stripHtml: true,
-          columns: ':visible'
-        }
-      }
-    ]
-  });
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+  // new DataTable('#dailysummary', {
+  //   responsive: true,
+  //   dom: 'lBfrtip',
+  //   buttons: [
+  //     {
+  //       extend: 'print',
+  //       exportOptions: {
+  //         stripHtml: false,
+  //         columns: ':visible'
+  //       }
+  //     },
+  //     {
+  //       extend: 'pdf',
+  //       exportOptions: {
+  //         stripHtml: true,
+  //         columns: ':visible'
+  //       }
+  //     }
+  //   ]
+  // });
 </script>
 {% endblock %}

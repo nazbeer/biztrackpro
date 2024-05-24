@@ -32,7 +32,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date">Cash on Hand:</label>
-                                <input type="number" name="cash_on_hand" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
+                                <input type="number" name="cash_on_hand" value="" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
                             </div>
                         </div>
                     </div>
@@ -43,14 +43,10 @@
                     <h5 class="text-left mb-0">Sale</h5>
                 </div>
                 <div class="card-body bg-white br-5">
-                    
-                    
                     <div class="row ">
                         <div class="col-md-4">
                             <label>Cash Sale</label>
                             <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1"> 
-                            
-                            
                         </div>
                         <div class="col-md-4">
                             <label>Credit Sale</label>
@@ -63,16 +59,17 @@
                     </div>
                     <div class="row mb-3 mt-2">
                         <div class="col-md-4 ">
-                            <label>Bank</label>
+                            <label>Bank Sale Total</label>
                             <div class="bg-light p-2 rounded" >58500.00</div>
-                                <input type="hidden" name="bank_sale_total" required class="form-control bg-light" id="id_bank_sale_total" > 
+                                <input type="hidden" name="bank_sale_total" value=""  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <div class="table-responsive">
+                    <table id="tablebanksale"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead style="color:transparent !important;">
                             <tr>
                                 <th>Customer</th>
                                 <th>Transaction Mode</th>
@@ -99,6 +96,7 @@
                         </tbody>
                     </table>
                 </div>
+                </div>
             </div>
             <div class="card  mt-4">
                 <div class="card-header text-white">
@@ -108,19 +106,12 @@
                     
                     <div class="row mb-4">
                         <div class="col-md-3">
-                            <label>Cash</label>
-                            <div class="bg-light p-2 rounded">16750.00</div>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card</label>
-                            <div class="bg-light p-2 rounded">15000.00</div>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank</label>
+                            <label>Credit Collection Total</label>
                             <div class="bg-light p-2 rounded">8500.00</div>
-                        </div>
+                            <input type="hidden" name="credit_collection_total" value=""  required class="form-control bg-light" id="id_credit_collection_total" > 
+                        </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
                         </div>
                     </div>
                     <table class="table table-bordered">
@@ -161,20 +152,170 @@
                 <div class="card-body bg-white  br-5">
                     
                     <div class="row mb-4">
-                        <div class="col-md-3">
+                        <!-- <div class="col-md-3">
                             <label>Cash</label>
                             <div class="bg-light p-2 rounded">16750.00</div>
                         </div>
                         <div class="col-md-3">
                             <label>Card</label>
                             <div class="bg-light p-2 rounded">15000.00</div>
-                        </div>
+                        </div>-->
                         <div class="col-md-3">
-                            <label>Bank</label>
+                            <label>Msc. Income Total</label>
                             <div class="bg-light p-2 rounded">8500.00</div>
-                        </div>
+                            <input type="hidden" name="msc_income_total" value="" required class="form-control bg-light" id="id_msc_income_total" > 
+                        </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Msc. Income</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Msc. Income</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Mode of Transaction</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for msc_incomes in msc_income %}
+                            <tr>
+                                <td>{{ msc_incomes.receipt_type.name }}</td>
+                                <td>{{ msc_incomes.mode_of_transaction.name }}</td>
+                                <td>{{ msc_incomes.bank.name }}</td>
+                                <td>{{ msc_incomes.amount }}</td>
+                                <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Purchases</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row mb-4">
+                        
+                        <div class="col-md-3">
+                            <label>Purchases Total</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="purchases_total" value="" required class="form-control bg-light" id="id_purchases_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal">Add Purchases</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th>Opening Outstanding</th>
+                                    <th>Mode of Transaction</th>
+                                    <th>Invoice Date</th>
+                                    <th>Invoice No</th>
+                                    <th>Invoice Amount</th>
+                                    <th>Cheque Date</th>
+                                    <th>Cheque No</th>
+                                    <th>Bank</th>
+                                </tr>                                
+                        </thead>
+                        <tbody>
+                           
+                            {% for purchase in purchases %}
+                            <tr>
+                                <td>{{ purchase.supplier.name }}</td>
+                                <td>{{ purchase.opening_outstanding }}</td>
+                                <td>{{ purchase.mode_of_transaction.name }}</td>
+                                <td>{{ purchase.invoice_date|date:"d/m/Y" }}</td>
+                                <td>{{ purchase.invoice_no }}</td>
+                                <td>{{ purchase.invoice_amount }}</td>
+                                <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ purchase.cheque_no }}</td>
+                                <td>{{ purchase.bank.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Supplier Payment</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row mb-4">
+                        
+                        <div class="col-md-3">
+                            <label>Supplier Payment Total</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="supplier_payment_total" value="" required class="form-control bg-light" id="id_supplier_payment_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Opening Outstanding</th>
+                                <th>Mode of Transaction</th>
+                                <th>Amount</th>
+                                <th>Cheque Date</th>
+                                <th>Cheque No</th>
+                                <th>Bank</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for supplier_payment in supplier_payments %}
+                            <tr>
+                                <td>{{ supplier_payment.supplier.name }}</td>
+                                <td>{{ supplier_payment.opening_outstanding }}</td>
+                                <td>{{ supplier_payment.mode_of_transaction }}</td>
+                                <td>{{ supplier_payment.amount }}</td>
+                                <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ supplier_payment.cheque_no }}</td>
+                                <td>{{ supplier_payment.bank.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Expenses</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row mb-4">
+                        
+                        <div class="col-md-3">
+                            <label>Expense Total</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="expense_total" value="" required class="form-control bg-light" id="id_expense_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
                         </div>
                     </div>
                     <table class="table table-bordered">
@@ -207,12 +348,63 @@
                     </table>
                 </div>
             </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Bank Deposit</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row mb-4">
+                        
+                        <div class="col-md-3">
+                            <label>Bank Deposit Total</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="bank_deposit_total" value="" required class="form-control bg-light" id="id_bank_deposit_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Mode of Transaction</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for msc_incomes in msc_income %}
+                            <tr>
+                                <td>{{ msc_incomes.expense_type.name }}</td>
+                                <td>{{ msc_incomes.mode_of_transaction.name }}</td>
+                                <td>{{ msc_incomes.bank.name }}</td>
+                                <td>{{ msc_incomes.amount }}</td>
+                                <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
         </div>
         <div class="card-footer mb-0">
             <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <button type="submit" class="btn btn-warning">Save</button>
-                <a href="{% url 'daily_summary_list' %}" class="btn btn-secondary">Reset</a>
+                <a href="{% url 'create_daily_summary' %}" class="btn btn-secondary">Reset</a>
             </div>
         </div>
     </form>
@@ -245,15 +437,7 @@
 
         </div>
        
-      
-      <!-- Buttons to trigger various modals -->
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Miscellaneous Income</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#purchaseModal">Add Purchase</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
-      <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
+    
     
     </div>
     <div class="card-footer mb-0">
@@ -269,6 +453,10 @@
 {% include 'modals/bank_sale_modal.html' %}
 {% include 'modals/credit_collection_modal.html' %}
 {% include 'modals/msc_income_modal.html' %}
+{% include 'modals/purchase_modal.html' %}
+{% include 'modals/supplier_payment_modal.html' %}
+{% include 'modals/expense_modal.html' %}
+{% include 'modals/bank_deposit_modal.html' %}
 <!-- Repeat similar structure for other modals: Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
 
 {% endblock %}
@@ -276,4 +464,27 @@
 {% block extra_scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+     new DataTable('#tablebanksale', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+</script>
 {% endblock %}

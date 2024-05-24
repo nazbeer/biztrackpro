@@ -114,8 +114,9 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <div class="table-responsive">
+                    <table id="tablecreditcollection"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color:transparent !important;">
                             <tr>
                                 <th>Customer</th>
                                 <th>Payment Mode</th>
@@ -143,6 +144,7 @@
                         </tbody>
                     </table>
                 </div>
+                </div>
             </div>
 
             <div class="card  mt-4">
@@ -152,14 +154,7 @@
                 <div class="card-body bg-white  br-5">
                     
                     <div class="row mb-4">
-                        <!-- <div class="col-md-3">
-                            <label>Cash</label>
-                            <div class="bg-light p-2 rounded">16750.00</div>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card</label>
-                            <div class="bg-light p-2 rounded">15000.00</div>
-                        </div>-->
+                       
                         <div class="col-md-3">
                             <label>Msc. Income Total</label>
                             <div class="bg-light p-2 rounded">8500.00</div>
@@ -169,8 +164,8 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Msc. Income</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <table id="tablemscincome"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <th>Income Type</th>
                                 <th>Mode of Transaction</th>
@@ -218,8 +213,8 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal">Add Purchases</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <table id="tablepurchases"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <tr>
                                     <th>Supplier</th>
@@ -271,8 +266,8 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <table id="tablesupplierpayment"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <th>Supplier</th>
                                 <th>Opening Outstanding</th>
@@ -318,8 +313,8 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <table id="tableexpense"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <th>Income Type</th>
                                 <th>Mode of Transaction</th>
@@ -367,8 +362,8 @@
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead class="thead-light">
+                    <table id="tablebankdeposit"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <th>Income Type</th>
                                 <th>Mode of Transaction</th>
@@ -466,6 +461,132 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
      new DataTable('#tablebanksale', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tablecreditcollection', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tablebankdeposit', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tableexpense', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tablepurchase', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tablemscincome', {
+            responsive: true,
+            dom: 'lBfrtip',
+            order: [],
+            buttons: [
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                      
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                       
+                    }
+                }
+            ]
+        });
+        new DataTable('#tablesupplierpayment', {
             responsive: true,
             dom: 'lBfrtip',
             order: [],

@@ -19,6 +19,9 @@ def index(request):
     business = ShopAdmin.objects.get(user = user)
     return HttpResponse(f"{user}  {business}")
 
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']

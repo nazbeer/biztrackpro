@@ -217,4 +217,4 @@ class MiscellaneousIncome(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.business_profile.name} - {self.amount}"
+        return f"{self.amount}"

@@ -588,6 +588,7 @@ def create_daily_summary(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     
     # Query for bank sales created on the current date
+    expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
@@ -605,6 +606,7 @@ def create_daily_summary(request):
             'msc_income': msc_income,
             'credit_collections':credit_collections,
             'bank_sales': bank_sales,
+            'expense_type':expense_type,
         }
     )
 
@@ -651,6 +653,18 @@ def create_misc_income(request):
             form.save()
             return redirect('create_daily_summary')
     return redirect('create_daily_summary')
+
+def list_msc_income(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
+    # print(bank_sales)
+    return render(request, 'create_daily_summary.html', {'msc_income': msc_income})
+
+
 
 def edit_daily_summary(request, id):
     summary = get_object_or_404(DailySummary, id=id)

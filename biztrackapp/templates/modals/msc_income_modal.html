@@ -1,0 +1,70 @@
+<!-- Miscellaneous Income Modal -->
+<div class="modal fade" id="miscIncomeModal" tabindex="-1" aria-labelledby="miscIncomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-primary">
+                <h5 class="modal-title text-white" id="miscIncomeModalLabel">Add Miscellaneous Income</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="miscIncomeForm" method="post" action="{% url 'create_misc_income' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div id="miscIncomeErrors" class="alert alert-danger d-none"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_expense_type">Expense Type</label>
+                                <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <select id="id_expense_type" name="expense_type" class="form-control" tabindex="0">
+                                    <option>-- Select Expense Type --</option>
+                                    {% for expense_type in misc_income_form.expense_type.field.queryset %}
+                                        <option value="{{ expense_type.id }}">{{ expense_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_amount">Amount</label>
+                                <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="2">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_cheque_date">Cheque Date</label>
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_mode_of_transaction">Mode of Transaction</label>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
+                                    <option>-- Mode of Transaction --</option>
+                                    {% for transaction_mode in misc_income_form.mode_of_transaction.field.queryset %}
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_bank">Bank</label>
+                                <select id="id_bank" name="bank" class="form-control" tabindex="3">
+                                    <option>-- Select Bank --</option>
+                                    {% for bank in misc_income_form.bank.field.queryset %}
+                                        <option value="{{ bank.id }}">{{ bank.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_cheque_no">Cheque Number</label>
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="miscIncomeErrors" class="text-danger"></div>
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

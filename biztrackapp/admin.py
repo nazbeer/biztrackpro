@@ -79,7 +79,7 @@ class SupplierAdmin(admin.ModelAdmin):
 
 @admin.register(Bank)
 class BankAdmin(admin.ModelAdmin):
-    list_display = ['name','account_number','opening_balance', 'business_profile','created_on']
+    list_display = ['id', 'name','account_number','opening_balance', 'business_profile','created_on']
 
 
 
@@ -91,4 +91,5 @@ class BankSaleAdmin(admin.ModelAdmin):
     list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'created_on', 'updated_on']
 
 admin.site.register(CreditCollection)
+admin.site.register(MiscellaneousIncome)
 

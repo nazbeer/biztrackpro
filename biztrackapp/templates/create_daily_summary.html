@@ -153,6 +153,60 @@
                     </table>
                 </div>
             </div>
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Msc. Income</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <label>Cash</label>
+                            <div class="bg-light p-2 rounded">16750.00</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card</label>
+                            <div class="bg-light p-2 rounded">15000.00</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank</label>
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Msc. Income</button>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Mode of Transaction</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for msc_incomes in msc_income %}
+                            <tr>
+                                <td>{{ msc_incomes.expense_type.name }}</td>
+                                <td>{{ msc_incomes.mode_of_transaction.name }}</td>
+                                <td>{{ msc_incomes.bank.name }}</td>
+                                <td>{{ msc_incomes.amount }}</td>
+                                <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <div class="card-footer mb-0">
             <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
@@ -214,6 +268,7 @@
 </div>
 {% include 'modals/bank_sale_modal.html' %}
 {% include 'modals/credit_collection_modal.html' %}
+{% include 'modals/msc_income_modal.html' %}
 <!-- Repeat similar structure for other modals: Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
 
 {% endblock %}

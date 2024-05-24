@@ -212,7 +212,7 @@ class MiscellaneousIncome(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
     cheque_date = models.DateField()
     cheque_no = models.CharField(max_length=255)
-    business_profile = models.ForeignKey(BusinessProfile, on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 

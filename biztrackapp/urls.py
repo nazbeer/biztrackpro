@@ -53,7 +53,10 @@ urlpatterns = [
     
     path('bank-sale/create/', create_bank_sale, name='create_bank_sale'),
     path('bank-sales/', list_bank_sales, name='list_bank_sales'),
+
     path('create-credit-collection/', create_credit_collection, name='create_credit_collection'),
+    path('credit-collections/', list_credit_collection, name='list_credit_collection'),
+    path('create-misc-income/', create_misc_income, name='create_misc_income'),
 
 ]
 if settings.DEBUG:

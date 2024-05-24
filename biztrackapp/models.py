@@ -176,7 +176,7 @@ class DailySummary(models.Model):
     def __str__(self):
         return f"{self.date} {self.status}"
     
-class BankSale(models.Model):
+class BankSales(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -203,3 +203,18 @@ class CreditCollection(models.Model):
 
     def __str__(self):
         return f"{self.customer.name} - {self.amount}"
+
+
+class MiscellaneousIncome(models.Model):
+    expense_type = models.ForeignKey(ExpenseType, on_delete=models.CASCADE)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    business_profile = models.ForeignKey(BusinessProfile, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.business_profile.name} - {self.amount}"

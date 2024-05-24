@@ -19,13 +19,14 @@
           <form method="post">
         <div class="card-body ">
             {% csrf_token %}
-            <div class="card">
+            <div class="card mt-0">
                 <div class="card-body bg-white br-5">
-                    <div class="row mb-3">
+                    <div class="row ">
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date">Date:</label>
                                 <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
+                                <input type="hidden" name="business_profile" value={{business_profile}}>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -35,11 +36,20 @@
                             </div>
                         </div>
                     </div>
-                    <h3 class="text-center ">Sale</h3>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Sale</h5>
+                </div>
+                <div class="card-body bg-white br-5">
+                    
+                    
                     <div class="row ">
                         <div class="col-md-4">
                             <label>Cash Sale</label>
                             <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1"> 
+                            
                             
                         </div>
                         <div class="col-md-4">
@@ -54,7 +64,8 @@
                     <div class="row mb-3 mt-2">
                         <div class="col-md-4 ">
                             <label>Bank</label>
-                            <div class="bg-light p-2 rounded">58500.00</div>
+                            <div class="bg-light p-2 rounded" >58500.00</div>
+                                <input type="hidden" name="bank_sale_total" required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
@@ -90,56 +101,54 @@
                 </div>
             </div>
             <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Credit Collection</h5>
+                </div>
                 <div class="card-body bg-white  br-5">
-                    <h3 class="text-center">Credit Collection</h3>
+                    
                     <div class="row mb-4">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label>Cash</label>
                             <div class="bg-light p-2 rounded">16750.00</div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label>Card</label>
                             <div class="bg-light p-2 rounded">15000.00</div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label>Bank</label>
                             <div class="bg-light p-2 rounded">8500.00</div>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
+                        <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
                         </div>
                     </div>
                     <table class="table table-bordered">
                         <thead class="thead-light">
                             <tr>
-                                <th>Type</th>
+                                <th>Customer</th>
+                                <th>Payment Mode</th>
                                 <th>Bank</th>
                                 <th>Amount</th>
                                 <th>Dep. Date</th>
                                 <th>Chq. Date</th>
-                                <th>Bank</th>
+                                
                                 <th>Chq No.</th>
                             </tr>
                         </thead>
                         <tbody>
+                           
+                            {% for creditcol in credit_collections %}
                             <tr>
-                                <td>Cheque</td>
-                                <td>ADIB</td>
-                                <td>10000.00</td>
-                                <td>12/06/24</td>
-                                <td>12/05/24</td>
-                                <td>Al Hilal</td>
-                                <td>154632</td>
+                                <td>{{ creditcol.customer.name }}</td>
+                                <td>{{ creditcol.payment_mode.name }}</td>
+                                <td>{{ creditcol.bank.name }}</td>
+                                <td>{{ creditcol.amount }}</td>
+                                <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ creditcol.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ creditcol.cheque_no }}</td>
                             </tr>
-                            <tr>
-                                <td>Cash</td>
-                                <td>ADCB</td>
-                                <td>8500.00</td>
-                                <td>23/05/24</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -203,143 +212,9 @@
     </form>
   </div>
 </div>
-
-<!-- Bank Sale -->
-<div class="modal fade" id="bankSaleModal" tabindex="-1" aria-labelledby="bankSaleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header bg-dark text-white">
-        <h5 class="modal-title text-white" id="bankSaleModalLabel">Add Bank Sale</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form id="bankSaleForm" method="post" action="{% url 'create_bank_sale' %}">
-        <div class="modal-body">
-          {% csrf_token %}
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="id_customer">Customer</label>
-                <select id="id_customer" name="customer" class="form-control" tabindex="0">
-                  <option>-- Select Customer --</option>
-                  {% for customer in bank_sale_form.customer.field.queryset %}
-                    <option value="{{ customer.id }}">{{ customer.name }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="id_amount">Amount</label>
-                <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
-              </div>
-              <div class="form-group">
-                <label for="id_cheque_date">Cheque Date</label>
-                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="id_mode_of_transaction">Mode of Transaction</label>
-                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
-                  <option>-- Mode of Transaction --</option>
-                  {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
-                    <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="id_bank">Bank</label>
-                <select id="id_bank" name="bank" class="form-control" tabindex="3">
-                  <option>-- Select Bank --</option>
-                  {% for bank in bank_sale_form.bank.field.queryset %}
-                    <option value="{{ bank.id }}">{{ bank.name }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="id_cheque_no">Cheque Number</label>
-                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer bg-white ">
-          <button type="submit" class="btn btn-primary" tabindex="6">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<!-- Credit Collection Modal -->
-<div class="modal fade" id="creditCollectionModal" tabindex="-1" aria-labelledby="creditCollectionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title text-white" id="creditCollectionModalLabel">Add Credit Collection</h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form id="creditCollectionForm" method="post" action="{% url 'create_credit_collection' %}">
-          <div class="modal-body">
-            {% csrf_token %}
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="id_customer">Customer</label>
-                  <select id="id_customer" name="customer" class="form-control" tabindex="0">
-                    <option>-- Select Customer --</option>
-                    {% for customer in credit_collection_form.customer.field.queryset %}
-                      <option value="{{ customer.id }}">{{ customer.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="id_amount">Amount</label>
-                  <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
-                </div>
-                <div class="form-group">
-                  <label for="id_cheque_date">Cheque Date</label>
-                  <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="id_payment_mode">Payment Mode</label>
-                  <select id="id_payment_mode" name="payment_mode" class="form-control" tabindex="1">
-                    <option>-- Select Payment Mode --</option>
-                    {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
-                      <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="id_bank">Bank</label>
-                  <select id="id_bank" name="bank" class="form-control" tabindex="3">
-                    <option>-- Select Bank --</option>
-                    {% for bank in credit_collection_form.bank.field.queryset %}
-                      <option value="{{ bank.id }}">{{ bank.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="id_cheque_no">Cheque Number</label>
-                  <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" tabindex="6">Save</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  
-<!-- Repeat similar structure for other modals: Credit Collection, Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
+{% include 'modals/bank_sale_modal.html' %}
+{% include 'modals/credit_collection_modal.html' %}
+<!-- Repeat similar structure for other modals: Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
 
 {% endblock %}
 

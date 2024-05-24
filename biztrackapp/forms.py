@@ -75,7 +75,7 @@ class DailySummaryForm(forms.ModelForm):
 
 class BankSaleForm(forms.ModelForm):
     class Meta:
-        model = BankSale
+        model = BankSales
         fields = '__all__'
 
 
@@ -84,3 +84,9 @@ class CreditCollectionForm(forms.ModelForm):
         model = CreditCollection
         fields = '__all__'
         # fields = ['customer', 'payment_mode', 'amount', 'bank', 'cheque_date', 'cheque_no']
+
+
+class MiscellaneousIncomeForm(forms.ModelForm):
+    class Meta:
+        model = MiscellaneousIncome
+        fields = '__all__'

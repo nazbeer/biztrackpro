@@ -86,7 +86,7 @@ class BankAdmin(admin.ModelAdmin):
 admin.site.register(Employee)
 admin.site.register(DailySummary)
 
-@admin.register(BankSale)
+@admin.register(BankSales)
 class BankSaleAdmin(admin.ModelAdmin):
     list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'created_on', 'updated_on']
 

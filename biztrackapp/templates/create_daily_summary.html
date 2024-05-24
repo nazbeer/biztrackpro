@@ -5,11 +5,13 @@
 {% block content %}
 <style>
     .bg-white{
-        background-color: #fff !important;
+        /* background-color: #fff !important; */
+        color:#000 !important;
     }
     .br-5{
         border-radius: 5px !important;
     }
+   
 </style>
 <div class="container ">
     <div class="card  ">
@@ -68,7 +70,7 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                    <table id="tablebanksale"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                    <table  class="table table-bordered table-striped "  id="tablebanksale" >
                         <thead style="color:transparent !important;">
                             <tr>
                                 <th>Customer</th>
@@ -471,151 +473,179 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
      new DataTable('#tablebanksale', {
-            responsive: true,
+        responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tablecreditcollection', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tablebankdeposit', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tableexpense', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tablepurchase', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tablemscincome', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
         new DataTable('#tablesupplierpayment', {
             responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
 </script>
 {% endblock %}

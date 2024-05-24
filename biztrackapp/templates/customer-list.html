@@ -10,7 +10,8 @@
             <a href="{% url 'create_customer' %}" class="btn btn-primary float-right">Create Customer</a>
         </div>
         <div class="card-body">
-            <table class="table">
+            <div class="table-responsive">
+                <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -32,6 +33,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

@@ -68,25 +68,29 @@
 
 <script>
   new DataTable('#dailysummary', {
-            responsive: true,
+    responsive: true,
             dom: 'lBfrtip',
-            order: [],
+            
             buttons: [
                 {
+                    text: 'Print',
                     extend: 'print',
                     exportOptions: {
                         stripHtml: false,
-                      
+                        columns: [0, 1, 2, 3, 4]
                     }
                 },
                 {
+                    text: 'Export PDF',
                     extend: 'pdf',
+                    
                     exportOptions: {
                         stripHtml: true,
                        
-                    }
+                    },
+          
                 }
-            ]
+            ],
         });
   // new DataTable('#dailysummary', {
   //   responsive: true,

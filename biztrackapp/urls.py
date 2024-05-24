@@ -42,7 +42,7 @@ urlpatterns = [
     path('customer-list/', customer_list, name='customer_list'),
     path('supplier-list/', supplier_list, name='supplier_list'),
 
-    path('sale/success/', success_view, name='success'),
+    path('success/', success_view, name='success'),
 
     path('daily-summary/', daily_summary_list, name='daily_summary_list'),
     path('daily-summary/create/', create_daily_summary, name='create_daily_summary'),

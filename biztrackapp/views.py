@@ -118,7 +118,7 @@ def create_business_profile(request):
         try:
             shop_admin = ShopAdmin.objects.get(user=request.user)
             shop_name = shop_admin.shop.name
-            print(shop_name)
+            # print(shop_name)
             context['shop_details'] = shop_admin.shop
             context['license_number'] = shop_admin.shop.license_number
 

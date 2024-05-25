@@ -602,6 +602,8 @@ def create_daily_summary(request):
         msc_income_form = MiscellaneousIncomeForm()
         purchase_form = PurchaseForm()
         supplier_payments_form = SupplierPaymentForm()
+        bank_deposit_form = BankDepositsForm()
+
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     
@@ -616,6 +618,7 @@ def create_daily_summary(request):
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
     purchases = Purchase.objects.filter(business_profile=business_profile.id)
     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
+    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html',
         {
             
@@ -627,6 +630,7 @@ def create_daily_summary(request):
             'msc_income_form': msc_income_form,
             'purchase_form':purchase_form,
             'supplier_payments_form':supplier_payments_form,
+            'bank_deposit_form':bank_deposit_form,
             #listings
             'msc_income': msc_income,
             'credit_collections':credit_collections,
@@ -635,6 +639,8 @@ def create_daily_summary(request):
             'receipt_type':receipt_type,
             'purchases':purchases,
             'supplier_payments':supplier_payments,
+            'bank_deposit':bank_deposit,
+
         }
     )
 
@@ -725,6 +731,25 @@ def list_supplier_payment(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html', {'supplier_payments': supplier_payments})
+
+
+def create_bank_deposit(request):
+    if request.method == 'POST':
+        form = BankDepositsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')
+    return redirect('create_daily_summary')
+
+def list_bank_deposit(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
+    # print(bank_sales)
+    return render(request, 'create_daily_summary.html', {'bank_deposit': bank_deposit})
 
 
 def edit_daily_summary(request, id):

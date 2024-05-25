@@ -104,3 +104,9 @@ class SupplierPaymentForm(forms.ModelForm):
     class Meta:
         model = SupplierPayments
         fields = '__all__'
+
+
+class BankDepositsForm(forms.ModelForm):
+    class Meta:
+        model = BankDeposits
+        fields = '__all__'

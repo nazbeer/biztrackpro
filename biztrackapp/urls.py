@@ -65,6 +65,9 @@ urlpatterns = [
     path('create_supplier_payment/', create_supplier_payment, name='create_supplier_payment'),
     path('supplier_payments/', list_supplier_payment, name='list_supplier_payment'),
 
+    path('create-bank-deposit/', create_bank_deposit, name='create_bank_deposit'),
+    path('bank-deposit/', list_bank_deposit, name='list_bank_deposit'),
+
     
 
 ]

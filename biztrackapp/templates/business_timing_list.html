@@ -13,6 +13,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Business Profile</th>
                         <th>Start Time</th>
                         <th>End Time</th>
@@ -24,6 +25,7 @@
                 <tbody>
                     {% for business_timing in business_timings %}
                     <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
                         <td>{{ business_timing.business_profile.name }}</td>
                         <td>{{ business_timing.business_start_time }}</td>
                         <td>{{ business_timing.business_end_time }}</td>

@@ -563,6 +563,24 @@ def daily_summary_list(request):
     daily_summaries = DailySummary.objects.filter(business_profile=business_profile.id)
     return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries})
 
+def edit_daily_summary(request, id):
+    daily_summaries = get_object_or_404(DailySummary, id=id)
+    print(daily_summaries)
+    if request.method == 'POST':
+        form = DailySummaryForm(request.POST, instance=daily_summaries)
+        if form.is_valid():
+            form.save()
+            return redirect('daily_summary_list')
+    else:
+        form = DailySummaryForm(instance=daily_summaries)
+    
+    return render(request, 'edit_daily_summary.html', {'daily_summaries': daily_summaries, 'form': form})
+
+def delete_daily_summary(request, pk):
+    daily_summary = get_object_or_404(DailySummary, id=pk)
+    print(daily_summary)
+    daily_summary.delete()
+    return redirect('daily_summary_list')
 
 def create_business_timing(request):
     if request.method == 'POST':
@@ -593,8 +611,8 @@ def business_timing_list(request):
     return render(request, 'business_timing_list.html', {'business_timings': business_timings})
 
 
-def edit_business_timing(request, pk):
-    business_timing = get_object_or_404(BusinessTiming, pk=pk)
+def edit_business_timing(request, id):
+    business_timing = get_object_or_404(BusinessTiming, id=id)
     print(business_timing)
     if request.method == 'POST':
         form = BusinessTimingForm(request.POST, instance=business_timing)
@@ -611,7 +629,7 @@ def delete_business_timing(request, id):
     business_timing = get_object_or_404(BusinessTiming, id=id)
     print(business_timing)
     business_timing.delete()
-    return redirect('business_timing_listing')
+    return redirect('business_timing_list')
 
 def create_daily_summary(request):
     if request.method == 'POST':

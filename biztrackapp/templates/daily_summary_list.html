@@ -28,7 +28,7 @@
               <th scope="col">Expense</th>
               <th scope="col">Bank Deposit</th>
               <th scope="col">Closing Balance</th>
-              <th scope="col">Business Profile</th>
+              
               <th scope="col">Status</th>
               <th scope="col">Created On</th>
               <th scope="col">Updated On</th>
@@ -52,17 +52,18 @@
                 <td>{{ summary.expense }}</td>
                 <td>{{ summary.bank_deposit }}</td>
                 <td>{{ summary.closing_balance }}</td>
-                <td>{{ summary.business_profile }}</td>
+                
                 <td>{{ summary.status }}</td>
                 <td>{{ summary.created_on }}</td>
                 <td>{{ summary.updated_on }}</td>
+                
                 <td>
                   <a href="{% url 'edit_daily_summary' summary.id %}" class="btn btn-primary btn-sm">Edit</a>
                   <form action="{% url 'delete_daily_summary' summary.id %}" method="post" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                   </form>
-                </td>
+                </td>  
               </tr>
             {% endfor %}
           </tbody>

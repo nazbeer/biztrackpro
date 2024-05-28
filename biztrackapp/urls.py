@@ -30,8 +30,8 @@ urlpatterns = [
 
     path('create-business-timing/', create_business_timing, name='create_business_timing'),
     path('business-timing-list/', business_timing_list, name='business_timing_list'),
-    path('business_timing/edit/<int:pk>/', views.edit_business_timing, name='edit_business_timing'),
-    path('business_timing/delete/<int:pk>/', views.delete_business_timing, name='delete_business_timing'),
+    path('business_timing/edit/<int:id>/', edit_business_timing, name='edit_business_timing'),
+    path('business_timing/delete/<int:id>/', delete_business_timing, name='delete_business_timing'),
    
     path('bank/create/', create_bank, name='create_bank'),
     path('banks/', BankListView.as_view(), name='bank_list'),
@@ -50,6 +50,8 @@ urlpatterns = [
 
     path('daily-summary/', daily_summary_list, name='daily_summary_list'),
     path('daily-summary/create/', create_daily_summary, name='create_daily_summary'),
+    path('daily_summary/edit/<int:id>/', edit_daily_summary, name='edit_daily_summary'),
+    path('daily_summary/delete/<int:pk>/', delete_daily_summary, name='delete_daily_summary'),
     
     path('bank-sale/create/', create_bank_sale, name='create_bank_sale'),
     path('bank-sales/', list_bank_sales, name='list_bank_sales'),

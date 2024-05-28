@@ -621,6 +621,21 @@ def create_daily_summary(request):
     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
     expense = Expense.objects.filter(business_profile=business_profile.id)
     total_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    cheque_transaction_mode = get_object_or_404(TransactionMode ,id=1)
+    bank_transaction_mode = get_object_or_404(TransactionMode ,id=2)
+    cash_transaction_mode = get_object_or_404(TransactionMode ,id=3)
+    credit_transaction_mode = get_object_or_404(TransactionMode ,id=4)
+    # card_transaction_mode = get_object_or_404(TransactionMode ,id=5)
+
+
+    # bank_sale
+    bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+    # bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    bank_sale_totals = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
 
 
     return render(request, 'create_daily_summary.html',
@@ -646,10 +661,24 @@ def create_daily_summary(request):
             'supplier_payments':supplier_payments,
             'bank_deposits':bank_deposit,
             'expenses':expense,
-            'expense_sum':total_amount
+            'expense_sum':total_amount,
+
+
+
+            # calculated vales
+            'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
+            'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
+            'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
+            'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+            # 'bank_sale_total_card_sale':bank_sale_total_card_sales,
+            'bank_sale_total':bank_sale_totals,
+
+
+
 
         }
     )
+
 
 def create_bank_sale(request):
     if request.method == 'POST':

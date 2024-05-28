@@ -17,6 +17,9 @@
               <th scope="col">#</th>
               <th scope="col">Date</th>
               <th scope="col">Opening Balance</th>
+              <th scope="col">Cash Sale</th>
+              <th scope="col">Credit Sale</th>
+              <th scope="col">Card Sale</th>
               <th scope="col">Sales</th>
               <th scope="col">Credit Collection</th>
               <th scope="col">Miscellaneous Income</th>
@@ -38,6 +41,9 @@
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ summary.date }}</td>
                 <td>{{ summary.opening_balance }}</td>
+                <td>{{ summary.cash_sale }}</td>
+                <td>{{ summary.credit_sale }}</td>
+                <td>{{ summary.card_sale }}</td>
                 <td>{{ summary.sales }}</td>
                 <td>{{ summary.credit_collection }}</td>
                 <td>{{ summary.miscellaneous_income }}</td>

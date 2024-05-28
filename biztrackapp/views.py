@@ -609,6 +609,7 @@ def edit_business_timing(request, pk):
 
 def delete_business_timing(request, id):
     business_timing = get_object_or_404(BusinessTiming, id=id)
+    print(business_timing)
     business_timing.delete()
     return redirect('business_timing_listing')
 

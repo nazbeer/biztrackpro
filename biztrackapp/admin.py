@@ -90,9 +90,20 @@ admin.site.register(DailySummary)
 class BankSaleAdmin(admin.ModelAdmin):
     list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'created_on', 'updated_on']
 
+@admin.register(BankDeposits)
+class BankDepositAdmin(admin.ModelAdmin):
+    list_display = ['id', 'bank_deposit_bank','mode_of_transaction','amount', 'bank','deposit_date','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'expense_type','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no','invoice_no','business_profile', 'created_on', 'updated_on']
+
+
+
 admin.site.register(CreditCollection)
 admin.site.register(MiscellaneousIncome)
 admin.site.register(Purchase)
 admin.site.register(SupplierPayments)
 admin.site.register(BusinessTiming)
+
 

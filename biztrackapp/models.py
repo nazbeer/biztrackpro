@@ -167,6 +167,9 @@ class DailySummary(models.Model):
     ]
     date = models.DateField()
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    cash_sale = models.DecimalField(max_digits=10, decimal_places=2)
+    credit_sale = models.DecimalField(max_digits=10, decimal_places=2)
+    card_sale = models.DecimalField(max_digits=10, decimal_places=2)
     sales = models.DecimalField(max_digits=10, decimal_places=2)
     credit_collection = models.DecimalField(max_digits=10, decimal_places=2)
     miscellaneous_income = models.DecimalField(max_digits=10, decimal_places=2)
@@ -256,3 +259,36 @@ class SupplierPayments(models.Model):
 
     def __str__(self):
         return f"Amount {self.amount} - {self.supplier.name}"
+    
+
+class BankDeposits(models.Model):
+    bank_deposit_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank_deposit')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank')
+    deposit_date = models.DateField()
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    cheque_date = models.DateField()
+    cheque_no = models.CharField(max_length=255)
+    business_profile = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.amount}"
+
+
+class Expense(models.Model):
+    expense_type = models.ForeignKey(ExpenseType, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    cheque_no = models.CharField(max_length=255,null=True,blank=True)
+    invoice_no = models.CharField(max_length=255)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    cheque_date = models.DateField()
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    business_profile = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.amount}"
+

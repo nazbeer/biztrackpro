@@ -110,3 +110,8 @@ class BankDepositsForm(forms.ModelForm):
     class Meta:
         model = BankDeposits
         fields = '__all__'
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = '__all__'

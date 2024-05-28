@@ -7,7 +7,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="addexpenseForm" method="post" action="{% url 'create_misc_income' %}">
+            <form id="addexpenseForm" method="post" action="{% url 'create_expense' %}">
                 <div class="modal-body">
                     {% csrf_token %}
                     <div id="addexpenseErrors" class="alert alert-danger d-none"></div>
@@ -18,7 +18,7 @@
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <select id="id_expense_type" name="expense_type" class="form-control" tabindex="0">
                                     <option>-- Select Expense Type --</option>
-                                    {% for expense_type in msc_income_form.expense_type.field.queryset %}
+                                    {% for expense_type in expense_form.expense_type.field.queryset %}
                                         <option value="{{ expense_type.id }}">{{ expense_type.name }}</option>
                                     {% endfor %}
                                 </select>
@@ -31,13 +31,17 @@
                                 <label for="id_cheque_date">Cheque Date</label>
                                 <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
                             </div>
+                            <div class="form-group">
+                                <label for="id_invoice_no">Invoice Number</label>
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="6">
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_mode_of_transaction">Mode of Transaction</label>
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
                                     <option>-- Mode of Transaction --</option>
-                                    {% for transaction_mode in msc_income_form.mode_of_transaction.field.queryset %}
+                                    {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                     {% endfor %}
                                 </select>
@@ -46,7 +50,7 @@
                                 <label for="id_bank">Bank</label>
                                 <select id="id_bank" name="bank" class="form-control" tabindex="3">
                                     <option>-- Select Bank --</option>
-                                    {% for bank in msc_income_form.bank.field.queryset %}
+                                    {% for bank in expense_form.bank.field.queryset %}
                                         <option value="{{ bank.id }}">{{ bank.name }}</option>
                                     {% endfor %}
                                 </select>
@@ -67,3 +71,4 @@
         </div>
     </div>
 </div>
+

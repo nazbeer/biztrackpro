@@ -167,6 +167,9 @@ class DailySummary(models.Model):
     ]
     date = models.DateField()
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    cash_sale = models.DecimalField(max_digits=10, decimal_places=2)
+    credit_sale = models.DecimalField(max_digits=10, decimal_places=2)
+    card_sale = models.DecimalField(max_digits=10, decimal_places=2)
     sales = models.DecimalField(max_digits=10, decimal_places=2)
     credit_collection = models.DecimalField(max_digits=10, decimal_places=2)
     miscellaneous_income = models.DecimalField(max_digits=10, decimal_places=2)

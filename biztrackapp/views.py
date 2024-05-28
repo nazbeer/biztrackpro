@@ -502,7 +502,6 @@ def create_employee(request):
     'num_users_created': num_users_created,
     'max_users_allowed': max_users_allowed,
     'business_profile_id': shop.id,
-    # 'nationalities': NATIONALITIES,  # Pass NATIONALITIES to the template context
     }
 
     return render(request, 'create_employee.html', context)
@@ -603,6 +602,7 @@ def create_daily_summary(request):
         purchase_form = PurchaseForm()
         supplier_payments_form = SupplierPaymentForm()
         bank_deposit_form = BankDepositsForm()
+        expense_form = ExpenseForm()
 
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
@@ -619,6 +619,10 @@ def create_daily_summary(request):
     purchases = Purchase.objects.filter(business_profile=business_profile.id)
     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
+    expense = Expense.objects.filter(business_profile=business_profile.id)
+    total_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+
     return render(request, 'create_daily_summary.html',
         {
             
@@ -631,6 +635,7 @@ def create_daily_summary(request):
             'purchase_form':purchase_form,
             'supplier_payments_form':supplier_payments_form,
             'bank_deposit_form':bank_deposit_form,
+            'expense_form':expense_form,
             #listings
             'msc_income': msc_income,
             'credit_collections':credit_collections,
@@ -639,7 +644,9 @@ def create_daily_summary(request):
             'receipt_type':receipt_type,
             'purchases':purchases,
             'supplier_payments':supplier_payments,
-            'bank_deposit':bank_deposit,
+            'bank_deposits':bank_deposit,
+            'expenses':expense,
+            'expense_sum':total_amount
 
         }
     )
@@ -751,6 +758,24 @@ def list_bank_deposit(request):
     # print(bank_sales)
     return render(request, 'create_daily_summary.html', {'bank_deposit': bank_deposit})
 
+
+def create_expense(request):
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_daily_summary')
+    return redirect('create_daily_summary')
+
+def list_expense(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    expense = Expense.objects.filter(business_profile=business_profile.id)
+    # print(bank_sales)
+    return render(request, 'create_daily_summary.html', {'expenses': expense})
 
 def edit_daily_summary(request, id):
     summary = get_object_or_404(DailySummary, id=id)

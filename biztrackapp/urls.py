@@ -30,7 +30,9 @@ urlpatterns = [
 
     path('create-business-timing/', create_business_timing, name='create_business_timing'),
     path('business-timing-list/', business_timing_list, name='business_timing_list'),
-
+    path('business_timing/edit/<int:pk>/', views.edit_business_timing, name='edit_business_timing'),
+    path('business_timing/delete/<int:pk>/', views.delete_business_timing, name='delete_business_timing'),
+   
     path('bank/create/', create_bank, name='create_bank'),
     path('banks/', BankListView.as_view(), name='bank_list'),
 

@@ -580,13 +580,37 @@ def create_business_timing(request):
     return render(request, 'create_business_timing.html', {'form': form, 'business_profile':business_profile.id})
 
 def business_timing_list(request):
+    # Get the ShopAdmin instance for the current user
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    shop = shop_admin.shop
     
-    # Retrieve the business profile associated with the shop
-    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-    business_timings = BusinessTiming.objects.filter(business_profile=business_profile.id)
+    # Retrieve the BusinessProfile instance associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop_admin.shop.name)
+    
+    # Fetch the BusinessTiming objects related to the business profile
+    business_timings = BusinessTiming.objects.filter(business_profile=business_profile)
+    
+    # Render the business_timing_list template with the business timings
     return render(request, 'business_timing_list.html', {'business_timings': business_timings})
+
+
+def edit_business_timing(request, pk):
+    business_timing = get_object_or_404(BusinessTiming, pk=pk)
+    print(business_timing)
+    if request.method == 'POST':
+        form = BusinessTimingForm(request.POST, instance=business_timing)
+        if form.is_valid():
+            form.save()
+            return redirect('business_timing_list')
+    else:
+        form = BusinessTimingForm(instance=business_timing)
+    
+    return render(request, 'edit_business_timing.html', {'business_timing': business_timing, 'form': form})
+
+
+def delete_business_timing(request, id):
+    business_timing = get_object_or_404(BusinessTiming, id=id)
+    business_timing.delete()
+    return redirect('business_timing_listing')
 
 def create_daily_summary(request):
     if request.method == 'POST':

@@ -8,29 +8,58 @@
         <h4 class="mb-0">Create Business Timing</h4>
     </div>
     <form method="POST">
-    <div class="card-body">
-        {% csrf_token %}
-        <div class="row">
-        <div class="col-md-6">
-        <div class="form-group">
-            <label for="business_start_time" class="mb-3">Business Start Time:</label>
-            <input type="time" id="business_start_time" name="business_start_time" class="form-control mb-3" required>
-            <input type="hidden" name="business_profile" value="{{ business_profile }}">
+        <div class="card-body">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="business_start_time" class="mb-3">Business Start Time:</label>
+                        <input type="time" id="business_start_time" name="business_start_time" class="form-control mb-3" required>
+                        <input type="hidden" name="business_profile" value="{{ business_profile }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="business_end_time" class="mb-3">Business End Time:</label>
+                        <input type="time" id="business_end_time" name="business_end_time" class="form-control mb-3" required >
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label for="business_end_time" class="mb-3">Business End Time:</label>
-            <input type="time" id="business_end_time" name="business_end_time" class="form-control mb-3" required>
+        <div class="card-footer">
+            <div class="form-group mb-0">
+                <button type="submit" value="Submit" class="btn btn-success">Create Business Timing</button>
+            </div>
         </div>
-    </div>
-</div>
-</div>
-    <div class="card-footer">
-        <div class="form-group mb-0">
-            <button type="submit" value="Submit" class="btn btn-success">Create Business Timing</button>
-        </div>
-    </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var startTimeInput = document.getElementById('business_start_time');
+        var endTimeInput = document.getElementById('business_end_time');
+
+        // Function to add 23 hours and 59 minutes to a given time
+        function calculateEndTime(startTime) {
+            var [hours, minutes] = startTime.split(':').map(Number);
+            var endDate = new Date();
+            endDate.setHours(hours + 23);
+            endDate.setMinutes(minutes + 59);
+            var endHours = String(endDate.getHours()).padStart(2, '0');
+            var endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+            return `${endHours}:${endMinutes}`;
+        }
+
+        // Function to set end time based on start time
+        function setEndTime() {
+            if (startTimeInput.value) {
+                var endTime = calculateEndTime(startTimeInput.value);
+                endTimeInput.value = endTime;
+            }
+        }
+
+        // Add an event listener to the start time input to set the end time
+        startTimeInput.addEventListener('input', setEndTime);
+    });
+</script>
 {% endblock %}

@@ -33,6 +33,11 @@ class BusinessTimingForm(forms.ModelForm):
     class Meta:
         model = BusinessTiming
         fields = '__all__'
+        widgets = {
+            'business_start_time': forms.TimeInput(attrs={'type': 'time'}),
+            'business_end_time': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
 
 
 class SupplierForm(forms.ModelForm):

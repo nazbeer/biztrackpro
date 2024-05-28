@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Business Timing{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h5>Edit Business Timing</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'edit_business_timing' business_timing.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="business_start_time">Business Start Time: {{ business_timing.business_start_time }}</label>
+                    <input type="time" id="business_start_time" name="business_start_time" class="form-control" value="{{ business_timing.business_start_time }}" required>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="business_end_time">Business End Time: {{ business_timing.business_end_time }}</label>
+                    <input type="time" id="business_end_time" name="business_end_time" class="form-control" value="{{ business_timing.business_end_time }}" required>
+                </div>
+                <div class="form-group mt-3">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <a href="{% url 'business_timing_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var startTimeInput = document.getElementById('id_business_start_time');
+        var endTimeInput = document.getElementById('id_business_end_time');
+
+        // Function to add 23 hours and 59 minutes to a given time
+        function calculateEndTime(startTime) {
+            var [hours, minutes] = startTime.split(':').map(Number);
+            var endDate = new Date();
+            endDate.setHours(hours + 23);
+            endDate.setMinutes(minutes + 59);
+            var endHours = String(endDate.getHours()).padStart(2, '0');
+            var endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+            return `${endHours}:${endMinutes}`;
+        }
+
+        // Function to set end time based on start time
+        function setEndTime() {
+            if (startTimeInput.value) {
+                var endTime = calculateEndTime(startTimeInput.value);
+                endTimeInput.value = endTime;
+            }
+        }
+
+        // Add an event listener to the start time input to set the end time
+        startTimeInput.addEventListener('input', setEndTime);
+    });
+</script>
+{% endblock %}

@@ -635,6 +635,91 @@ def delete_business_timing(request, id):
     business_timing.delete()
     return redirect('business_timing_list')
 
+# def create_daily_summary(request):
+#     id = request.GET.get('id')
+#     if request.method == 'POST':
+#         form = DailySummaryForm(request.POST)
+#         if form.is_valid():
+#             instance = form.save(commit=False)
+#             instance.id = id  # Assign the value here
+#             instance.save()
+#             return redirect('daily_summary_list')
+#     else:
+#         form = DailySummaryForm()
+#         bank_sale_form = BankSaleForm()
+#         credit_collection_form = CreditCollectionForm()
+#         msc_income_form = MiscellaneousIncomeForm()
+#         purchase_form = PurchaseForm()
+#         supplier_payments_form = SupplierPaymentForm()
+#         bank_deposit_form = BankDepositsForm()
+#         expense_form = ExpenseForm()
+
+#     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#     shop = shop_admin.shop
+    
+#     # Retrieve the business profile associated with the shop
+#     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    
+#     # Query for bank sales created on the current date
+#     expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
+#     receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
+#     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
+#     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
+#     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
+#     purchases = Purchase.objects.filter(business_profile=business_profile.id)
+#     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
+#     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
+#     expense = Expense.objects.filter(business_profile=business_profile.id)
+#     total_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+#     cheque_transaction_mode = get_object_or_404(TransactionMode ,id=1)
+#     bank_transaction_mode = get_object_or_404(TransactionMode ,id=2)
+#     cash_transaction_mode = get_object_or_404(TransactionMode ,id=3)
+#     credit_transaction_mode = get_object_or_404(TransactionMode ,id=4)
+
+#     # bank_sale
+#     bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+#     bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+#     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+#     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+
+#     return render(request, 'create_daily_summary.html',
+#         {
+            
+#             'business_profile': business_profile.id,
+#             #forms
+#             'form': form,
+#             'bank_sale_form': bank_sale_form,
+#             'credit_collection_form': credit_collection_form,
+#             'msc_income_form': msc_income_form,
+#             'purchase_form':purchase_form,
+#             'supplier_payments_form':supplier_payments_form,
+#             'bank_deposit_form':bank_deposit_form,
+#             'expense_form':expense_form,
+#             #listings
+#             'msc_income': msc_income,
+#             'credit_collections':credit_collections,
+#             'bank_sales': bank_sales,
+#             'expense_type':expense_type,
+#             'receipt_type':receipt_type,
+#             'purchases':purchases,
+#             'supplier_payments':supplier_payments,
+#             'bank_deposits':bank_deposit,
+#             'expenses':expense,
+#             'expense_sum':total_amount,
+
+#             # calculated vales
+#             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
+#             'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
+#             'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
+#             'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+
+#             'id': id
+
+
+#         }
+#     )
+
 def create_daily_summary(request):
     id = request.GET.get('id')
     if request.method == 'POST':
@@ -661,27 +746,93 @@ def create_daily_summary(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     
     # Query for bank sales created on the current date
-    expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
-    receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
     purchases = Purchase.objects.filter(business_profile=business_profile.id)
     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id)
-    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
     expense = Expense.objects.filter(business_profile=business_profile.id)
-    total_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
 
-    cheque_transaction_mode = get_object_or_404(TransactionMode ,id=1)
-    bank_transaction_mode = get_object_or_404(TransactionMode ,id=2)
-    cash_transaction_mode = get_object_or_404(TransactionMode ,id=3)
-    credit_transaction_mode = get_object_or_404(TransactionMode ,id=4)
+    expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
+    receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
+
+    cheque_transaction_mode = None
+    cash_transaction_mode = None
+    bank_transaction_mode = None
+    credit_transaction_mode = None
+    card_transaction_mode = None
+
+    
+    try:
+        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.get(name="bank")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.get(name="card")
+    except TransactionMode.DoesNotExist:
+        pass 
 
     # bank_sale
     bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
-    bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+    bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    # credit_sale
+    credit_sale_total_cheque_sales = CreditCollection.objects.filter(payment_mode=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    credit_sale_total_cash_sales = CreditCollection.objects.filter(payment_mode=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    credit_sale_total_bank_sales = CreditCollection.objects.filter(payment_mode=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    credit_sale_total_card_sales = CreditCollection.objects.filter(payment_mode=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    # mis_income
+    mis_income_total_cheque = MiscellaneousIncome.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    mis_income_total_cash = MiscellaneousIncome.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    mis_income_total_bank = MiscellaneousIncome.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    mis_income_total_card = MiscellaneousIncome.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    purchase_total_cheque = Purchase.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('invoice_amount'))['total_cheque_amount'] or 0
+    purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+    purchase_total_bank = Purchase.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('invoice_amount'))['total_bank_amount'] or 0
+    purchase_total_card = Purchase.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('invoice_amount'))['total_card_amount'] or 0
+    purchase_total_credit = Purchase.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('invoice_amount'))['total_credit_amount'] or 0
+    total_purchase_amount = purchases.aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
+
+    supplier_payment_total_cheque = SupplierPayments.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    supplier_payment_total_bank = SupplierPayments.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    supplier_payment_total_card = SupplierPayments.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    # supplier_payment_total_credit = SupplierPayments.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+    total_supplier_payment_amount = supplier_payments.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    expense_total_cheque = Expense.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    expense_total_bank = Expense.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    expense_total_card = Expense.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    total_expense_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+
 
     return render(request, 'create_daily_summary.html',
         {
@@ -706,19 +857,58 @@ def create_daily_summary(request):
             'supplier_payments':supplier_payments,
             'bank_deposits':bank_deposit,
             'expenses':expense,
-            'expense_sum':total_amount,
 
             # calculated vales
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
-            'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
+            'bank_sale_total_card_sale':bank_sale_total_card_sales,
             'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
             'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+            'total_bank_sale_amount':total_bank_sale_amount,
 
+            'credit_sale_total_cheque_sale':credit_sale_total_cheque_sales,
+            'credit_sale_total_cash_sale':credit_sale_total_cash_sales,
+            'credit_sale_total_bank_sale':credit_sale_total_bank_sales,
+            'credit_sale_total_card_sale':credit_sale_total_card_sales,
+            'total_credit_sale_amount':total_credit_sale_amount,
+
+            'mis_income_total_cheque':mis_income_total_cheque,
+            'mis_income_total_cash':mis_income_total_cash,
+            'mis_income_total_bank':mis_income_total_bank,
+            'mis_income_total_card':mis_income_total_card,
+            'total_mis_income_amount':total_mis_income_amount,
+
+            'purchase_total_cheque':purchase_total_cheque,
+            'purchase_total_cash':purchase_total_cash,
+            'purchase_total_bank':purchase_total_bank,
+            'purchase_total_credit':purchase_total_credit,
+            'purchase_total_card':purchase_total_card,
+            'total_purchase_amount':total_purchase_amount,
+
+            'supplier_payment_total_cheque':supplier_payment_total_cheque,
+            'supplier_payment_total_cash':supplier_payment_total_cash,
+            'supplier_payment_total_bank':supplier_payment_total_bank,
+            'supplier_payment_total_card':supplier_payment_total_card,
+            'total_supplier_payment_amount':total_supplier_payment_amount,
+
+            'expense_total_cheque':expense_total_cheque,
+            'expense_total_cash':expense_total_cash,
+            'expense_total_bank':expense_total_bank,
+            'expense_total_card':expense_total_card,
+            'total_expense_amount':total_expense_amount,
+
+            'bank_deposit_total_cheque':bank_deposit_total_cheque,
+            'bank_deposit_total_cash':bank_deposit_total_cash,
+            'bank_deposit_total_bank':bank_deposit_total_bank,
+            'bank_deposit_total_card':bank_deposit_total_card,
+            'bank_deposit_amount':bank_deposit_amount,
+
+    
             'id': id
 
 
         }
     )
+
 
 
 def create_bank_sale(request):

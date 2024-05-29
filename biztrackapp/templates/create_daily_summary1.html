@@ -109,28 +109,24 @@
                 </div>
                 <div class="card-body bg-white br-5">
                     <div class="row ">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ bank_sale_total_cash_sale }}"> 
+                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1"> 
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label>Credit Sale</label>
-                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="2" value="{{ bank_sale_total_credit_sale }}" > 
+                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="2"> 
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ bank_sale_total_card_sale }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ bank_sale_total_cheque_sale }}"> 
+                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3"> 
                         </div>
                     </div>
                     <div class="row mb-3 mt-2">
                         <div class="col-md-4 ">
                             <label>Bank Sale Total</label>
-                            <div class="bg-light p-2 rounded">{{total_bank_sale_amount}}</div>
-                                <input type="hidden" name="bank_sale_total" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
+                            <div class="bg-light p-2 rounded" >58500.00</div>
+                                <input type="hidden" name="bank_sale_total" value=""  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
@@ -172,30 +168,12 @@
                     <h5 class="text-left mb-0">Credit Collection</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ credit_sale_total_cash_sale }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ credit_sale_total_bank_sale }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ credit_sale_total_card_sale }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ credit_sale_total_cheque_sale }}"> 
-                        </div>
-                    </div>
                     
-                    <div class="row mb-3 mt-2">
+                    <div class="row mb-4">
                         <div class="col-md-3">
                             <label>Credit Collection Total</label>
-                            <div class="bg-light p-2 rounded">{{total_credit_sale_amount}}</div>
-                            <input type="hidden" name="credit_collection_total" value="{{total_bank_sale_amount}}"  required class="form-control bg-light" id="id_credit_collection_total" > 
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="credit_collection_total" value=""  required class="form-control bg-light" id="id_credit_collection_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add Credit Collection</button>
@@ -234,37 +212,18 @@
                 </div>
             </div>
 
-
-
             <div class="card  mt-4">
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Msc. Income</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ mis_income_total_cash }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ mis_income_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ mis_income_total_card }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ mis_income_total_cheque }}"> 
-                        </div>
-                    </div>
                     
-                    <div class="row mb-3 mt-2">
+                    <div class="row mb-4">
+                       
                         <div class="col-md-3">
                             <label>Msc. Income Total</label>
-                            <div class="bg-light p-2 rounded">{{total_mis_income_amount}}</div>
-                            <input type="hidden" name="msc_income_total" value="{{total_mis_income_amount}}" required class="form-control bg-light" id="id_msc_income_total" > 
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="msc_income_total" value="" required class="form-control bg-light" id="id_msc_income_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add Msc. Income</button>
@@ -309,35 +268,13 @@
                     <h5 class="text-left mb-0">Purchases</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ purchase_total_cash }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ purchase_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ purchase_total_card }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ purchase_total_cheque }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Credit Sale</label>
-                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="5" value="{{ purchase_total_credit }}"> 
-                        </div>
-                    </div>
                     
-                    <div class="row mb-3 mt-2">
+                    <div class="row mb-4">
                         
                         <div class="col-md-3">
                             <label>Purchases Total</label>
-                            <div class="bg-light p-2 rounded">{{total_purchase_amount}}</div>
-                            <input type="hidden" name="purchases_total" value="{{total_purchase_amount}}" required class="form-control bg-light" id="id_purchases_total" > 
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="purchases_total" value="" required class="form-control bg-light" id="id_purchases_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal">Add Purchases</button>
@@ -386,31 +323,13 @@
                     <h5 class="text-left mb-0">Supplier Payment</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ supplier_payment_total_cash }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ supplier_payment_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ supplier_payment_total_card }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ supplier_payment_total_cheque }}"> 
-                        </div>
-                    </div>
-
                     
-                    <div class="row mb-3 mt-2">                        
+                    <div class="row mb-4">
+                        
                         <div class="col-md-3">
                             <label>Supplier Payment Total</label>
-                            <div class="bg-light p-2 rounded">{{total_supplier_payment_amount}}</div>
-                            <input type="hidden" name="supplier_payment_total" value="{{total_supplier_payment_amount}}" required class="form-control bg-light" id="id_supplier_payment_total" > 
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="supplier_payment_total" value="" required class="form-control bg-light" id="id_supplier_payment_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add Supplier Payment</button>
@@ -448,38 +367,18 @@
                 </div>
             </div>
 
-
-
             <div class="card  mt-4">
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Expenses</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
                     
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ expense_total_cash }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ expense_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ expense_total_card }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ expense_total_cheque }}"> 
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3 mt-2">                        
+                    <div class="row mb-4">
+                        
                         <div class="col-md-3">
                             <label>Expense Total</label>
-                            <div class="bg-light p-2 rounded">{{total_expense_amount}}</div>
-                            <input type="hidden" name="expense_total" value="{{total_expense_amount}}" required class="form-control bg-light" id="id_expense_total" > 
+                            <div class="bg-light p-2 rounded">{{expense_sum}}</div>
+                            <input type="hidden" name="expense_total" value="" required class="form-control bg-light" id="id_expense_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal">Add Expense</button>
@@ -526,30 +425,12 @@
                 </div>
                 <div class="card-body bg-white  br-5">
                     
-                    <div class="row ">
-                        <div class="col-md-3">
-                            <label>Cash Sale</label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ bank_deposit_total_cash }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Bank Sale</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="2" value="{{ bank_deposit_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Card Sale</label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ bank_deposit_total_card }}"> 
-                        </div>
-                        <div class="col-md-3">
-                            <label>Cheque Sale</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ bank_deposit_total_cheque }}"> 
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-3 mt-2">                        
+                    <div class="row mb-4">
+                        
                         <div class="col-md-3">
                             <label>Bank Deposit Total</label>
-                            <div class="bg-light p-2 rounded">{{bank_deposit_amount}}</div>
-                            <input type="hidden" name="bank_deposit_total" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
+                            <div class="bg-light p-2 rounded">8500.00</div>
+                            <input type="hidden" name="bank_deposit_total" value="" required class="form-control bg-light" id="id_bank_deposit_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>

@@ -128,7 +128,15 @@ class Bank(models.Model):
         return f"{self.name}"
 
 class TransactionMode(models.Model):
-    name = models.CharField(max_length=255)
+    CHOICES = [
+        ('card', 'Card'),
+        ('cash', 'Cash'),
+        ('bank', 'Bank Transfer'),
+        ('cheque', 'Cheque'),
+        ('credit', 'Credit'),
+
+    ]
+    name = models.CharField(max_length=255,choices=CHOICES)
     business_profile = models.CharField(max_length=255, null=True)
     status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
@@ -167,6 +175,7 @@ class DailySummary(models.Model):
     ]
     date = models.DateField()
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     cash_sale = models.DecimalField(max_digits=10, decimal_places=2)
     credit_sale = models.DecimalField(max_digits=10, decimal_places=2)
     card_sale = models.DecimalField(max_digits=10, decimal_places=2)
@@ -188,6 +197,7 @@ class DailySummary(models.Model):
     
 class BankSales(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
@@ -202,6 +212,7 @@ class BankSales(models.Model):
 
 class CreditCollection(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     payment_mode = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
@@ -216,6 +227,7 @@ class CreditCollection(models.Model):
 
 class MiscellaneousIncome(models.Model):
     receipt_type = models.ForeignKey(ReceiptType, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
@@ -230,6 +242,7 @@ class MiscellaneousIncome(models.Model):
 
 class Purchase(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     opening_outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     invoice_date = models.DateField()
@@ -247,6 +260,7 @@ class Purchase(models.Model):
 
 class SupplierPayments(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     opening_outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -263,6 +277,7 @@ class SupplierPayments(models.Model):
 
 class BankDeposits(models.Model):
     bank_deposit_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank_deposit')
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank')
     deposit_date = models.DateField()
@@ -280,6 +295,7 @@ class BankDeposits(models.Model):
 class Expense(models.Model):
     expense_type = models.ForeignKey(ExpenseType, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True,blank=True)
     invoice_no = models.CharField(max_length=255)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)

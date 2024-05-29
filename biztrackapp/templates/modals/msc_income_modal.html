@@ -16,6 +16,7 @@
                             <div class="form-group">
                                 <label for="id_receipt_type">Income Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <input type="hidden" id="modal_daily_summary_id2" name="daily_summary_id">
                                 <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="0">
                                     <option>-- Select Income Type --</option>
                                     {% for receipt_type in msc_income_form.receipt_type.field.queryset %}

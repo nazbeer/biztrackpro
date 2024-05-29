@@ -16,6 +16,7 @@
                             <div class="form-group">
                                 <label for="id_expense_type">Expense Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <input type="hidden" id="modal_daily_summary_id7" name="daily_summary_id">
                                 <select id="id_expense_type" name="expense_type" class="form-control" tabindex="0">
                                     <option>-- Select Expense Type --</option>
                                     {% for expense_type in expense_form.expense_type.field.queryset %}
@@ -28,23 +29,8 @@
                                 <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="2">
                             </div>
                             <div class="form-group">
-                                <label for="id_cheque_date">Cheque Date</label>
-                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
-                            </div>
-                            <div class="form-group">
-                                <label for="id_invoice_no">Invoice Number</label>
-                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="6">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_mode_of_transaction">Mode of Transaction</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
-                                    <option>-- Mode of Transaction --</option>
-                                    {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
-                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
-                                    {% endfor %}
-                                </select>
+                                <label for="id_cheque_no">Cheque Number</label>
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
                             </div>
                             <div class="form-group">
                                 <label for="id_bank">Bank</label>
@@ -55,9 +41,27 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                           
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="id_cheque_no">Cheque Number</label>
-                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                                <label for="id_invoice_no">Invoice Number</label>
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_mode_of_transaction">Mode of Transaction</label>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="1">
+                                    <option>-- Mode of Transaction --</option>
+                                    {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                           
+                            <div class="form-group">
+                                <label for="id_cheque_date">Cheque Date</label>
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
                             </div>
                         </div>
                     </div>

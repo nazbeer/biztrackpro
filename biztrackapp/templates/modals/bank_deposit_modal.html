@@ -1,3 +1,35 @@
+<script>
+//     document.addEventListener('DOMContentLoaded', (event) => {
+//       // Get the full URL of the current page
+//       const currentUrl = window.location.href;
+//       console.log("Full URL: ", currentUrl);
+
+//       // Create a new URL object
+//       const url = new URL(currentUrl);
+
+//       // Get the value of the 'id' query parameter
+//       const id = url.searchParams.get('id');
+//       console.log("ID: ", id);
+//       if (id) {
+//           document.getElementById('daily_summary_id').value = id;
+//       }
+//       $('.modal').each(function() {
+//             $(this).attr('id', dailySummaryId); // Assuming each modal has class 'modal'
+//         });
+//   });
+
+    // $(document).ready(function() {
+    //     $('#bankDepositModal').on('show.bs.modal', function (event) {
+    //         // Fetch the daily_summary_id value
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         // Set the daily_summary_id value in the modal's hidden input field
+    //         $('#modal_daily_summary_id').val(dailySummaryId);
+    //     });
+    // });
+
+
+</script>
 <div class="modal fade" id="bankDepositModal" tabindex="-1" aria-labelledby="bankDepositModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -16,6 +48,7 @@
                             <div class="form-group">
                                 <label for="id_expense_type">Bank Deposit</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <input type="hidden" id="modal_daily_summary_id1" name="daily_summary_id">
                                 <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="0">
                                     <option>-- Select Expense Type --</option>
                                     {% for bank_deposit_bank in bank_deposit_form.bank_deposit_bank.field.queryset %}
@@ -27,9 +60,14 @@
                                 <label for="id_amount">Amount</label>
                                 <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="2">
                             </div>
+                           
                             <div class="form-group">
-                                <label for="id_cheque_date">Cheque Date</label>
-                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                                <label for="id_cheque_no">Cheque Number</label>
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="id_deposit_date">Deposit Date</label>
+                                <input type="date" id="id_deposit_date" name="deposit_date" class="form-control" tabindex="5">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -52,13 +90,10 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="id_cheque_no">Cheque Number</label>
-                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                                <label for="id_cheque_date">Cheque Date</label>
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
                             </div>
-                            <div class="form-group">
-                                <label for="id_deposit_date">Deposit Date</label>
-                                <input type="date" id="id_deposit_date" name="deposit_date" class="form-control" tabindex="5">
-                            </div>
+                            
                         </div>
                     </div>
                     <div id="addbankDepositErrors" class="text-danger"></div>

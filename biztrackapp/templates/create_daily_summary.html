@@ -3,6 +3,68 @@
 {% block title %}Create Daily Summary{% endblock %}
 
 {% block content %}
+<script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+        const currentUrl = window.location.href;        
+        const url = new URL(currentUrl);
+        const id = url.searchParams.get('id');
+        console.log("ID: ", id);
+        if (id) {
+            document.getElementById('daily_summary_id').value = id;
+        }
+        // $('.modal').each(function() {
+        //     $(this).attr('data-id', id); // Assuming each modal has class 'modal'
+        // });
+    });
+    $(document).ready(function() {
+        $('#bankDepositModal').on('show.bs.modal', function (event) {
+            const currentUrl = window.location.href;        
+            const url = new URL(currentUrl);
+            const id = url.searchParams.get('id');
+            console.log('theetam', id);
+            document.getElementById('modal_daily_summary_id1').value = id;
+            // $('#modal_daily_summary_id').val(dailySummaryId);
+        });
+        $('#miscIncomeModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
+            $('#modal_daily_summary_id2').val(dailySummaryId);
+        });
+        $('#creditCollectionModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
+            $('#modal_daily_summary_id3').val(dailySummaryId);
+        });
+        $('#bankSaleModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
+            $('#modal_daily_summary_id4').val(dailySummaryId);
+        });
+        $('#purchaseModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
+            $('#modal_daily_summary_id5').val(dailySummaryId);
+        });
+        $('#supplierPaymentModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
+            $('#modal_daily_summary_id6').val(dailySummaryId);
+        });
+        $('#expenseModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
+            $('#modal_daily_summary_id7').val(dailySummaryId);
+        });
+    });
+
+</script>
 <style>
     .bg-white{
         /* background-color: #fff !important; */
@@ -29,6 +91,7 @@
                                 <label for="id_date">Date:</label>
                                 <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -472,180 +535,37 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
-     new DataTable('#tablebanksale', {
+   
+   
+   $(document).ready(function() {
+    
+    // Initialize DataTables
+    $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
         responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
+        dom: 'lBfrtip',
+        buttons: [
+            {
+                text: 'Print',
+                extend: 'print',
+                exportOptions: {
+                    stripHtml: false,
+                    columns: [0, 1, 2, 3, 4]
                 }
-            ],
-        });
-        new DataTable('#tablecreditcollection', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
+            },
+            {
+                text: 'Export PDF',
+                extend: 'pdf',
+                exportOptions: {
+                    stripHtml: true,
                 },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
-        new DataTable('#tablebankdeposit', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
-        new DataTable('#tableexpense', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
-        new DataTable('#tablepurchase', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
-        new DataTable('#tablemscincome', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
-        new DataTable('#tablesupplierpayment', {
-            responsive: true,
-            dom: 'lBfrtip',
-            
-            buttons: [
-                {
-                    text: 'Print',
-                    extend: 'print',
-                    exportOptions: {
-                        stripHtml: false,
-                        columns: [0, 1, 2, 3, 4]
-                    }
-                },
-                {
-                    text: 'Export PDF',
-                    extend: 'pdf',
-                    
-                    exportOptions: {
-                        stripHtml: true,
-                       
-                    },
-          
-                }
-            ],
-        });
+            }
+        ],
+    });
+
+   
+});
+
 </script>
 {% endblock %}
+
+

@@ -630,11 +630,15 @@ def delete_business_timing(request, id):
     print(business_timing)
     business_timing.delete()
     return redirect('business_timing_list')
+
 def create_daily_summary(request):
+    id = request.GET.get('id')
     if request.method == 'POST':
         form = DailySummaryForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.id = id  # Assign the value here
+            instance.save()
             return redirect('daily_summary_list')
     else:
         form = DailySummaryForm()
@@ -675,13 +679,6 @@ def create_daily_summary(request):
     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
 
-
-    # print('cheque',bank_sale_total_cheque_sales)
-    # print('bank',bank_sale_total_bank_sales)
-    # print('cash',bank_sale_total_cash_sales)
-    # print('credit',bank_sale_total_credit_sales)
-
-
     return render(request, 'create_daily_summary.html',
         {
             
@@ -711,19 +708,26 @@ def create_daily_summary(request):
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
             'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
             'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
-            'bank_sale_total_credit_sale':bank_sale_total_credit_sales
+            'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+
+            'id': id
 
 
         }
     )
 
-   
+
 def create_bank_sale(request):
     if request.method == 'POST':
         form = BankSaleForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')  
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+           
     return redirect('create_daily_summary')
 
 def list_bank_sales(request):
@@ -740,8 +744,12 @@ def create_credit_collection(request):
     if request.method == 'POST':
         form = CreditCollectionForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_credit_collection(request):
@@ -758,8 +766,12 @@ def create_misc_income(request):
     if request.method == 'POST':
         form = MiscellaneousIncomeForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_msc_income(request):
@@ -776,8 +788,12 @@ def create_purchase(request):
     if request.method == 'POST':
         form = PurchaseForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_purchases(request):
@@ -793,8 +809,12 @@ def create_supplier_payment(request):
     if request.method == 'POST':
         form = SupplierPaymentForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_supplier_payment(request):
@@ -811,8 +831,12 @@ def create_bank_deposit(request):
     if request.method == 'POST':
         form = BankDepositsForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_bank_deposit(request):
@@ -830,8 +854,12 @@ def create_expense(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            return redirect('create_daily_summary')
+            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     return redirect('create_daily_summary')
 
 def list_expense(request):

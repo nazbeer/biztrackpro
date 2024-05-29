@@ -73,16 +73,7 @@
                             <label for="{{ business_profile_form.vat_submission_date_3.id_for_label }}">VAT Submission Date 3:</label>
                             <input type="date" id="{{ business_profile_form.vat_submission_date_3.id_for_label }}" name="vat_submission_date_3" class="form-control" required>
                         </div>
-                        {{ business_profile_form.business_start_time.errors }}
-                        <div class="form-group">
-                            <label for="{{ business_profile_form.business_start_time.id_for_label }}">Business Start Time:</label>
-                            <input type="time" id="{{ business_profile_form.business_start_time.id_for_label }}" name="business_start_time" class="form-control" >
-                        </div>
-                        {{ business_profile_form.business_end_time.errors }}
-                        <div class="form-group">
-                            <label for="{{ business_profile_form.business_end_time.id_for_label }}">Business End Time:</label>
-                            <input type="time" id="{{ business_profile_form.business_end_time.id_for_label }}" name="business_end_time" class="form-control" >
-                        </div>
+                       
                     </div>
                     <div class="col-md-6">
                         <!-- License Number (Read-only) -->

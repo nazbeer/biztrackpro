@@ -57,8 +57,8 @@ class BusinessProfile(models.Model):
     vat_submission_date_reminder_days = models.PositiveIntegerField(null=True, verbose_name='VAT Submission Date Reminder (days)')
     employee_visa_expiration_reminder_days = models.PositiveIntegerField(null=True, verbose_name='Employee Visa Expiration Reminder (days)')
     employee_passport_expiration_reminder_days = models.PositiveIntegerField(null=True, verbose_name='Employee Passport Expiration Reminder (days)')
-    business_start_time = models.TimeField(null=True, blank=True)
-    business_end_time = models.TimeField(null=True, blank=True)
+    # business_start_time = models.TimeField(null=True, blank=True)
+    # business_end_time = models.TimeField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
 
@@ -94,7 +94,7 @@ class BusinessTiming(models.Model):
     business_start_time = models.TimeField(null=True, blank=True)
     business_end_time = models.TimeField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
-    updated_on = models.DateTimeField(auto_now_add=True, null=True)
+    updated_on = models.DateTimeField(auto_now=True, null=True)
     def __str__(self):
         return f"{self.business_profile} - {self.business_start_time} - {self.business_end_time}"
     
@@ -190,7 +190,7 @@ class DailySummary(models.Model):
     business_profile = models.CharField(max_length=255, null=True)
     status = models.CharField(max_length=20, choices=CHOICES)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
-    updated_on = models.DateTimeField(auto_now_add=True, null=True)
+    updated_on = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.date} {self.status}"

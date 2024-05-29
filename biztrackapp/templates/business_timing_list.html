@@ -19,7 +19,7 @@
                         <th>End Time</th>
                         <th>Created On</th>
                         <th>Updated On</th>
-                        <th>Actions</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,9 +31,9 @@
                         <td>{{ business_timing.business_end_time }}</td>
                         <td>{{ business_timing.created_on }}</td>
                         <td>{{ business_timing.updated_on }}</td>
-                        <td>
+                        <td class="text-center">
                             <a href="{% url 'edit_business_timing' business_timing.id %}" class="btn btn-warning btn-sm"><i class="fas fa-pen text-white"></i></a>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ business_timing.id }}"><i class="fas fa-trash text-white"></i></button>
+                            <!-- <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ business_timing.id }}"><i class="fas fa-trash text-white"></i></button> -->
                         </td>
                     </tr>
 

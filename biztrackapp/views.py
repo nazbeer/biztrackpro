@@ -613,7 +613,11 @@ def business_timing_list(request):
 
 def edit_business_timing(request, id):
     business_timing = get_object_or_404(BusinessTiming, id=id)
-    print(business_timing)
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
+    # Retrieve the BusinessProfile instance associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop_admin.shop.name)
+    # print(business_timing)
     if request.method == 'POST':
         form = BusinessTimingForm(request.POST, instance=business_timing)
         if form.is_valid():
@@ -622,7 +626,7 @@ def edit_business_timing(request, id):
     else:
         form = BusinessTimingForm(instance=business_timing)
     
-    return render(request, 'edit_business_timing.html', {'business_timing': business_timing, 'form': form})
+    return render(request, 'edit_business_timing.html', {'business_timing': business_timing, 'form': form, 'business_profile':business_profile.id})
 
 
 def delete_business_timing(request, id):

@@ -13,11 +13,11 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="business_start_time">Business Start Time: {{ business_timing.business_start_time }}</label>
-                    <input type="time" id="business_start_time" name="business_start_time" class="form-control" value="{{ business_timing.business_start_time }}" required>
+                    <input type="time" id="business_start_time" name="business_start_time" class="form-control" value="{{ business_timing.business_start_time|default_if_none:''|time:'H:i' }}" required>
                 </div>
                 <div class="form-group mt-3">
                     <label for="business_end_time">Business End Time: {{ business_timing.business_end_time }}</label>
-                    <input type="time" id="business_end_time" name="business_end_time" class="form-control" value="{{ business_timing.business_end_time }}" required>
+                    <input type="time" id="business_end_time" name="business_end_time" class="form-control" value="{{ business_timing.business_end_time|default_if_none:''|time:'H:i' }}" required>
                 </div>
                 <div class="form-group mt-3">
                     <button type="submit" class="btn btn-primary">Save changes</button>

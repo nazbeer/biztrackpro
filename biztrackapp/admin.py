@@ -79,7 +79,7 @@ class SupplierAdmin(admin.ModelAdmin):
 
 @admin.register(Bank)
 class BankAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name','account_number','opening_balance', 'business_profile','created_on']
+    list_display = ['id', 'name','account_number','opening_balance', 'business_profile','created_on', 'update_on']
 
 
 

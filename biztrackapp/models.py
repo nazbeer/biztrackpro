@@ -125,7 +125,7 @@ class Bank(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     update_on =models.DateTimeField(auto_now=True, null=True)
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name} - {self.opening_balance}"
 
 class TransactionMode(models.Model):
     CHOICES = [

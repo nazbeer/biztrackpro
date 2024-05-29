@@ -3,6 +3,70 @@
 {% block title %}Create Daily Summary{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const dateInput = document.getElementById('id_date');
+        const today = new Date();
+
+        // Format today's date as 'YYYY-MM-DD'
+        const formattedToday = today.toISOString().split('T')[0];
+
+        // Get start and end times from the server in 'g:i A' format
+        const startTimeValue = "{{ start_time|default_if_none:''|date:'g:i A' }}";
+        const endTimeValue = "{{ end_time|default_if_none:''|date:'g:i A' }}";
+
+        // Function to convert 'g:i A' format to 24-hour format
+        function convertTo24Hour(time) {
+            const [timePart, modifier] = time.split(' ');
+            let [hours, minutes] = timePart.split(':');
+            if (hours === '12') {
+                hours = '00';
+            }
+            if (modifier === 'PM') {
+                hours = parseInt(hours, 10) + 12;
+            }
+            return { hours: parseInt(hours, 10), minutes: parseInt(minutes, 10) };
+        }
+
+        // Parse start and end times to Date objects
+        const startTimeParts = convertTo24Hour(startTimeValue);
+        const endTimeParts = convertTo24Hour(endTimeValue);
+
+        const startTime = new Date(today);
+        startTime.setHours(startTimeParts.hours);
+        startTime.setMinutes(startTimeParts.minutes);
+
+        const endTime = new Date(today);
+        endTime.setHours(endTimeParts.hours);
+        endTime.setMinutes(endTimeParts.minutes);
+
+        // Check if the end time is before the start time
+        if (endTime <= startTime) {
+            // If end time is before or equal to start time, it means end time is on the next day
+            endTime.setDate(endTime.getDate() + 1);
+        }
+
+        // Format tomorrow's date as 'YYYY-MM-DD' from end time date
+        const formattedTomorrow = endTime.toISOString().split('T')[0];
+
+        // Set date input value and limits
+        dateInput.value = formattedToday;
+        dateInput.min = formattedToday;
+        dateInput.max = formattedTomorrow;
+
+        // Set the start and end times in the hidden inputs
+        const startTimeInput = document.getElementById('start_time');
+        const endTimeInput = document.getElementById('end_time');
+
+        startTimeInput.value = startTimeValue;
+        endTimeInput.value = endTimeValue;
+    });
+</script>
 <script>
       document.addEventListener('DOMContentLoaded', (event) => {
         const currentUrl = window.location.href;        
@@ -92,12 +156,14 @@
                                 <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
+                                <input type="hidden" id="start_time" value="{{ start_time|default_if_none:''|date:'g:i A' }}">
+                                <input type="hidden" id="end_time" value="{{ end_time|default_if_none:''|date:'g:i A' }}">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date">Cash on Hand:</label>
-                                <input type="number" name="cash_on_hand" value="" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
+                                <input type="number" name="cash_on_hand" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
                             </div>
                         </div>
                     </div>
@@ -684,6 +750,27 @@
    
 });
 
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // Initialize Select2 for the cheque number input
+        $('#id_cheque_no').select2({
+            ajax: {
+                url: '{% url "fetch_cheque_numbers" %}',
+                dataType: 'json',
+                delay: 250,
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({ id: item.cheque_no, text: item.cheque_no }))
+                    };
+                },
+                cache: true
+            },
+            placeholder: 'Search for a cheque number',
+            minimumInputLength: 1
+        });
+    });
 </script>
 {% endblock %}
 

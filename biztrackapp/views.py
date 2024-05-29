@@ -722,6 +722,11 @@ def delete_business_timing(request, id):
 
 def create_daily_summary(request):
     id = request.GET.get('id')
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     if request.method == 'POST':
         form = DailySummaryForm(request.POST)
         if form.is_valid():
@@ -739,11 +744,6 @@ def create_daily_summary(request):
         bank_deposit_form = BankDepositsForm()
         expense_form = ExpenseForm()
 
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    shop = shop_admin.shop
-    
-    # Retrieve the business profile associated with the shop
-    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     
     # Query for bank sales created on the current date
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
@@ -832,12 +832,18 @@ def create_daily_summary(request):
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
-
+    bankdata = Bank.objects.filter(business_profile=business_profile.id).first()
+    print(bankdata.opening_balance)
 
     return render(request, 'create_daily_summary.html',
         {
             
             'business_profile': business_profile.id,
+
+            #business timings
+            'start_time':business_timing.business_start_time,
+            'end_time':business_timing.business_end_time,
+
             #forms
             'form': form,
             'bank_sale_form': bank_sale_form,
@@ -857,6 +863,9 @@ def create_daily_summary(request):
             'supplier_payments':supplier_payments,
             'bank_deposits':bank_deposit,
             'expenses':expense,
+
+            #cash on hand
+            'cash_on_hand':bankdata.opening_balance,
 
             # calculated vales
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
@@ -919,7 +928,6 @@ def create_bank_sale(request):
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
            
     return redirect('create_daily_summary')
@@ -1083,3 +1091,18 @@ def delete_daily_summary(request, id):
         summary.delete()
         return redirect('daily_summary_list')
     return render(request, 'daily_summary_confirm_delete.html', {'summary': summary})
+
+
+def fetch_cheque_numbers(request):
+    cheque_numbers = set()
+    
+    # Fetch cheque numbers from all specified models
+    cheque_numbers.update(BankSales.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(CreditCollection.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(MiscellaneousIncome.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(Purchase.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(SupplierPayments.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(Expense.objects.values_list('cheque_no', flat=True))
+    
+    cheque_numbers = list(cheque_numbers)
+    return JsonResponse(cheque_numbers, safe=False)

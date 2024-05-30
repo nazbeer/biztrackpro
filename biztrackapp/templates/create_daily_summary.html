@@ -5,33 +5,38 @@
 {% block content %}
 
 <style>
-     .awesomplete ul {
-            width: 100%;
-            box-sizing: border-box;
-            max-height: 50px !important;
-            overflow-y: auto;
-        }
+    .awesomplete ul {
+        width: 100%;
+        box-sizing: border-box;
+        max-height: 50px !important;
+        overflow-y: auto;
+    }
 </style>
 <script>
- document.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', (event) => {
 
-const currentUrl = window.location.href;        
-const url = new URL(currentUrl);
-const id = url.searchParams.get('id');
-console.log("ID: ", id);
-if (id) {
-    document.getElementById('daily_summary_id').value = id;
-}
-// $('.modal').each(function() {
-//     $(this).attr('data-id', id); // Assuming each modal has class 'modal'
-// });
-});
-document.addEventListener('DOMContentLoaded', function() {
-        const currentUrl = window.location.href;
-                const url = new URL(currentUrl);
-                const id = url.searchParams.get('id');
-       
-                document.getElementById('modal_daily_summary_id1').value = id;
+        const currentUrl = window.location.href;        
+        const url = new URL(currentUrl);
+        const id = url.searchParams.get('id');
+        console.log("ID: ", id);
+        if (id) {
+            document.getElementById('daily_summary_id').value = id;
+            document.getElementById('modal_daily_summary_id_bank').value = id;
+        }
+        // $('.modal').each(function() {
+        //     $(this).attr('data-id', id); // Assuming each modal has class 'modal'
+        // });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+                const toggleBank = document.getElementById("toggleBank");
+                const toggleBankContent = document.getElementById("toggleBankContent");
+
+                // Add event listener to the button
+                toggleBank.addEventListener("click", function() {
+                    console.log(toggleBank);
+                    // Toggle the display property of the div
+                    toggleBankContent.style.display = toggleBankContent.style.display === "none" ? "block" : "none";
+                });
 
                 // Initialize Awesomplete for cheque number input
                 const input = document.getElementById('id_cheque_no_b');
@@ -62,15 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             .catch(error => console.error('Error fetching cheque numbers:', error));
                     }
                 });
-                const toggleButton = document.getElementById("toggleBank");
-                const myDiv = document.getElementById("toggleBankContent");
-
-                // Add event listener to the button
-                toggleButton.addEventListener("click", function() {
-                    // Toggle the display property of the div
-                    myDiv.style.display = myDiv.style.display === "none" ? "block" : "none";
-                });
-            });
+                
+    });
     document.addEventListener('DOMContentLoaded', (event) => {
         
         const dateInput = document.getElementById('id_date');
@@ -132,46 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
      
-    // document.addEventListener('DOMContentLoaded', function() {
-       
-        //     document.getElementById('bankDepositModal').addEventListener('show.bs.modal', function (event) {
-        //     //     const currentUrl = window.location.href;
-        //     //     const url = new URL(currentUrl);
-        //     //     const id = url.searchParams.get('id');
-       
-        //     //     document.getElementById('modal_daily_summary_id1').value = id;
-
-        //     //     // Initialize Awesomplete for cheque number input
-        //     //     const input = document.getElementById('id_cheque_no_b');
-        //     //     new Awesomplete(input, {
-        //     //         minChars: 2,
-        //     //         autoFirst: true,
-        //     //         list: [],
-        //     //         data: function (item, input) {
-        //     //             return { label: item.cheque_number, value: item.id };
-        //     //         },
-        //     //         filter: Awesomplete.FILTER_CONTAINS,
-        //     //         replace: function (item) {
-        //     //             this.input.value = item.label;
-        //     //         }
-        //     //     });
-
-        //     //     // Fetch cheque numbers dynamically
-        //     //     input.addEventListener('input', function () {
-        //     //         const input = this;
-        //     //         if (input.value.length >= 2) {
-        //     //             fetch('/fetch_cheque_numbers/')
-        //     //                 .then(response => response.json())
-        //     //                 .then(data => {
-        //     //                     const list = data.map(item => item.cheque_number);
-        //     //                     console.log(response.json());
-        //     //                     input.setAttribute('data-list', list.join(','));
-        //     //                 })
-        //     //                 .catch(error => console.error('Error fetching cheque numbers:', error));
-        //     //         }
-        //     //     });
-        //     // });
-        // });
     $(document).ready(function() {
         // $('#bankDepositModal').on('show.bs.modal', function (event) {
         //         const currentUrl = window.location.href;
@@ -179,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
         //         const id = url.searchParams.get('id');
         //         console.log('theetam', id);
         //         document.getElementById('modal_daily_summary_id1').value = id;
-
         //     });
         $('#miscIncomeModal').on('show.bs.modal', function (event) {
             var urlParams = new URLSearchParams(window.location.search);
@@ -230,9 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
         border-radius: 5px !important;
     }
     .toggle-content{
-            display: none;
-           
-        }
+        display: none;
+    }
 </style>
 <div class="container ">
     <div class="card  ">
@@ -715,69 +671,69 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3"  id="toggleBank">Add Bank Deposit</button>
                         </div>
-                        <div class="row p-4 toggle-content" id="toggleBankContent">
-                            <form id="bankSaleForm" method="post" action="{% url 'create_bank_sale' %}">
-                                <div class="modal-body">
-                                  {% csrf_token %}
-                                  <div id="form-errors" class="alert alert-danger d-none"></div>
-                                  <div class="row">
-                                    <div class="col-md-6">
-                                      <div class="form-group">
-                                        <label for="id_customer">Customer</label>
-                                        <input type="hidden" name="business_profile" value="{{ business_profile }}">
-                                        <input type="hidden" id="modal_daily_summary_id4" name="daily_summary_id">
-                                        <select id="id_customer" name="customer" class="form-control" tabindex="0">
-                                          <option>-- Select Customer --</option>
-                                          {% for customer in bank_sale_form.customer.field.queryset %}
-                                            <option value="{{ customer.id }}">{{ customer.name }}</option>
-                                          {% endfor %}
-                                        </select>
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="id_amount">Amount</label>
-                                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="id_cheque_date">Cheque Date</label>
-                                        <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                      <div class="form-group">
-                                        <label for="id_mode_of_transaction">Mode of Transaction</label>
-                                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="1">
-                                          <option>-- Mode of Transaction --</option>
-                                          {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
-                                            <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
-                                          {% endfor %}
-                                        </select>
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="id_bank">Bank</label>
-                                        <select id="id_bank" name="bank" class="form-control" tabindex="3">
-                                          <option>-- Select Bank --</option>
-                                          {% for bank in bank_sale_form.bank.field.queryset %}
-                                            <option value="{{ bank.id }}">{{ bank.name }}</option>
-                                          {% endfor %}
-                                        </select>
-                                      </div>
-                                      <div class="form-group">
-                                        <label for="id_cheque_no">Cheque Number</label>
-                                        <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div id="bankSaleErrors" class="text-danger"></div>
-                                </div>
-                                <div class="modal-footer bg-white">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                  <button type="submit" class="btn btn-primary" id="saveBankSale">Save changes</button>
-                              
-                                </div>
-                              </form>
-                        </div>
+                        
                     </div>
-                    
+                    <div class="row p-4 toggle-content" id="toggleBankContent" style="display:none;">
+                        <form id="bankSaleForm" method="post" action="{% url 'create_bank_sale' %}">
+                            <div class="modal-body">
+                              {% csrf_token %}
+                              <div id="form-errors" class="alert alert-danger d-none"></div>
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="id_customer">Customer</label>
+                                    <input type="hidden" name="business_profile" value="{{ business_profile }}">
+                                    <input type="hidden" id="modal_daily_summary_id_bank" name="daily_summary_id">
+                                    <select id="id_customer" name="customer" class="form-control" tabindex="0">
+                                      <option>-- Select Customer --</option>
+                                      {% for customer in bank_sale_form.customer.field.queryset %}
+                                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                                      {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="id_amount">Amount</label>
+                                    <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="id_cheque_date">Cheque Date</label>
+                                    <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                                  </div>
+                                </div>
+                                <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="id_mode_of_transaction">Mode of Transaction</label>
+                                    <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="1">
+                                      <option>-- Mode of Transaction --</option>
+                                      {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                      {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="id_bank">Bank</label>
+                                    <select id="id_bank" name="bank" class="form-control" tabindex="3">
+                                      <option>-- Select Bank --</option>
+                                      {% for bank in bank_sale_form.bank.field.queryset %}
+                                        <option value="{{ bank.id }}">{{ bank.name }}</option>
+                                      {% endfor %}
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="id_cheque_no">Cheque Number</label>
+                                    <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                                  </div>
+                                </div>
+                              </div>
+                              <div id="bankSaleErrors" class="text-danger"></div>
+                            </div>
+                            <div class="modal-footer bg-white">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary" id="saveBankSale">Save changes</button>
+                          
+                            </div>
+                          </form>
+                    </div>
                     <div class="table-responsive">
                     <table id="tablebankdeposit"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
                         <thead class="thead-light" style="border-color: transparent !important;">

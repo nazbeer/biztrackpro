@@ -1094,15 +1094,20 @@ def delete_daily_summary(request, id):
 
 
 def fetch_cheque_numbers(request):
-    cheque_numbers = set()
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
     
+    # Retrieve the business profile associated with the shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    cheque_numbers = set()
     # Fetch cheque numbers from all specified models
-    cheque_numbers.update(BankSales.objects.values_list('cheque_no', flat=True))
-    cheque_numbers.update(CreditCollection.objects.values_list('cheque_no', flat=True))
-    cheque_numbers.update(MiscellaneousIncome.objects.values_list('cheque_no', flat=True))
-    cheque_numbers.update(Purchase.objects.values_list('cheque_no', flat=True))
-    cheque_numbers.update(SupplierPayments.objects.values_list('cheque_no', flat=True))
-    cheque_numbers.update(Expense.objects.values_list('cheque_no', flat=True))
+    cheque_numbers.update(BankSales.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+    cheque_numbers.update(CreditCollection.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+    cheque_numbers.update(MiscellaneousIncome.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+    cheque_numbers.update(Purchase.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+    cheque_numbers.update(SupplierPayments.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+    cheque_numbers.update(Expense.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
     
     cheque_numbers = list(cheque_numbers)
+    # print(cheque_numbers)
     return JsonResponse(cheque_numbers, safe=False)

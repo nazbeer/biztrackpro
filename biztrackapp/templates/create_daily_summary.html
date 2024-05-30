@@ -3,13 +3,76 @@
 {% block title %}Create Daily Summary{% endblock %}
 
 {% block content %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-
+<style>
+     .awesomplete ul {
+            width: 100%;
+            box-sizing: border-box;
+            max-height: 50px !important;
+            overflow-y: auto;
+        }
+</style>
 <script>
+ document.addEventListener('DOMContentLoaded', (event) => {
+
+const currentUrl = window.location.href;        
+const url = new URL(currentUrl);
+const id = url.searchParams.get('id');
+console.log("ID: ", id);
+if (id) {
+    document.getElementById('daily_summary_id').value = id;
+}
+// $('.modal').each(function() {
+//     $(this).attr('data-id', id); // Assuming each modal has class 'modal'
+// });
+});
+document.addEventListener('DOMContentLoaded', function() {
+        const currentUrl = window.location.href;
+                const url = new URL(currentUrl);
+                const id = url.searchParams.get('id');
+       
+                document.getElementById('modal_daily_summary_id1').value = id;
+
+                // Initialize Awesomplete for cheque number input
+                const input = document.getElementById('id_cheque_no_b');
+                new Awesomplete(input, {
+                    minChars: 2,
+                    autoFirst: true,
+                    list: [],
+                    data: function (item, input) {
+                        return { label: item.cheque_number, value: item.id };
+                    },
+                    filter: Awesomplete.FILTER_CONTAINS,
+                    replace: function (item) {
+                        this.input.value = item.label;
+                    }
+                });
+
+                // Fetch cheque numbers dynamically
+                input.addEventListener('input', function () {
+                    const input = this;
+                    if (input.value.length >= 2) {
+                        fetch('/fetch_cheque_numbers/')
+                            .then(response => response.json())
+                            .then(data => {
+                                const list = data.map(item => item.cheque_number);
+                                console.log(response.json());
+                                input.setAttribute('data-list', list.join(','));
+                            })
+                            .catch(error => console.error('Error fetching cheque numbers:', error));
+                    }
+                });
+                const toggleButton = document.getElementById("toggleBank");
+                const myDiv = document.getElementById("toggleBankContent");
+
+                // Add event listener to the button
+                toggleButton.addEventListener("click", function() {
+                    // Toggle the display property of the div
+                    myDiv.style.display = myDiv.style.display === "none" ? "block" : "none";
+                });
+            });
     document.addEventListener('DOMContentLoaded', (event) => {
+        
         const dateInput = document.getElementById('id_date');
         const today = new Date();
 
@@ -68,27 +131,56 @@
     });
 </script>
 <script>
-      document.addEventListener('DOMContentLoaded', (event) => {
-        const currentUrl = window.location.href;        
-        const url = new URL(currentUrl);
-        const id = url.searchParams.get('id');
-        console.log("ID: ", id);
-        if (id) {
-            document.getElementById('daily_summary_id').value = id;
-        }
-        // $('.modal').each(function() {
-        //     $(this).attr('data-id', id); // Assuming each modal has class 'modal'
+     
+    // document.addEventListener('DOMContentLoaded', function() {
+       
+        //     document.getElementById('bankDepositModal').addEventListener('show.bs.modal', function (event) {
+        //     //     const currentUrl = window.location.href;
+        //     //     const url = new URL(currentUrl);
+        //     //     const id = url.searchParams.get('id');
+       
+        //     //     document.getElementById('modal_daily_summary_id1').value = id;
+
+        //     //     // Initialize Awesomplete for cheque number input
+        //     //     const input = document.getElementById('id_cheque_no_b');
+        //     //     new Awesomplete(input, {
+        //     //         minChars: 2,
+        //     //         autoFirst: true,
+        //     //         list: [],
+        //     //         data: function (item, input) {
+        //     //             return { label: item.cheque_number, value: item.id };
+        //     //         },
+        //     //         filter: Awesomplete.FILTER_CONTAINS,
+        //     //         replace: function (item) {
+        //     //             this.input.value = item.label;
+        //     //         }
+        //     //     });
+
+        //     //     // Fetch cheque numbers dynamically
+        //     //     input.addEventListener('input', function () {
+        //     //         const input = this;
+        //     //         if (input.value.length >= 2) {
+        //     //             fetch('/fetch_cheque_numbers/')
+        //     //                 .then(response => response.json())
+        //     //                 .then(data => {
+        //     //                     const list = data.map(item => item.cheque_number);
+        //     //                     console.log(response.json());
+        //     //                     input.setAttribute('data-list', list.join(','));
+        //     //                 })
+        //     //                 .catch(error => console.error('Error fetching cheque numbers:', error));
+        //     //         }
+        //     //     });
+        //     // });
         // });
-    });
     $(document).ready(function() {
-        $('#bankDepositModal').on('show.bs.modal', function (event) {
-            const currentUrl = window.location.href;        
-            const url = new URL(currentUrl);
-            const id = url.searchParams.get('id');
-            console.log('theetam', id);
-            document.getElementById('modal_daily_summary_id1').value = id;
-            // $('#modal_daily_summary_id').val(dailySummaryId);
-        });
+        // $('#bankDepositModal').on('show.bs.modal', function (event) {
+        //         const currentUrl = window.location.href;
+        //         const url = new URL(currentUrl);
+        //         const id = url.searchParams.get('id');
+        //         console.log('theetam', id);
+        //         document.getElementById('modal_daily_summary_id1').value = id;
+
+        //     });
         $('#miscIncomeModal').on('show.bs.modal', function (event) {
             var urlParams = new URLSearchParams(window.location.search);
             var dailySummaryId = urlParams.get('id');
@@ -137,7 +229,10 @@
     .br-5{
         border-radius: 5px !important;
     }
-   
+    .toggle-content{
+            display: none;
+           
+        }
 </style>
 <div class="container ">
     <div class="card  ">
@@ -162,8 +257,8 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="id_date">Cash on Hand:</label>
-                                <input type="number" name="cash_on_hand" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0">   
+                                <label for="id_date">Opening Balance <small class="text-muted">(cash on hand)</small>:</label>
+                                <input type="number" name="cash_on_hand" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
                             </div>
                         </div>
                     </div>
@@ -194,12 +289,12 @@
                     </div>
                     <div class="row mb-3 mt-2">
                         <div class="col-md-4 ">
-                            <label>Bank Sale Total</label>
+                            <label>Sales Total</label>
                             <div class="bg-light p-2 rounded">{{total_bank_sale_amount}}</div>
                                 <input type="hidden" name="bank_sale_total" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Bank Sale</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add Sale</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -220,7 +315,7 @@
                             {% for sale in bank_sales %}
                             <tr>
                                 <td>{{ sale.customer.name }}</td>
-                                <td>{{ sale.mode_of_transaction.name }}</td>
+                                <td class="text-capitalize">{{ sale.mode_of_transaction.name }}</td>
                                 <td>{{ sale.bank.name }}</td>
                                 <td>{{ sale.amount }}</td>
                                 <td>{{ sale.created_on|date:"d/m/Y" }}</td>
@@ -286,7 +381,7 @@
                             {% for creditcol in credit_collections %}
                             <tr>
                                 <td>{{ creditcol.customer.name }}</td>
-                                <td>{{ creditcol.payment_mode.name }}</td>
+                                <td  class="text-capitalize">{{ creditcol.payment_mode.name }}</td>
                                 <td>{{ creditcol.bank.name }}</td>
                                 <td>{{ creditcol.amount }}</td>
                                 <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
@@ -304,7 +399,7 @@
 
             <div class="card  mt-4">
                 <div class="card-header text-white">
-                    <h5 class="text-left mb-0">Msc. Income</h5>
+                    <h5 class="text-left mb-0">Miscellaneous Income</h5>
                 </div>
                 <div class="card-body bg-white  br-5">
                     <div class="row ">
@@ -355,7 +450,7 @@
                             {% for msc_incomes in msc_income %}
                             <tr>
                                 <td>{{ msc_incomes.receipt_type.name }}</td>
-                                <td>{{ msc_incomes.mode_of_transaction.name }}</td>
+                                <td  class="text-capitalize">{{ msc_incomes.mode_of_transaction.name }}</td>
                                 <td>{{ msc_incomes.bank.name }}</td>
                                 <td>{{ msc_incomes.amount }}</td>
                                 <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
@@ -431,7 +526,7 @@
                             <tr>
                                 <td>{{ purchase.supplier.name }}</td>
                                 <td>{{ purchase.opening_outstanding }}</td>
-                                <td>{{ purchase.mode_of_transaction.name }}</td>
+                                <td  class="text-capitalize">{{ purchase.mode_of_transaction.name }}</td>
                                 <td>{{ purchase.invoice_date|date:"d/m/Y" }}</td>
                                 <td>{{ purchase.invoice_no }}</td>
                                 <td>{{ purchase.invoice_amount }}</td>
@@ -500,7 +595,7 @@
                             {% for supplier_payment in supplier_payments %}
                             <tr>
                                 <td>{{ supplier_payment.supplier.name }}</td>
-                                <td>{{ supplier_payment.opening_outstanding }}</td>
+                                <td  class="text-capitalize">{{ supplier_payment.opening_outstanding }}</td>
                                 <td>{{ supplier_payment.mode_of_transaction }}</td>
                                 <td>{{ supplier_payment.amount }}</td>
                                 <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
@@ -570,7 +665,7 @@
                             {% for expense in expenses %}
                             <tr>
                                 <td>{{ expense.expense_type.name }}</td>
-                                <td>{{ expense.mode_of_transaction.name }}</td>
+                                <td  class="text-capitalize">{{ expense.mode_of_transaction.name }}</td>
                                 <td>{{ expense.bank.name }}</td>
                                 <td>{{ expense.amount }}</td>
                                 <td>{{ expense.invoice_no}}</td>
@@ -618,9 +713,71 @@
                             <input type="hidden" name="bank_deposit_total" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankDepositModal">Add Bank Deposit</button>
+                            <button type="button" class="btn btn-primary mt-3"  id="toggleBank">Add Bank Deposit</button>
+                        </div>
+                        <div class="row p-4 toggle-content" id="toggleBankContent">
+                            <form id="bankSaleForm" method="post" action="{% url 'create_bank_sale' %}">
+                                <div class="modal-body">
+                                  {% csrf_token %}
+                                  <div id="form-errors" class="alert alert-danger d-none"></div>
+                                  <div class="row">
+                                    <div class="col-md-6">
+                                      <div class="form-group">
+                                        <label for="id_customer">Customer</label>
+                                        <input type="hidden" name="business_profile" value="{{ business_profile }}">
+                                        <input type="hidden" id="modal_daily_summary_id4" name="daily_summary_id">
+                                        <select id="id_customer" name="customer" class="form-control" tabindex="0">
+                                          <option>-- Select Customer --</option>
+                                          {% for customer in bank_sale_form.customer.field.queryset %}
+                                            <option value="{{ customer.id }}">{{ customer.name }}</option>
+                                          {% endfor %}
+                                        </select>
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="id_amount">Amount</label>
+                                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="id_cheque_date">Cheque Date</label>
+                                        <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                                      </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                      <div class="form-group">
+                                        <label for="id_mode_of_transaction">Mode of Transaction</label>
+                                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="1">
+                                          <option>-- Mode of Transaction --</option>
+                                          {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
+                                            <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                          {% endfor %}
+                                        </select>
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="id_bank">Bank</label>
+                                        <select id="id_bank" name="bank" class="form-control" tabindex="3">
+                                          <option>-- Select Bank --</option>
+                                          {% for bank in bank_sale_form.bank.field.queryset %}
+                                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                                          {% endfor %}
+                                        </select>
+                                      </div>
+                                      <div class="form-group">
+                                        <label for="id_cheque_no">Cheque Number</label>
+                                        <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5">
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div id="bankSaleErrors" class="text-danger"></div>
+                                </div>
+                                <div class="modal-footer bg-white">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  <button type="submit" class="btn btn-primary" id="saveBankSale">Save changes</button>
+                              
+                                </div>
+                              </form>
                         </div>
                     </div>
+                    
                     <div class="table-responsive">
                     <table id="tablebankdeposit"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
                         <thead class="thead-light" style="border-color: transparent !important;">
@@ -639,7 +796,7 @@
                             {% for bank_deposit in bank_deposits %}
                             <tr>
                                 <td>{{ bank_deposit.bank_deposit_bank.name }}</td>
-                                <td>{{ bank_deposit.mode_of_transaction.name }}</td>
+                                <td  class="text-capitalize">{{ bank_deposit.mode_of_transaction.name }}</td>
                                 <td>{{ bank_deposit.bank.name }}</td>
                                 <td>{{ bank_deposit.amount }}</td>
                                 <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
@@ -711,8 +868,7 @@
 {% include 'modals/purchase_modal.html' %}
 {% include 'modals/supplier_payment_modal.html' %}
 {% include 'modals/expense_modal.html' %}
-{% include 'modals/bank_deposit_modal.html' %}
-<!-- Repeat similar structure for other modals: Miscellaneous Income, Purchase, Supplier Payment, Expense, Bank Deposit -->
+
 
 {% endblock %}
 
@@ -753,24 +909,10 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        // Initialize Select2 for the cheque number input
-        $('#id_cheque_no').select2({
-            ajax: {
-                url: '{% url "fetch_cheque_numbers" %}',
-                dataType: 'json',
-                delay: 250,
-                processResults: function (data) {
-                    return {
-                        results: data.map(item => ({ id: item.cheque_no, text: item.cheque_no }))
-                    };
-                },
-                cache: true
-            },
-            placeholder: 'Search for a cheque number',
-            minimumInputLength: 1
-        });
-    });
+    // Get references to the button and the div
+    
+       
+    
 </script>
 {% endblock %}
 

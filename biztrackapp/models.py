@@ -131,7 +131,7 @@ class TransactionMode(models.Model):
     CHOICES = [
         ('card', 'Card'),
         ('cash', 'Cash'),
-        ('bank', 'Bank Transfer'),
+        ('bank transfer', 'Bank Transfer'),
         ('cheque', 'Cheque'),
         ('credit', 'Credit'),
 

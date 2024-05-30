@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="bankDepositModal" tabindex="-1" aria-labelledby="bankDepositModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -30,7 +31,10 @@
                             </div>
                             <div class="form-group">
                                 <label for="id_cheque_no">Cheque Number</label>
-                                <select id="id_cheque_no" name="cheque_no" class="form-control" tabindex="5"><option>Am Still working on this....</option></select>
+                                <!-- <select id="id_cheque_no_b" name="cheque_no" class="form-control" tabindex="5">
+                                    <option value="">Search for a cheque number</option>
+                                </select> -->
+                                <input id="id_cheque_no_b" name="cheque_no" class="form-control" tabindex="5" placeholder="Search for a cheque number">
                             </div>
                             <div class="form-group">
                                 <label for="id_deposit_date">Deposit Date</label>
@@ -72,24 +76,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function() {
-        // Initialize Select2 for the cheque number input
-        $('#id_cheque_no').select2({
-            ajax: {
-                url: '{% url "fetch_cheque_numbers" %}',
-                dataType: 'json',
-                delay: 250,
-                processResults: function (data) {
-                    return {
-                        results: data.map(item => ({ id: item, text: item }))
-                    };
-                },
-                cache: true
-            },
-            placeholder: 'Search for a cheque number',
-            minimumInputLength: 1
-        });
-    });
-</script>

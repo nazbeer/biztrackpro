@@ -75,7 +75,7 @@ urlpatterns = [
     path('create-expense/', create_expense, name='create_expense'),
     path('list-expense/', list_expense, name='list_expense'),
 
-    path('fetch-cheque-numbers/', fetch_cheque_numbers, name='fetch_cheque_numbers'),
+    path('fetch_cheque_numbers/', fetch_cheque_numbers, name='fetch_cheque_numbers'),
 
 ]
 # handler404 = 'custom_404_view'

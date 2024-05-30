@@ -49,6 +49,10 @@
               <input type="date" id="id_vat_submission_date_3" class="form-control" name="vat_submission_date_3" value="{{ business_profile.vat_submission_date_3|date:'Y-m-d' }}">
             </div>
             <div class="form-group">
+              <label for="license_number">Opening Balance:</label>
+              <input type="text" id="opening_balance" name="opening_balance" class="form-control" value="{{ opening_balance }}" required>
+          </div>
+            <div class="form-group">
               <label for="id_address">Address:</label>
               <textarea id="id_address" class="form-control" name="address">{{ business_profile.address }}</textarea>
             </div>

@@ -73,7 +73,10 @@
                             <label for="{{ business_profile_form.vat_submission_date_3.id_for_label }}">VAT Submission Date 3:</label>
                             <input type="date" id="{{ business_profile_form.vat_submission_date_3.id_for_label }}" name="vat_submission_date_3" class="form-control" required>
                         </div>
-                       
+                        <div class="form-group">
+                            <label for="license_number">Opening Balance:</label>
+                            <input type="text" id="opening_balance" name="opening_balance" class="form-control" value="{{ opening_balance }}" required>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <!-- License Number (Read-only) -->
@@ -136,7 +139,8 @@
                             <label for="{{ business_profile_form.business_end_time.id_for_label }}">Business End Time:</label>
                             <input type="time" id="{{ business_profile_form.business_end_time.id_for_label }}" name="business_end_time" class="form-control" >
                         </div> {% endcomment %}
-                        <!-- Add other additional fields for the main business profile here -->
+                        
+                      
                     </div>
                     <div class="col-md-12">
                         <!-- Address -->

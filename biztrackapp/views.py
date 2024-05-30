@@ -719,9 +719,11 @@ def delete_business_timing(request, id):
 
 #         }
 #     )
-
+from datetime import date
+from django.db.models import Max
 def create_daily_summary(request):
     id = request.GET.get('id')
+    today = date.today()
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     # Retrieve the business profile associated with the shop
@@ -744,7 +746,19 @@ def create_daily_summary(request):
         bank_deposit_form = BankDepositsForm()
         expense_form = ExpenseForm()
 
+    try:
+        # Get the latest DailySummary by sorting by date in descending order and taking the first one
+        daily_summary = DailySummary.objects.latest('date')
+        bankdata = daily_summary.closing_balance
+    except DailySummary.DoesNotExist:
+        # If no DailySummary exists at all, get the opening balance from BusinessProfile
+        bankdata = business_profile.opening_balance
+
+    daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
+
+    # bankdata = business_profile.opening_balance
     
+
     # Query for bank sales created on the current date
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
@@ -832,8 +846,6 @@ def create_daily_summary(request):
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
-    bankdata = Bank.objects.filter(business_profile=business_profile.id).first()
-    print(bankdata.opening_balance)
 
     return render(request, 'create_daily_summary.html',
         {
@@ -865,7 +877,7 @@ def create_daily_summary(request):
             'expenses':expense,
 
             #cash on hand
-            'cash_on_hand':bankdata.opening_balance,
+            'cash_on_hand':bankdata,
 
             # calculated vales
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
@@ -1100,14 +1112,15 @@ def fetch_cheque_numbers(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     cheque_numbers = set()
+    
     # Fetch cheque numbers from all specified models
     cheque_numbers.update(BankSales.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
+
     cheque_numbers.update(CreditCollection.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
     cheque_numbers.update(MiscellaneousIncome.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
     cheque_numbers.update(Purchase.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
     cheque_numbers.update(SupplierPayments.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
     cheque_numbers.update(Expense.objects.filter(business_profile=business_profile.id).values_list('cheque_no', flat=True))
-    
+    print(cheque_numbers)
     cheque_numbers = list(cheque_numbers)
-    # print(cheque_numbers)
     return JsonResponse(cheque_numbers, safe=False)

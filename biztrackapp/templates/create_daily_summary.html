@@ -177,6 +177,17 @@
     });
 
 </script>
+<script>
+    function saveFunction() {
+        document.getElementById('status').value = 'ongoing';
+        document.getElementById("daily_summary_form").submit();
+    }
+    function submitFunction() {
+        document.getElementById('status').value = 'completed';
+        document.getElementById("daily_summary_form").submit();
+    }
+</script>
+
 <style>
     .bg-white{
         color:#000 !important;
@@ -193,7 +204,7 @@
         <div class="card-header">
             <h5 class="mb-0">Create Daily Summary</h5>
           </div>
-          <form method="post"  enctype="multipart/form-data" class="form">
+          <form method="post"  enctype="multipart/form-data" class="form" id="daily_summary_form">
         <div class="card-body ">
             {% csrf_token %}
             <div class="card mt-0">
@@ -716,8 +727,11 @@
             <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
                 <input type="hidden" name="closing_balance" value="0">
                 <input type="hidden" name="status" id="status" value="ongoing">
-                <button type="submit" class="btn btn-primary" id="submit-btn" onclick="setStatus('completed')">Submit</button>
-                <button type="submit" class="btn btn-warning" id="save-btn" onclick="setStatus('ongoing')">Save</button>
+                {% comment %} <input type="button" onclick="saveFunction()"  class="btn btn-warning" value="Save">
+                <input type="button"  class="btn btn-primary" value="Submit"> {% endcomment %}
+        
+             <button type="submit" class="btn btn-primary" id="submit-btn" onclick="submitFunction()">Submit</button>
+                <button type="submit" class="btn btn-warning" id="save-btn" onclick="saveFunction()">Save</button>
             </div>
         </div>
     </form>
@@ -740,9 +754,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
    $(document).ready(function() {
-    function setStatus(status) {
-        document.getElementById('status').value = status;
-    }
     // Initialize DataTables
     $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
         responsive: true,

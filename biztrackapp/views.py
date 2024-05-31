@@ -655,10 +655,22 @@ def create_daily_summary(request):
     if request.method == 'POST':
         form = DailySummaryForm(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.daily_summary_id = id  # Assign the value here
-            instance.save()
-            return redirect('daily_summary_list')
+            if DailySummary.objects.filter(daily_summary_id=id).exists():
+                return redirect('daily_summary_list')  # Redirect if it already exists
+            else:
+                instance = form.save(commit=False)
+                instance.daily_summary_id = id
+                instance.save()
+                status = request.POST.get('status')
+                if status == "ongoing":
+                    return redirect(reverse('create_daily_summary') + f'?id={instance.daily_summary_id}')
+                return redirect('daily_summary_list')
+            # instance = form.save(commit=False)
+            # instance.daily_summary_id = id  # Assign the value here
+            # instance.save()
+            # if instance.status == "ongoing":
+            #     return redirect(reverse('create_daily_summary') + f'?id={instance.daily_summary_id}')
+            # return redirect('daily_summary_list')
     else:
         form = DailySummaryForm()
         bank_sale_form = BankSaleForm()
@@ -672,6 +684,8 @@ def create_daily_summary(request):
     try:
         # Get the latest DailySummary by sorting by date in descending order and taking the first one
         daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
+        # daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-date')[0]
+
         # print('bankdata', daily_summary)
         bankdata = daily_summary.closing_balance
         

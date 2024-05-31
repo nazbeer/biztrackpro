@@ -117,17 +117,71 @@ class ReceiptType(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+BANK_CHOICES = [
+    (bank, bank) for bank in [
+        'FAB',
+        'ADCB',
+        'AL MASRAF',
+        'CBOD',
+        'Emirates NBD',
+        'Mashreq',
+        'Bank of Sharjah',
+        'United Arab Bank',
+        'Invest Bank',
+        'Rak Bank',
+        'CBI',
+        'NBF',
+        'NBQ',
+        'Dubai Islamic Bank',
+        'Emirates Islamic Bank',
+        'Sharjah Islamic Bank',
+        'ADIB',
+        'Al Hilal Bank',
+        'Ajman Bank',
+        'Arab Bank',
+        'Banque Misr',
+        'Bank of Baroda',
+        'Nilein Bank',
+        'NBB',
+        'BNP Paribas',
+        'HSBC',
+        'AAIB',
+        'Al Khaliji',
+        'ABK',
+        'Barclays Bank',
+        'HBL',
+        'Habib Bank AG Zurich',
+        'Standard Chartered',
+        'Citi Bank',
+        'Bank Saderat Iran',
+        'Bank Melli Iran',
+        'Banque Banorient France',
+        'United Bank Limited',
+        'Doha Bank',
+        'Samba Financial Group',
+        'Deutsche Bank',
+        'ICBC',
+        'NBK',
+        'GIB',
+        'Bank of China',
+        'BOK',
+        'Credit Agricole',
+        'IDB',
+    ]
+]
+
 class Bank(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, choices=BANK_CHOICES)
     account_number = models.CharField(max_length=50)
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
     business_profile = models.CharField(max_length=255, null=True)
     status = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
-    update_on =models.DateTimeField(auto_now=True, null=True)
+    update_on = models.DateTimeField(auto_now=True, null=True)
+
     def __str__(self):
         return f"{self.name} - {self.opening_balance}"
-
+    
 class TransactionMode(models.Model):
     CHOICES = [
         ('card', 'Card'),
@@ -277,6 +331,7 @@ class SupplierPayments(models.Model):
     
 
 class BankDeposits(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     bank_deposit_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank_deposit')
     daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

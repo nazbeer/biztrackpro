@@ -61,6 +61,8 @@ class ReceiptTypeForm(forms.ModelForm):
         fields = '__all__'
 
 class BankForm(forms.ModelForm):
+    name = forms.ChoiceField(choices=BANK_CHOICES, label="Bank Name")
+
     class Meta:
         model = Bank
         fields = '__all__'

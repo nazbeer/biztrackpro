@@ -7,34 +7,156 @@
       <h4 class="mb-0">Create Bank</h4>
     </div>
     <form method="post" enctype="multipart/form-data" class="form">
-    <div class="card-body">
-      
-  
- 
-    {% csrf_token %}
-    <div class="form-group">
-      <label for="name">Bank Name:</label>
-      <input type="text" id="name" name="name" class="form-control" required>
-    </div>
-    <div class="form-group">
-      <label for="account_number">Account Number:</label>
-      <input type="text" id="account_number" name="account_number" class="form-control" required>
-      <input type="hidden" name="business_profile" value="{{ business_profile }}">
-    </div>
-    <div class="form-group">
-      <label for="opening_balance">Opening Balance:</label>
-      <input type="number" id="opening_balance" name="opening_balance" class="form-control" step="0.01" required>
-    </div>
-    
-  
-</div>
-<div class="card-footer">
-  <div class="form-group mb-0">
-    <button type="submit" class="btn btn-primary">Create Bank</button>
+      <div class="card-body">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Bank Name:</label>
+          <div class="custom-select-wrapper">
+            <input type="text" id="search" placeholder="Search Bank..." class="search-box text-capitalize">
+            <select id="name" name="name" class="custom-select" required>
+              <option value="" disabled>Select Bank</option>
+              {% for value, display in bank_choices %}
+                <option value="{{ value }}">{{ display }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="account_number">Account Number:</label>
+          <input type="text" id="account_number" name="account_number" class="form-control" required>
+          <input type="hidden" name="business_profile" value="{{ business_profile }}">
+        </div>
+        <div class="form-group">
+          <label for="opening_balance">Opening Balance:</label>
+          <input type="number" id="opening_balance" name="opening_balance" class="form-control" step="0.01" required>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="form-group mb-0">
+          <button type="submit" class="btn btn-primary">Create Bank</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
-</form>
 
-</div>
-</div>
+<!-- Custom CSS for styling -->
+<style>
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-box {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.custom-select {
+    display: none; /* Hide by default */
+    width: 100%;
+    padding: 10px;
+    height: 45px;
+    font-size: 16px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    position: absolute;
+    top: 100%; /* Position below the search box */
+    left: 0;
+    z-index: 1;
+}
+</style>
+
+<!-- JavaScript for searchable select -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('name');
+    const searchBox = document.getElementById('search');
+    const options = Array.from(select.options).map(option => ({ text: option.textContent, value: option.value }));
+    let originalOptions = Array.from(select.options);
+
+    // Function to update search box and hide select
+    function updateSearchBox(optionText) {
+        searchBox.value = optionText;
+        select.style.display = 'none';
+        
+        // Remove selected attribute from all options
+        originalOptions.forEach(option => {
+            option.removeAttribute('selected');
+        });
+        
+        // Set selected attribute for the selected option
+        const selectedOption = select.querySelector(`option[value="${optionText}"]`);
+        if (selectedOption) {
+            selectedOption.setAttribute('selected', 'selected');
+        }
+    }
+
+    // Function to handle click event on options
+    function handleOptionClick(event) {
+        const clickedOption = event.target;
+        const optionValue = clickedOption.getAttribute('value');
+        select.value = optionValue; // Set select value to the clicked option's value
+        updateSearchBox(clickedOption.textContent);
+    }
+
+    searchBox.addEventListener('input', function() {
+        const searchText = searchBox.value.toLowerCase();
+        let filteredOptions = originalOptions.filter(option => option.textContent.toLowerCase().includes(searchText));
+
+        // Clear and update the select options
+        select.innerHTML = ''; 
+        filteredOptions.forEach(option => {
+            const opt = new Option(option.textContent, option.value);
+            select.appendChild(opt);
+        });
+
+        // Show or hide the select element based on search input
+        if (searchText) {
+            select.style.display = 'block';
+        } else {
+            select.style.display = 'none';
+        }
+    });
+
+    select.addEventListener('change', function() {
+        updateSearchBox(select.options[select.selectedIndex].text);
+    });
+
+    // Handle focus and blur events for select and search box
+    searchBox.addEventListener('focus', function() {
+        select.style.display = 'block';
+    });
+
+    searchBox.addEventListener('blur', function() {
+        // Delay hiding the select to allow click events to be captured
+        setTimeout(() => {
+            select.style.display = 'none';
+        }, 200);
+    });
+
+    select.addEventListener('focus', function() {
+        select.style.display = 'block';
+    });
+
+    select.addEventListener('blur', function() {
+        setTimeout(() => {
+            select.style.display = 'none';
+        }, 200);
+    });
+
+    // Add click event listener to each option
+    originalOptions.forEach(option => {
+        option.addEventListener('click', handleOptionClick);
+    });
+});
+</script>
+
+
+
 {% endblock %}

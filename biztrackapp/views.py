@@ -804,6 +804,7 @@ def create_daily_summary(request):
     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
     bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+    bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # credit_sale
@@ -884,6 +885,7 @@ def create_daily_summary(request):
             'bank_sale_total_card_sale':bank_sale_total_card_sales,
             'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
             'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+            'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
             'total_bank_sale_amount':total_bank_sale_amount,
 
             'credit_sale_total_cheque_sale':credit_sale_total_cheque_sales,
@@ -929,6 +931,8 @@ def create_daily_summary(request):
 
         }
     )
+
+
 
 
 

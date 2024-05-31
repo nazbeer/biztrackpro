@@ -19,7 +19,7 @@
                               <label for="id_supplier">Supplier</label>
                               <select id="id_supplier" name="supplier" class="form-control" tabindex="0">
                                 <option>-- Select Supplier --</option>
-                                {% for supplier in purchase_form.supplier.field.queryset %}
+                                {% for supplier in supplier_payments_form.supplier.field.queryset %}
                                   <option value="{{ supplier.id }}">{{ supplier.name }}</option>
                                 {% endfor %}
                               </select>
@@ -38,7 +38,7 @@
                                 <label for="id_bank">Bank</label>
                                 <select id="id_bank" name="bank" class="form-control" tabindex="8">
                                   <option>-- Select Bank --</option>
-                                  {% for bank in purchase_form.bank.field.queryset %}
+                                  {% for bank in supplier_payments_form.bank.field.queryset %}
                                     <option value="{{ bank.id }}">{{ bank.name }}</option>
                                   {% endfor %}
                                 </select>
@@ -54,7 +54,7 @@
                                 <label for="id_mode_of_transaction">Mode of Transaction</label>
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="2">
                                   <option>-- Mode of Transaction --</option>
-                                  {% for transaction_mode in purchase_form.mode_of_transaction.field.queryset %}
+                                  {% for transaction_mode in supplier_payments_form.mode_of_transaction.field.queryset %}
                                     <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                   {% endfor %}
                                 </select>

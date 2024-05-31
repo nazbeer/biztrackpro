@@ -87,18 +87,23 @@ class BankSaleForm(forms.ModelForm):
         model = BankSales
         fields = '__all__'
 
-
 class CreditCollectionForm(forms.ModelForm):
     class Meta:
         model = CreditCollection
         fields = '__all__'
-        # fields = ['customer', 'payment_mode', 'amount', 'bank', 'cheque_date', 'cheque_no']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['payment_mode'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
 
 class MiscellaneousIncomeForm(forms.ModelForm):
     class Meta:
         model = MiscellaneousIncome
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
 
 class PurchaseForm(forms.ModelForm):
     class Meta:
@@ -109,6 +114,9 @@ class SupplierPaymentForm(forms.ModelForm):
     class Meta:
         model = SupplierPayments
         fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
 
 
 class BankDepositsForm(forms.ModelForm):
@@ -116,7 +124,15 @@ class BankDepositsForm(forms.ModelForm):
         model = BankDeposits
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+
+
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
         fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])

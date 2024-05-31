@@ -14,6 +14,7 @@
         <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
           <thead>
             <tr>
+              <!-- <th scope="col">#</th> -->
               <th scope="col">ID</th>
               <th scope="col">Date</th>
               <th scope="col">Opening Balance</th>
@@ -37,9 +38,10 @@
           <tbody>
             {% for summary in daily_summaries %}
               <tr>
+                <!-- <th scope="row">{{summary.id}}</th> -->
                 <th scope="row"> 
-                  {% if summary.date <= today %}
-                    <a href="{% url 'create_daily_summary' %}?id={{ summary.daily_summary_id }}">{{ summary.daily_summary_id }}</a>
+                  {% if summary.date == today  and summary.status == 'ongoing'  %}
+                    <a href="{% url 'create_daily_summary' %}?id={{ summary.daily_summary_id }}"> {{ summary.daily_summary_id }}</a>
                   {% else %}
                     {{ summary.daily_summary_id }}
                   {% endif %}
@@ -61,7 +63,7 @@
                 <td>{{ summary.created_on }}</td>
                 <td>{{ summary.updated_on }}</td>
                 <td>
-                  {% if summary.date <= today %}
+                  {% if summary.date == today  and summary.status == 'ongoing'  %}
                     <a href="{% url 'create_daily_summary' %}?id={{ summary.daily_summary_id }}" class="btn btn-primary btn-sm">Edit</a>
                   {% else %}
                     <button class="btn btn-primary btn-sm" disabled>Edit</button>
@@ -92,6 +94,7 @@
   new DataTable('#dailysummary', {
     responsive: true,
     dom: 'lBfrtip',
+    order: [[1, 'desc']], 
     buttons: [
       {
         text: 'Print',

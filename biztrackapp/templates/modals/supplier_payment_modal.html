@@ -51,9 +51,9 @@
                                 <input type="number" id="id_opening_outstanding" name="opening_outstanding" class="form-control" step="0.01" tabindex="1">
                               </div>
                               <div class="form-group">
-                                <label for="id_mode_of_transaction">Mode of Transaction</label>
+                                <label for="id_mode_of_transaction">Payment Mode</label>
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="2">
-                                  <option>-- Mode of Transaction --</option>
+                                  <option>-- Payment Mode --</option>
                                   {% for transaction_mode in supplier_payments_form.mode_of_transaction.field.queryset %}
                                     <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                   {% endfor %}

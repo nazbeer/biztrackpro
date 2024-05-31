@@ -541,7 +541,7 @@
                             <tr>
                                 <th>Supplier</th>
                                 <th>Opening Outstanding</th>
-                                <th>Mode of Transaction</th>
+                                <th>Payment Mode</th>
                                 <th>Amount</th>
                                 <th>Cheque Date</th>
                                 <th>Cheque No</th>
@@ -609,7 +609,7 @@
                         <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
                                 <th>Income Type</th>
-                                <th>Mode of Transaction</th>
+                                <th>Payment Mode</th>
                                 <th>Bank</th>
                                 <th>Amount</th>
                                 <th>Invoice No.</th>
@@ -680,8 +680,9 @@
                     <table id="tablebankdeposit"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
                         <thead class="thead-light" style="border-color: transparent !important;">
                             <tr>
+                                <!-- <th>Customer</th> -->
                                 <th>Dep. Bank</th>
-                                <th>Mode of Transaction</th>
+                                <th>Payment Mode</th>
                                 <th>Bank</th>
                                 <th>Amount</th>
                                 <th>Dep. Date</th>
@@ -693,6 +694,7 @@
                            
                             {% for bank_deposit in bank_deposits %}
                             <tr>
+                                <!-- <td>{{ bank_deposit.customer.name }}</td> -->
                                 <td>{{ bank_deposit.bank_deposit_bank.name }}</td>
                                 <td  class="text-capitalize">{{ bank_deposit.mode_of_transaction.name }}</td>
                                 <td>{{ bank_deposit.bank.name }}</td>
@@ -713,11 +715,9 @@
         <div class="card-footer mb-0">
             <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
                 <input type="hidden" name="closing_balance" value="0">
-                <input type="hidden" name="status" value="ongoing">
-                <button type="submit" class="btn btn-primary">Submit</button>
-                <!-- <button type="submit" class="btn btn-warning">Save</button> -->
-                
-        
+                <input type="hidden" name="status" id="status" value="ongoing">
+                <button type="submit" class="btn btn-primary" id="submit-btn" onclick="setStatus('completed')">Submit</button>
+                <button type="submit" class="btn btn-warning" id="save-btn" onclick="setStatus('ongoing')">Save</button>
             </div>
         </div>
     </form>
@@ -740,6 +740,9 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
    $(document).ready(function() {
+    function setStatus(status) {
+        document.getElementById('status').value = status;
+    }
     // Initialize DataTables
     $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
         responsive: true,

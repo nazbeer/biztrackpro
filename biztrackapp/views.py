@@ -558,13 +558,14 @@ def employee_edit(request, pk):
 
 
 def daily_summary_list(request):
+    today = date.today()
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     daily_summaries = DailySummary.objects.filter(business_profile=business_profile.id)
-    return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries})
+    return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries,'today':today})
 
 def edit_daily_summary(request, id):
     daily_summaries = get_object_or_404(DailySummary, id=id)
@@ -771,7 +772,7 @@ def create_daily_summary(request):
             
             'business_profile': business_profile.id,
             'today':today,
-            
+
             #business timings
             'start_time':business_timing.business_start_time,
             'end_time':business_timing.business_end_time,

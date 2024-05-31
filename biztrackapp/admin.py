@@ -84,7 +84,12 @@ class BankAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Employee)
-admin.site.register(DailySummary)
+@admin.register(DailySummary)
+class DailySummaryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'daily_summary_id', 'date', 'status', 'opening_balance', 'cash_sale', 'credit_sale', 'card_sale', 'sales', 'credit_collection', 'miscellaneous_income', 'purchase', 'supplier_payment', 'expense', 'bank_deposit', 'closing_balance', 'business_profile', 'created_on', 'updated_on')
+    list_filter = ('status', 'date', 'business_profile')
+    search_fields = ('business_profile', 'daily_summary_id')
+    ordering = ('-date',)
 
 @admin.register(BankSales)
 class BankSaleAdmin(admin.ModelAdmin):
@@ -92,7 +97,7 @@ class BankSaleAdmin(admin.ModelAdmin):
 
 @admin.register(BankDeposits)
 class BankDepositAdmin(admin.ModelAdmin):
-    list_display = ['id','customer', 'daily_summary_id', 'bank_deposit_bank','mode_of_transaction','amount', 'bank','deposit_date','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
+    list_display = ['id', 'daily_summary_id', 'bank_deposit_bank','mode_of_transaction','amount', 'bank','deposit_date','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):

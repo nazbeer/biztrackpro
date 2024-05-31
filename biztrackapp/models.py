@@ -331,7 +331,7 @@ class SupplierPayments(models.Model):
     
 
 class BankDeposits(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    # customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
     bank_deposit_bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name='deposits_as_bank_deposit')
     daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

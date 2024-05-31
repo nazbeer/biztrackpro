@@ -639,11 +639,14 @@ def delete_business_timing(request, id):
     business_timing.delete()
     return redirect('business_timing_list')
 
-from datetime import date
+from datetime import date, datetime, timedelta
 from django.db.models import Max
+
 def create_daily_summary(request):
     id = request.GET.get('id')
     today = date.today()
+    yesterday = datetime.now() - timedelta(days=1)
+    yesterday_date = yesterday.date()
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     # Retrieve the business profile associated with the shop
@@ -668,8 +671,10 @@ def create_daily_summary(request):
 
     try:
         # Get the latest DailySummary by sorting by date in descending order and taking the first one
-        daily_summary = DailySummary.objects.latest('date')
+        daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
+        # print('bankdata', daily_summary)
         bankdata = daily_summary.closing_balance
+        
     except DailySummary.DoesNotExist:
         # If no DailySummary exists at all, get the opening balance from BusinessProfile
         bankdata = business_profile.opening_balance

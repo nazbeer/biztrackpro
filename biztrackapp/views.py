@@ -1028,7 +1028,9 @@ def create_daily_summary(request):
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
-    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
+    # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
+    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing', date=today)
+
     print('daily_summary_today', daily_summary_today)
     if daily_summary_today:
         closing_balance = (
@@ -1132,15 +1134,25 @@ def create_daily_summary(request):
 def create_bank_sale(request):
     if request.method == 'POST':
         form = BankSaleForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
+            # return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-           
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
 
+
+        
+            
 def list_bank_sales(request):
     # id = request.GET.get('id')
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)

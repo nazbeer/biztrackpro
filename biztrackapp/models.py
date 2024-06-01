@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from django.utils import timezone
+from django.core.validators import MinValueValidator
+from datetime import timedelta
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
+import pytz
 
 class Shop(models.Model):
     name = models.CharField(max_length=255, verbose_name='Shop Name')
@@ -363,4 +368,13 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.amount}"
+
+
+@receiver(pre_save)
+def set_created_on_timezone(sender, instance, **kwargs):
+    if hasattr(instance, 'created_on') and not instance.created_on:
+        dubai_timezone = pytz.timezone('Asia/Dubai')
+        instance.created_on = timezone.localtime(timezone.now(), dubai_timezone)
+
+pre_save.connect(set_created_on_timezone)
 

@@ -8,6 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            
             <form id="bankDepositForm" method="post" action="{% url 'create_bank_deposit' %}">
                 <div class="modal-body" >
                   {% csrf_token %}

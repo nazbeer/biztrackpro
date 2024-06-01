@@ -720,7 +720,11 @@
                     </div>
                 </div>
             </div>
-
+            <div class="card mt-3">
+                <div class="card-header " style="border-radius:5px; border:transparent;">
+                    <h5 class="text-white mb-0">Closing Balance : {{closing_balance}}</h5>
+                </div>
+            </div>
 
         </div>
         <div class="card-footer mb-0">
@@ -731,7 +735,7 @@
                 <input type="button"  class="btn btn-primary" value="Submit"> {% endcomment %}
         
              <button type="submit" class="btn btn-primary" id="submit-btn" onclick="submitFunction()">Submit</button>
-                <button type="submit" class="btn btn-warning" id="save-btn" onclick="saveFunction()">Save</button>
+                <button type="submit" class="btn btn-secondary" id="save-btn" onclick="saveFunction()">Save</button>
             </div>
         </div>
     </form>

@@ -639,7 +639,7 @@ def delete_business_timing(request, id):
     business_timing.delete()
     return redirect('business_timing_list')
 
-
+from django.forms.models import model_to_dict
 def save_after_submit(request):
     id = request.GET.get('id')
     today = date.today()
@@ -673,8 +673,9 @@ def save_after_submit(request):
         expense_form = ExpenseForm()
 
     try:
-        previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id=id)
+        previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
         bankdata = previous_daily_summary.closing_balance
+        print('yestdays bankdata', bankdata)
     except DailySummary.DoesNotExist:
         bankdata = business_profile.opening_balance
 
@@ -760,6 +761,17 @@ def save_after_submit(request):
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
+    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
+    print('daily_summary_today', list(daily_summary_today.__dict__.values()))
+
+    if daily_summary_today:
+        closing_balance = (
+                    (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
+                    daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
+                    (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
+                )
+    else:
+        closing_balance = 0
     return render(request, 'edit_daily_summary.html', {
         'business_profile': business_profile.id,
         'today': today,
@@ -787,6 +799,7 @@ def save_after_submit(request):
         'expenses': expense,
 
         'cash_on_hand': bankdata,
+        'closing_balance': closing_balance,
 
         'bank_sale_total_cheque_sale': bank_sale_total_cheque_sales,
         'bank_sale_total_card_sale': bank_sale_total_card_sales,
@@ -887,7 +900,7 @@ def create_daily_summary(request):
                     + instance.expense)
                     
                 )
-
+                
                 instance.daily_summary_id = id
                 instance.save()
                 status = request.POST.get('status')
@@ -913,9 +926,9 @@ def create_daily_summary(request):
     try:
         # Get the latest DailySummary by sorting by date in descending order and taking the first one
         # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
-        daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-date').first()
+        daily_summary = DailySummary.objects.filter(business_profile=business_profile.id, date=yesterday_date).order_by('-date').first()
 
-        # print('bankdata', daily_summary)
+        print('bankdata submit', daily_summary)
         bankdata = daily_summary.closing_balance
         
     except DailySummary.DoesNotExist:
@@ -925,8 +938,9 @@ def create_daily_summary(request):
     daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
 
     # bankdata = business_profile.opening_balance
-    
-
+    # print('today', today)
+       
+    # closing_balance = daily_summary_today.closing_balance
     # Query for bank sales created on the current date
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
@@ -1014,6 +1028,16 @@ def create_daily_summary(request):
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
+    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
+    print('daily_summary_today', daily_summary_today)
+    if daily_summary_today:
+        closing_balance = (
+                    (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
+                    daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
+                    (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
+                )
+    else:
+        closing_balance = 0
 
     return render(request, 'create_daily_summary.html',
         {
@@ -1047,6 +1071,7 @@ def create_daily_summary(request):
 
             #cash on hand
             'cash_on_hand':bankdata,
+            'closing_balance':closing_balance,
 
             # calculated vales
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,

@@ -1,0 +1,787 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Daily Summary{% endblock %}
+
+{% block content %}
+
+<style>
+    .awesomplete ul {
+        width: 100%;
+        box-sizing: border-box;
+        max-height: 50px !important;
+        overflow-y: auto;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+
+        const currentUrl = window.location.href;        
+        const url = new URL(currentUrl);
+        const id = url.searchParams.get('id');
+        console.log("ID: ", id);
+        if (id) {
+            document.getElementById('daily_summary_id').value = id;
+            // document.getElementById('modal_daily_summary_id_bank').value = id;
+        }
+      
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+                // const toggleBank = document.getElementById("toggleBank");
+                // const toggleBankContent = document.getElementById("toggleBankContent");
+
+                // // Add event listener to the button
+                // toggleBank.addEventListener("click", function() {
+                //     console.log(toggleBank);
+                //     // Toggle the display property of the div
+                //     toggleBankContent.style.display = toggleBankContent.style.display === "none" ? "block" : "none";
+                // });
+
+                // Initialize Awesomplete for cheque number input
+                const input = document.getElementById('id_cheque_no_b');
+                new Awesomplete(input, {
+                    minChars: 2,
+                    // autoFirst: true,
+                    list: [],
+                    data: function (item, input) {
+                        console.log(item.cheque_number);
+                        return { label: item.cheque_number, value: item.id };
+                    },
+                    filter: Awesomplete.FILTER_CONTAINS,
+                    replace: function (item) {
+                        this.input.value = item.label;
+                    }
+                });
+
+                // Fetch cheque numbers dynamically
+                input.addEventListener('input', function () {
+                    const input = this;
+                   
+                    // if (input.value.length >= 2) {
+                    if (input.value.length >=2) {
+                        fetch('/fetch_cheque_numbers/')
+                            .then(response => response.json())
+                            .then(data => {
+                                const list = data.map(item => item.cheque_number);
+                                console.log(list);
+                                input.setAttribute('data-list', list.join(','));
+                            })
+                            .catch(error => console.error('Error fetching cheque numbers:', error));
+                    }
+                });
+                
+    });
+    document.addEventListener('DOMContentLoaded', (event) => {
+        
+        const dateInput = document.getElementById('id_date');
+        const today = new Date();
+
+        // Format today's date as 'YYYY-MM-DD'
+        const formattedToday = today.toISOString().split('T')[0];
+
+        // Get start and end times from the server in 'g:i A' format
+        const startTimeValue = "{{ start_time|default_if_none:''|date:'g:i A' }}";
+        const endTimeValue = "{{ end_time|default_if_none:''|date:'g:i A' }}";
+
+        // Function to convert 'g:i A' format to 24-hour format
+        function convertTo24Hour(time) {
+            const [timePart, modifier] = time.split(' ');
+            let [hours, minutes] = timePart.split(':');
+            if (hours === '12') {
+                hours = '00';
+            }
+            if (modifier === 'PM') {
+                hours = parseInt(hours, 10) + 12;
+            }
+            return { hours: parseInt(hours, 10), minutes: parseInt(minutes, 10) };
+        }
+
+        // Parse start and end times to Date objects
+        const startTimeParts = convertTo24Hour(startTimeValue);
+        const endTimeParts = convertTo24Hour(endTimeValue);
+
+        const startTime = new Date(today);
+        startTime.setHours(startTimeParts.hours);
+        startTime.setMinutes(startTimeParts.minutes);
+
+        const endTime = new Date(today);
+        endTime.setHours(endTimeParts.hours);
+        endTime.setMinutes(endTimeParts.minutes);
+
+        // Check if the end time is before the start time
+        if (endTime <= startTime) {
+            // If end time is before or equal to start time, it means end time is on the next day
+            endTime.setDate(endTime.getDate() + 1);
+        }
+
+        // Format tomorrow's date as 'YYYY-MM-DD' from end time date
+        const formattedTomorrow = endTime.toISOString().split('T')[0];
+
+        // Set date input value and limits
+        dateInput.value = formattedToday;
+        dateInput.min = formattedToday;
+        dateInput.max = formattedTomorrow;
+
+        // Set the start and end times in the hidden inputs
+        const startTimeInput = document.getElementById('start_time');
+        const endTimeInput = document.getElementById('end_time');
+
+        startTimeInput.value = startTimeValue;
+        endTimeInput.value = endTimeValue;
+    });
+</script>
+<script>
+     
+    $(document).ready(function() {
+        $('#bankDepositModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id1').value = dailySummaryId;
+            $('#modal_daily_summary_id1').val(dailySummaryId);
+        });
+        $('#miscIncomeModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
+            $('#modal_daily_summary_id2').val(dailySummaryId);
+        });
+        $('#creditCollectionModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
+            $('#modal_daily_summary_id3').val(dailySummaryId);
+        });
+        $('#bankSaleModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
+            $('#modal_daily_summary_id4').val(dailySummaryId);
+        });
+        $('#purchaseModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
+            $('#modal_daily_summary_id5').val(dailySummaryId);
+        });
+        $('#supplierPaymentModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
+            $('#modal_daily_summary_id6').val(dailySummaryId);
+        });
+        $('#expenseModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
+            $('#modal_daily_summary_id7').val(dailySummaryId);
+        });
+    });
+
+</script>
+<script>
+    function saveFunction() {
+        document.getElementById('status').value = 'ongoing';
+        document.getElementById("daily_summary_form").submit();
+    }
+    function submitFunction() {
+        document.getElementById('status').value = 'completed';
+        document.getElementById("daily_summary_form").submit();
+    }
+</script>
+
+<style>
+    .bg-white{
+        color:#000 !important;
+    }
+    .br-5{
+        border-radius: 5px !important;
+    }
+    .toggle-content{
+        display: none;
+    }
+</style>
+<div class="container ">
+    <div class="card  ">
+        <div class="card-header">
+            <h5 class="mb-0">Edit Daily Summary</h5>
+          </div>
+          <form method="post"  enctype="multipart/form-data" class="form" id="daily_summary_form">
+        <div class="card-body ">
+            {% csrf_token %}
+            <div class="card mt-0">
+                <div class="card-body bg-white br-5">
+                    <div class="row ">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_date">Date:</label>
+                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
+                                <input type="hidden" name="business_profile" value={{business_profile}}>
+                                <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
+                                <input type="hidden" id="start_time" value="{{ start_time|default_if_none:''|date:'g:i A' }}">
+                                <input type="hidden" id="end_time" value="{{ end_time|default_if_none:''|date:'g:i A' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="id_date">Opening Balance <small class="text-muted">(cash on hand)</small>:</label>
+                                <input type="number" name="opening_balance" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Sale</h5>
+                </div>
+                <div class="card-body bg-white br-5">
+                    <div class="row ">
+                        <div class="col-md-2">
+                            <label>Cash </label>
+                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ bank_sale_total_cash_sale }}"> 
+                        </div>
+                        <div class="col-md-2">
+                            <label>Credit </label>
+                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="2" value="{{ bank_sale_total_credit_sale }}" > 
+                        </div>
+                        <div class="col-md-2">
+                            <label>Card </label>
+                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ bank_sale_total_card_sale }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque</label>
+                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ bank_sale_total_cheque_sale }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank</label>
+                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="5" value="{{ bank_sale_total_bank_sale }}"> 
+                        </div>
+                    </div>
+                    <div class="row mb-3 mt-2">
+                        <div class="col-md-4 ">
+                            <label>Sales Total</label>
+                            <div class="bg-light p-2 rounded">{{total_bank_sale_amount}}</div>
+                                <input type="hidden" name="sales" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table  class="table table-bordered table-striped "  id="tablebanksale" >
+                        <thead style="color:transparent !important;">
+                            <tr>
+                                <th>Customer</th>
+                                <th>Transaction Mode</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in bank_sales %}
+                            <tr>
+                                <td>{{ sale.customer.name }}</td>
+                                <td class="text-capitalize">{{ sale.mode_of_transaction.name }}</td>
+                                <td>{{ sale.bank.name }}</td>
+                                <td>{{ sale.amount }}</td>
+                                <td>{{ sale.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ sale.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ sale.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Credit Collection</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash</label>
+                            <input type="number" name="cash_collection" required class="form-control bg-light" id="id_cash_collection" tabindex="1" value="{{ credit_sale_total_cash_sale }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_collection" required class="form-control bg-light" id="id_bank_collection" tabindex="2" value="{{ credit_sale_total_bank_sale }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_collection" required class="form-control bg-light" id="id_card_collection" tabindex="3" value="{{ credit_sale_total_card_sale }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque</label>
+                            <input type="number" name="cheque_collection" required class="form-control bg-light" id="id_cheque_collection" tabindex="4" value="{{ credit_sale_total_cheque_sale }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">
+                        <div class="col-md-3">
+                            <label>Credit Collection Total</label>
+                            <div class="bg-light p-2 rounded">{{total_credit_sale_amount}}</div>
+                            <input type="hidden" name="credit_collection" value="{{total_bank_sale_amount}}"  required class="form-control bg-light" id="id_credit_collection_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tablecreditcollection"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color:transparent !important;">
+                            <tr>
+                                <th>Customer</th>
+                                <th>Payment Mode</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for creditcol in credit_collections %}
+                            <tr>
+                                <td>{{ creditcol.customer.name }}</td>
+                                <td  class="text-capitalize">{{ creditcol.payment_mode.name }}</td>
+                                <td>{{ creditcol.bank.name }}</td>
+                                <td>{{ creditcol.amount }}</td>
+                                <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ creditcol.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ creditcol.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Miscellaneous Income</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash </label>
+                            <input type="number" name="cash_msc_income" required class="form-control bg-light" id="id_cash_msc_income" tabindex="1" value="{{ mis_income_total_cash }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_msc_income" required class="form-control bg-light" id="id_bank_msc_income" tabindex="2" value="{{ mis_income_total_bank }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_msc_income" required class="form-control bg-light" id="id_card_msc_income" tabindex="3" value="{{ mis_income_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_msc_income" required class="form-control bg-light" id="id_cheque_msc_income" tabindex="4" value="{{ mis_income_total_cheque }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">
+                        <div class="col-md-3">
+                            <label>Msc. Income Total</label>
+                            <div class="bg-light p-2 rounded">{{total_mis_income_amount}}</div>
+                            <input type="hidden" name="miscellaneous_income" value="{{total_mis_income_amount}}" required class="form-control bg-light" id="id_msc_income_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tablemscincome"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Mode of Transaction</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for msc_incomes in msc_income %}
+                            <tr>
+                                <td>{{ msc_incomes.receipt_type.name }}</td>
+                                <td  class="text-capitalize">{{ msc_incomes.mode_of_transaction.name }}</td>
+                                <td>{{ msc_incomes.bank.name }}</td>
+                                <td>{{ msc_incomes.amount }}</td>
+                                <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ msc_incomes.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Purchases</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    <div class="row ">
+                        <div class="col-md-2">
+                            <label>Cash </label>
+                            <input type="number" name="cash_purchase" required class="form-control bg-light" id="id_cash_purchase" tabindex="1" value="{{ purchase_total_cash }}"> 
+                        </div>
+                        <div class="col-md-2">
+                            <label>Bank </label>
+                            <input type="number" name="bank_purchase" required class="form-control bg-light" id="id_bank_purchase" tabindex="2" value="{{ purchase_total_bank }}" > 
+                        </div>
+                        <div class="col-md-2">
+                            <label>Card </label>
+                            <input type="number" name="card_purchase" required class="form-control bg-light" id="id_card_purchase" tabindex="3" value="{{ purchase_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_purchase" required class="form-control bg-light" id="id_cheque_purchase" tabindex="4" value="{{ purchase_total_cheque }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Credit </label>
+                            <input type="number" name="credit_purchase" required class="form-control bg-light" id="id_credit_purchase" tabindex="5" value="{{ purchase_total_credit }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">
+                        
+                        <div class="col-md-3">
+                            <label>Purchases Total</label>
+                            <div class="bg-light p-2 rounded">{{total_purchase_amount}}</div>
+                            <input type="hidden" name="purchase" value="{{total_purchase_amount}}" required class="form-control bg-light" id="id_purchases_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal">Add</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tablepurchases"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <tr>
+                                    <th>Supplier</th>
+                                    <th>Opening Outstanding</th>
+                                    <th>Mode of Transaction</th>
+                                    <th>Invoice Date</th>
+                                    <th>Invoice No</th>
+                                    <th>Invoice Amount</th>
+                                    <th>Cheque Date</th>
+                                    <th>Cheque No</th>
+                                    <th>Bank</th>
+                                </tr>                                
+                        </thead>
+                        <tbody>
+                           
+                            {% for purchase in purchases %}
+                            <tr>
+                                <td>{{ purchase.supplier.name }}</td>
+                                <td>{{ purchase.opening_outstanding }}</td>
+                                <td  class="text-capitalize">{{ purchase.mode_of_transaction.name }}</td>
+                                <td>{{ purchase.invoice_date|date:"d/m/Y" }}</td>
+                                <td>{{ purchase.invoice_no }}</td>
+                                <td>{{ purchase.invoice_amount }}</td>
+                                <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ purchase.cheque_no }}</td>
+                                <td>{{ purchase.bank.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Supplier Payment</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash</label>
+                            <input type="number" name="cash_supplier_payment" required class="form-control bg-light" id="id_cash_supplier_payment" tabindex="1" value="{{ supplier_payment_total_cash }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank</label>
+                            <input type="number" name="bank_supplier_payment" required class="form-control bg-light" id="id_bank_supplier_payment" tabindex="2" value="{{ supplier_payment_total_bank }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_supplier_payment" required class="form-control bg-light" id="id_card_supplier_payment" tabindex="3" value="{{ supplier_payment_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_supplier_payment" required class="form-control bg-light" id="id_cheque_supplier_payment" tabindex="4" value="{{ supplier_payment_total_cheque }}"> 
+                        </div>
+                    </div>
+
+                    
+                    <div class="row mb-3 mt-2">                        
+                        <div class="col-md-3">
+                            <label>Supplier Payment Total</label>
+                            <div class="bg-light p-2 rounded">{{total_supplier_payment_amount}}</div>
+                            <input type="hidden" name="supplier_payment" value="{{total_supplier_payment_amount}}" required class="form-control bg-light" id="id_supplier_payment_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tablesupplierpayment"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Opening Outstanding</th>
+                                <th>Payment Mode</th>
+                                <th>Amount</th>
+                                <th>Cheque Date</th>
+                                <th>Cheque No</th>
+                                <th>Bank</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for supplier_payment in supplier_payments %}
+                            <tr>
+                                <td>{{ supplier_payment.supplier.name }}</td>
+                                <td  class="text-capitalize">{{ supplier_payment.opening_outstanding }}</td>
+                                <td>{{ supplier_payment.mode_of_transaction }}</td>
+                                <td>{{ supplier_payment.amount }}</td>
+                                <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ supplier_payment.cheque_no }}</td>
+                                <td>{{ supplier_payment.bank.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Expenses</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash </label>
+                            <input type="number" name="cash_expense" required class="form-control bg-light" id="id_cash_expense" tabindex="1" value="{{ expense_total_cash }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_expense" required class="form-control bg-light" id="id_bank_expense" tabindex="2" value="{{ expense_total_bank }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_expense" required class="form-control bg-light" id="id_card_expense" tabindex="3" value="{{ expense_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_expense" required class="form-control bg-light" id="id_cheque_expense" tabindex="4" value="{{ expense_total_cheque }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">                        
+                        <div class="col-md-3">
+                            <label>Expense Total</label>
+                            <div class="bg-light p-2 rounded">{{total_expense_amount}}</div>
+                            <input type="hidden" name="expense" value="{{total_expense_amount}}" required class="form-control bg-light" id="id_expense_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal">Add </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                    <table id="tableexpense"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <th>Income Type</th>
+                                <th>Payment Mode</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Invoice No.</th>
+                                <th>Create Date</th>
+                                <th>Chq. Date</th>
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for expense in expenses %}
+                            <tr>
+                                <td>{{ expense.expense_type.name }}</td>
+                                <td  class="text-capitalize">{{ expense.mode_of_transaction.name }}</td>
+                                <td>{{ expense.bank.name }}</td>
+                                <td>{{ expense.amount }}</td>
+                                <td>{{ expense.invoice_no}}</td>
+                                <td>{{ expense.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ expense.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ expense.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Bank Deposit</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash </label>
+                            <input type="number" name="cash_bank_deposit" required class="form-control bg-light" id="id_cash_bank_deposit" tabindex="1" value="{{ bank_deposit_total_cash }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_bank_deposit" required class="form-control bg-light" id="id_bank_bank_deposit" tabindex="2" value="{{ bank_deposit_total_bank }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_bank_deposit" required class="form-control bg-light" id="id_card_bank_deposit" tabindex="3" value="{{ bank_deposit_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_bank_deposit" required class="form-control bg-light" id="id_cheque_bank_deposit" tabindex="4" value="{{ bank_deposit_total_cheque }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">                        
+                        <div class="col-md-3">
+                            <label>Bank Deposit Total</label>
+                            <div class="bg-light p-2 rounded">{{bank_deposit_amount}}</div>
+                            <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#bankDepositModal">Add </button>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="table-responsive">
+                    <table id="tablebankdeposit"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <!-- <th>Customer</th> -->
+                                <th>Dep. Bank</th>
+                                <th>Payment Mode</th>
+                                <th>Bank</th>
+                                <th>Amount</th>
+                                <th>Dep. Date</th>
+                                <th>Chq. Date</th>
+                                <th>Chq No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for bank_deposit in bank_deposits %}
+                            <tr>
+                                <!-- <td>{{ bank_deposit.customer.name }}</td> -->
+                                <td>{{ bank_deposit.bank_deposit_bank.name }}</td>
+                                <td  class="text-capitalize">{{ bank_deposit.mode_of_transaction.name }}</td>
+                                <td>{{ bank_deposit.bank.name }}</td>
+                                <td>{{ bank_deposit.amount }}</td>
+                                <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
+                                <td>{{ bank_deposit.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ bank_deposit.cheque_no }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="card-footer mb-0">
+            <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
+                <input type="hidden" name="closing_balance" value="0">
+                <input type="hidden" name="status" id="status" value="ongoing">
+                {% comment %} <input type="button" onclick="saveFunction()"  class="btn btn-warning" value="Save">
+                <input type="button"  class="btn btn-primary" value="Submit"> {% endcomment %}
+        
+             <button type="submit" class="btn btn-primary" id="submit-btn" onclick="submitFunction()">Submit</button>
+                <button type="submit" class="btn btn-warning" id="save-btn" onclick="saveFunction()">Save</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+
+{% include 'modals/bank_sale_modal.html' %}
+{% include 'modals/credit_collection_modal.html' %}
+{% include 'modals/msc_income_modal.html' %}
+{% include 'modals/purchase_modal.html' %}
+{% include 'modals/supplier_payment_modal.html' %}
+{% include 'modals/expense_modal.html' %}
+{% include 'modals/bank_deposit_modal.html' %}
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+   $(document).ready(function() {
+    // Initialize DataTables
+    $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
+        responsive: true,
+        dom: 'lBfrtip',
+        buttons: [
+            {
+                text: 'Print',
+                extend: 'print',
+                exportOptions: {
+                    stripHtml: false,
+                    columns: [0, 1, 2, 3, 4]
+                }
+            },
+            {
+                text: 'Export PDF',
+                extend: 'pdf',
+                exportOptions: {
+                    stripHtml: true,
+                },
+            }
+        ],
+    });
+
+   
+});
+
+</script>
+
+{% endblock %}
+
+

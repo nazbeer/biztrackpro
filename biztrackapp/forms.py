@@ -82,6 +82,8 @@ class DailySummaryForm(forms.ModelForm):
     class Meta:
         model = DailySummary
         fields = '__all__'
+    closing_balance = forms.DecimalField(required=False)
+
 
 
 class BankSaleForm(forms.ModelForm):

@@ -6,6 +6,7 @@ from .views import *
 from biztrackapp import views
 
 urlpatterns = [
+    path('edit/',save_after_submit,name='save_after_submit' ),
 
     path('',login_view,name='login' ),
     path('logout/',logout_view,name='logout' ),

@@ -11,6 +11,13 @@
         max-height: 50px !important;
         overflow-y: auto;
     }
+    table thead th {
+        vertical-align: bottom;
+        border-bottom: 2px solid #dee2e6;
+        background-color: #ccc !important;
+        color: #000 !important;
+        
+    }
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -24,6 +31,12 @@
             // document.getElementById('modal_daily_summary_id_bank').value = id;
         }
       
+    });
+    window.addEventListener('beforeunload', (event) => {
+        const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
+        event.preventDefault();
+        event.returnValue = message; // For modern browsers
+        return message; // For older browsers
     });
     document.addEventListener('DOMContentLoaded', function() {
                 // const toggleBank = document.getElementById("toggleBank");
@@ -128,6 +141,7 @@
         startTimeInput.value = startTimeValue;
         endTimeInput.value = endTimeValue;
     });
+    
 </script>
 <script>
      

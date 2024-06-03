@@ -67,6 +67,26 @@
     <title>{% block title %}BizTrackPro{% endblock %}</title>
 
     <style>
+         .table-bordered td, .table-bordered th {
+        border: transparent !important;
+    }
+    .btn{
+        min-width: 130px !important;
+    }
+    .form-control{
+        height:35px !important;
+        padding: 5px 20px !important;
+
+    }
+    .tbody{
+        border-bottom-right-radius: 5px !important;
+        border-bottom-left-radius: 5px !important;
+    }
+    .table-bordered>:not(caption)>* {
+        border-width: 0px !important;
+        box-shadow: 2px 2px 2px 2px #ccc;
+        border-radius:5px;
+    }
     body, p, h1, h2, h3, h4, h5, h6, a, li, label, input, div, span, small{
         font-family: "Open Sans", sans-serif !important;
     }
@@ -140,9 +160,6 @@
     .navbar-light {
         border-bottom: 0.1em solid #f5f5f5;
         box-shadow: 1px -2px 5px 4px #ccc;
-    }
-    table thead{
-        border-radius: 5px !important;
     }
     table thead th {
         vertical-align: bottom;
@@ -302,19 +319,19 @@
     }
     .btn-primary {
         --bs-btn-color: #fff;
-        --bs-btn-bg: #184b7c;
-        --bs-btn-border-color: #184b7c;
+        --bs-btn-bg: #3280cc;
+        --bs-btn-border-color: #3280cc;
         --bs-btn-hover-color: #000;
         --bs-btn-hover-bg: #1d5c96;
-        --bs-btn-hover-border-color: #184b7c;
+        --bs-btn-hover-border-color: #3280cc;
         --bs-btn-focus-shadow-rgb: 0, 155, 132;
         --bs-btn-active-color: #000;
         --bs-btn-active-bg: #33c5af;
-        --bs-btn-active-border-color: #184b7c;
+        --bs-btn-active-border-color: #3280cc;
         --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
         --bs-btn-disabled-color: #000;
-        --bs-btn-disabled-bg: #184b7c;
-        --bs-btn-disabled-border-color: #184b7c;
+        --bs-btn-disabled-bg: #3280cc;
+        --bs-btn-disabled-border-color: #3280cc;
     }
     .dropdown-toggle::after {
         display: inline-block;

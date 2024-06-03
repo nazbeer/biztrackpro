@@ -41,13 +41,13 @@
               <tr>
                 <!-- <th scope="row">{{summary.id}}</th> -->
                 <td>{{ summary.date }}</td>
-                <th scope="row"> 
+                <td> 
                   {% if summary.date == today  and summary.status == 'ongoing'  %}
                     <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" target="_blank"> {{ summary.daily_summary_id }}</a>
                   {% else %}
                     {{ summary.daily_summary_id }}
                   {% endif %}
-                </th>
+                </td>
                 
                 <td>{{ summary.opening_balance }}</td>
                 <td>{{ summary.cash_sale }}</td>

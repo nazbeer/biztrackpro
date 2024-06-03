@@ -860,99 +860,6 @@ def create_daily_summary(request):
     shop = shop_admin.shop
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-    business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
-    if request.method == 'POST':
-        form = DailySummaryForm(request.POST)
-        if form.is_valid():
-            if DailySummary.objects.filter(daily_summary_id=id).exists():
-                return redirect('daily_summary_list')  # Redirect if it already exists
-            else:
-                instance = form.save(commit=False)
-
-                bank_transfer_sales = BankSales.objects.filter(
-                    business_profile=business_profile.id, 
-                    daily_summary_id=id,
-                    mode_of_transaction__name="bank transfer"
-                ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
-
-                card_sales = BankSales.objects.filter(
-                    business_profile=business_profile.id,
-                    daily_summary_id=id,
-                    mode_of_transaction__name="card"
-                ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
-
-                cheque_sales = BankSales.objects.filter(
-                    business_profile=business_profile.id,
-                    daily_summary_id=id,
-                    mode_of_transaction__name="cheque"
-                ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
-
-                # Calculate the total bank deposit amount
-                instance.bank_deposit += bank_transfer_sales + card_sales + cheque_sales
-
-                instance.sales = instance.cash_sale + instance.credit_sale
-                instance.closing_balance = (
-                    (instance.opening_balance + instance.sales + instance.bank_deposit
-                    + instance.credit_collection
-                    + instance.miscellaneous_income)-
-                    ( instance.purchase
-                    + instance.supplier_payment
-                    + instance.expense)
-                    
-                )
-                
-                instance.daily_summary_id = id
-                instance.save()
-                status = request.POST.get('status')
-                if status == "ongoing":
-                    return redirect(reverse('save_after_submit') + f'?id={instance.daily_summary_id}')
-                return redirect('daily_summary_list')
-            # instance = form.save(commit=False)
-            # instance.daily_summary_id = id  # Assign the value here
-            # instance.save()
-            # if instance.status == "ongoing":
-            #     return redirect(reverse('create_daily_summary') + f'?id={instance.daily_summary_id}')
-            # return redirect('daily_summary_list')
-    else:
-        form = DailySummaryForm()
-        bank_sale_form = BankSaleForm()
-        credit_collection_form = CreditCollectionForm()
-        msc_income_form = MiscellaneousIncomeForm()
-        purchase_form = PurchaseForm()
-        supplier_payments_form = SupplierPaymentForm()
-        bank_deposit_form = BankDepositsForm()
-        expense_form = ExpenseForm()
-
-    try:
-        # Get the latest DailySummary by sorting by date in descending order and taking the first one
-        # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
-        daily_summary = DailySummary.objects.filter(business_profile=business_profile.id, date=yesterday_date).order_by('-date').first()
-
-        print('bankdata submit', daily_summary)
-        bankdata = daily_summary.closing_balance
-        
-    except DailySummary.DoesNotExist:
-        # If no DailySummary exists at all, get the opening balance from BusinessProfile
-        bankdata = business_profile.opening_balance
-
-    daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
-
-    # bankdata = business_profile.opening_balance
-    # print('today', today)
-       
-    # closing_balance = daily_summary_today.closing_balance
-    # Query for bank sales created on the current date
-    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-
-    expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
-    receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
-
     cheque_transaction_mode = None
     cash_transaction_mode = None
     bank_transaction_mode = None
@@ -980,6 +887,140 @@ def create_daily_summary(request):
         card_transaction_mode = TransactionMode.objects.get(name="card")
     except TransactionMode.DoesNotExist:
         pass 
+
+    business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
+    if request.method == 'POST':
+        form = DailySummaryForm(request.POST)
+        if form.is_valid():
+            if DailySummary.objects.filter(daily_summary_id=id).exists():
+                return redirect('daily_summary_list')  # Redirect if it already exists
+            else:
+                instance = form.save(commit=False)
+
+                # bank_transfer_sales = BankSales.objects.filter(
+                #     business_profile=business_profile.id, 
+                #     daily_summary_id=id,
+                #     mode_of_transaction__name="bank transfer"
+                # ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+                # card_sales = BankSales.objects.filter(
+                #     business_profile=business_profile.id,
+                #     daily_summary_id=id,
+                #     mode_of_transaction__name="card"
+                # ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+                # cheque_sales = BankSales.objects.filter(
+                #     business_profile=business_profile.id,
+                #     daily_summary_id=id,
+                #     mode_of_transaction__name="cheque"
+                # ).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+                # # Calculate the total bank deposit amount
+                # instance.bank_deposit += bank_transfer_sales + card_sales + cheque_sales
+
+                # instance.sales = instance.cash_sale + instance.credit_sale
+                # instance.closing_balance = (
+                #     (instance.opening_balance + instance.sales + instance.bank_deposit
+                #     + instance.credit_collection
+                #     + instance.miscellaneous_income)-
+                #     ( instance.purchase
+                #     + instance.supplier_payment
+                #     + instance.expense)
+                    
+                # )
+                msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+                bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+
+
+                # instance.daily_summary_id = id
+
+                bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+                total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+                total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+                total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+                total_cash_sale = (total_bank_sale_amount  - bank_sale_total_credit_sales)
+
+                purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+                supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+                expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+
+                bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+                bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+                bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+                bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+
+
+
+                net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+                net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+                bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
+                print('net_collection',net_collection)
+                print('net_payment',net_payment)
+                print('bank_deposit_collection',bank_deposit_collection)
+                print('opening_balance',instance.opening_balance)
+                closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
+                print('closing_balance',closing_balance)
+                instance.closing_balance= closing_balance
+
+                instance.save()
+                status = request.POST.get('status')
+                if status == "ongoing":
+                    return redirect(reverse('save_after_submit') + f'?id={instance.daily_summary_id}')
+                return redirect('daily_summary_list')
+            # instance = form.save(commit=False)
+            # instance.daily_summary_id = id  # Assign the value here
+            # instance.save()
+            # if instance.status == "ongoing":
+            #     return redirect(reverse('create_daily_summary') + f'?id={instance.daily_summary_id}')
+            # return redirect('daily_summary_list')
+    else:
+        form = DailySummaryForm()
+        bank_sale_form = BankSaleForm()
+        credit_collection_form = CreditCollectionForm()
+        msc_income_form = MiscellaneousIncomeForm()
+        purchase_form = PurchaseForm()
+        supplier_payments_form = SupplierPaymentForm()
+        bank_deposit_form = BankDepositsForm()
+        expense_form = ExpenseForm()
+
+    try:
+        # Get the latest DailySummary by sorting by date in descending order and taking the first one
+        # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
+        daily_summary = DailySummary.objects.get(business_profile=business_profile.id, date=yesterday_date).order_by('-date').first()
+
+        print('bankdata submit', daily_summary)
+        bankdata = daily_summary.closing_balance or 0
+        
+    except DailySummary.DoesNotExist:
+        # If no DailySummary exists at all, get the opening balance from BusinessProfile
+        bankdata = business_profile.opening_balance or 0
+
+    daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
+
+    # bankdata = business_profile.opening_balance
+    # print('today', today)
+       
+    # closing_balance = daily_summary_today.closing_balance
+    # Query for bank sales created on the current date
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+    expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
+    receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
+
+
+
 
     # bank_sale
     bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
@@ -1029,9 +1070,10 @@ def create_daily_summary(request):
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
-    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing', date=today)
+    daily_summary_today = DailySummary.objects.filter(business_profile=business_profile.id, status='ongoing')
 
-    print('daily_summary_today', daily_summary_today)
+    # print('daily_summary_today', daily_summary_today)
+    # print(daily_summary_today.bank_deposit)
     if daily_summary_today:
         closing_balance = (
                     (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header ">
+        <h5 class="text-white mb-0">Create Partner</h5>
+       
+    </div>
+    <form method="post">
+    <div class="card-body">
+        
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="shop">Shop</label>
+                    <select id="shop" name="shop" class="form-control" disabled>
+                        {% for shop in form.shop.field.queryset %}
+                            <option value="{{ shop.id }}" {% if shop.id == form.shop.value %}selected{% endif %}>{{ shop.name }} - {{ shop.license_number}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="user">User</label>
+                    <select id="user" name="user" class="form-control">
+                        {% for user in form.user.field.queryset %}
+                            <option value="{{ user.id }}" {% if user.id == form.user.value %}selected{% endif %}>{{ user.username }}  {{user.country_code}}{{user.phone_number}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="business_profile">Business Profile</label>
+                    <select id="business_profile" name="business_profile" class="form-control">
+                        {% for business_profile in form.business_profile.field.queryset %}
+                            <option value="{{ business_profile.id }}" {% if business_profile.id == form.business_profile.value %}selected{% endif %}>{{ business_profile.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="email_1">Email 1</label>
+                    <input type="email" id="email_1" name="email_1" class="form-control" >
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="email_2">Email 2</label>
+                    <input type="email" id="email_2" name="email_2" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="email_3">Email 3</label>
+                    <input type="email" id="email_3" name="email_3" class="form-control" >
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="mobile_1">Mobile 1</label>
+                    <input type="number" id="mobile_1" name="mobile_1" class="form-control"  value="{{ form.mobile_1.value }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="mobile_2">Mobile 2</label>
+                    <input type="number" id="mobile_2" name="mobile_2" class="form-control"value="{{ form.mobile_2.value }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="mobile_3">Mobile 3</label>
+                    <input type="number" id="mobile_3" name="mobile_3" class="form-control" value="{{ form.mobile_3.value }}">
+                </div>
+            </div>
+            
+        
+    </div>
+    <div class="card-footer">
+        <div class="form-group mb-0 d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{% url 'partner_list' %}" class="btn btn-secondary float-right text-white">Partner List</a>
+        </div>
+    </div>
+</form>
+</div>
+{% endblock %}

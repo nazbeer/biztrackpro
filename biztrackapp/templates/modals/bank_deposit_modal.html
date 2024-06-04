@@ -32,9 +32,11 @@
                         <label for="id_amount">Amount</label>
                         <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="2">
                       </div>
+                      <div id="chequeDetailsd" class="d-none">
                       <div class="form-group">
                         <label for="id_cheque_no">Cheque Number</label>
                         <input type="text" id="id_cheque_no" name="cheque_no"placeholder="Enter Cheque Number" class="form-control" tabindex="5">
+                      </div>
                       </div>
                       <div class="form-group">
                         <label for="id_bank">Bank</label>
@@ -60,12 +62,12 @@
                           {% endfor %}
                         </select>
                       </div>
-
+                      <div id="chequeDetailsd1" class="d-none">
                       <div class="form-group">
                         <label for="id_cheque_date">Cheque Date</label>
                         <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
                       </div>
-                      
+                      </div>
                      
                     </div>
                   </div>

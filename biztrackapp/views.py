@@ -12,7 +12,7 @@ from django.db.models import Count, Sum, Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.http import JsonResponse
-
+from django.views import View
 def index(request):
     print('re',request.user)
     user = request.user
@@ -64,19 +64,20 @@ class HomeView(LoginRequiredMixin, TemplateView):
                 context['error_message'] = "No shop associated with the current user."
                 
         categories = [
-            {
-                'name': 'Shop & Profile Management',
-                'links': [
-                    {'label': 'Profile', 'url_name': 'home'},
-                    {'label': 'Shop', 'url_name': 'home'},
-                   
-                ]
-            },
+            
             {
                 'name': 'Shop Management',
                 'links': [
                     {'label': 'Create Business', 'url_name': 'create_business_profile'},
                     {'label': 'Business Profiles', 'url_name': 'business_profile_list'},
+                ]
+            },
+            {
+                'name': 'Partner Management',
+                'links': [
+                    {'label': 'Create Partners', 'url_name': 'partner_create'},
+                    {'label': 'Partner List', 'url_name': 'partner_list'},
+                   
                 ]
             },
             {
@@ -181,9 +182,31 @@ def delete_business_profile(request, pk):
         return redirect('business_profile_list')
     return render(request, 'delete_business_profile.html', {'business_profile': business_profile})
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+class PartnerListView(LoginRequiredMixin, View):
+    def get(self, request):
+        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        if shop:
+            partners = Partners.objects.filter(shop=shop)
+        else:
+            partners = Partners.objects.none()
+        return render(request, 'partner_list.html', {'partners': partners})
 
+class PartnerCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        form = PartnerForm(initial={'shop': shop})
+        return render(request, 'partner_form.html', {'form': form})
 
-
+    def post(self, request):
+        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        form = PartnerForm(request.POST, initial={'shop': shop})
+        if form.is_valid():
+            partner = form.save(commit=False)
+            partner.shop = shop
+            partner.save()
+            return redirect(reverse('partner_list'))
+        return render(request, 'partner_form.html', {'form': form})
 def create_supplier(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Partner List{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header  d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Partner List</h5>
+            <a href="{% url 'partner_create' %}" class="btn btn-primary float-right">Create Partner</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <!-- <th>Shop - (License No)</th> -->
+                            <th>User</th>
+                            <th>Business | ID | License No</th>
+                            <th>Emails</th>
+                            <th>Mobile Numbers</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partner in partners %}
+                        <tr>
+                            <!-- <td>{{ partner.shop.name }} - {{partner.shop.license_number}}</td> -->
+                            <td>{{ partner.user.username }}</td>
+                            <td>{{ partner.business_profile.name }} - {{ partner.business_profile.id }} - {{partner.shop.license_number}}</td>
+                            <td>{{ partner.email_1 }}, {{ partner.email_2 }}, {{ partner.email_3 }}</td>
+                            <td>{{ partner.mobile_1 }}, {{ partner.mobile_2 }}, {{ partner.mobile_3 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

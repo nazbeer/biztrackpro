@@ -71,6 +71,20 @@ class BusinessProfile(models.Model):
     def __str__(self):
         return f" {self.name}"
 
+class Partners(models.Model):
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    business_profile = models.ForeignKey(BusinessProfile, on_delete=models.CASCADE)
+    email_1 = models.EmailField(max_length=254)
+    email_2 = models.EmailField(max_length=254)
+    email_3 = models.EmailField(max_length=254)
+    mobile_1 = models.CharField(max_length=20)
+    mobile_2 = models.CharField(max_length=20)
+    mobile_3 = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"Partner for {self.shop.name} - {self.user.username}"
+    
 class Employee(models.Model):
     employee_id = models.CharField(max_length=10, unique=True)
     # business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)

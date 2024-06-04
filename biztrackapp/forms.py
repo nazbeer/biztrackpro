@@ -39,6 +39,10 @@ class BusinessTimingForm(forms.ModelForm):
         }
 
 
+class PartnerForm(forms.ModelForm):
+    class Meta:
+        model = Partners
+        fields = ['shop', 'user', 'business_profile', 'email_1', 'email_2', 'email_3', 'mobile_1', 'mobile_2', 'mobile_3']
 
 class SupplierForm(forms.ModelForm):
     class Meta:

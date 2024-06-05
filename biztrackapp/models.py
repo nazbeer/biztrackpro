@@ -392,6 +392,8 @@ class Withdrawal(models.Model):
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
+    cheque_date = models.DateField(null=True, blank=True)
+    cheque_no = models.CharField(max_length=255, null=True,blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 

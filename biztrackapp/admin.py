@@ -104,13 +104,15 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_display = ['id', 'expense_type','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no','invoice_no','business_profile', 'created_on', 'updated_on']
 
 
+@admin.register(Withdrawal)
+class WithdrawalAdmin(admin.ModelAdmin):
+    list_display = ['id', 'daily_summary_id','mode_of_transaction','amount', 'bank','withdrawal_date','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
 
 admin.site.register(CreditCollection)
 admin.site.register(MiscellaneousIncome)
 admin.site.register(Purchase)
 admin.site.register(SupplierPayments)
 admin.site.register(BusinessTiming)
-admin.site.register(Withdrawal)
 admin.site.register(Partners)
 
 

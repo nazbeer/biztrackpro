@@ -48,6 +48,10 @@ class WithdrawalForm(forms.ModelForm):
     class Meta:
         model = Withdrawal
         fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit','bank transfer','card'])
         
 class SupplierForm(forms.ModelForm):
     class Meta:

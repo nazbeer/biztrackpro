@@ -536,27 +536,27 @@
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label>Cash </label>
-                            <input type="number" name="cash_bank_deposit" required class="form-control bg-light" id="id_cash_bank_deposit" tabindex="1" value="{{ bank_deposit_total_cash }}"> 
+                            <input type="number" name="cash_withdrawal" required class="form-control bg-light" id="id_cash_withdrawal" tabindex="1" value="{{ withdrawal_total_cash }}"> 
                         </div>
-                        <div class="col-md-3">
+                        {% comment %} <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_bank_deposit" required class="form-control bg-light" id="id_bank_bank_deposit" tabindex="2" value="{{ bank_deposit_total_bank }}" > 
-                        </div>
-                        <div class="col-md-3">
+                            <input type="number" name="bank_withdrawal" required class="form-control bg-light" id="id_bank_withdrawal" tabindex="2" value="{{ withdrawal_total_bank }}" > 
+                        </div> {% endcomment %}
+                        {% comment %} <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_bank_deposit" required class="form-control bg-light" id="id_card_bank_deposit" tabindex="3" value="{{ bank_deposit_total_card }}"> 
-                        </div>
+                            <input type="number" name="card_withdrawal" required class="form-control bg-light" id="id_card_withdrawal" tabindex="3" value="{{ withdrawal_total_card }}"> 
+                        </div> {% endcomment %}
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_bank_deposit" required class="form-control bg-light" id="id_cheque_bank_deposit" tabindex="4" value="{{ bank_deposit_total_cheque }}"> 
+                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal" tabindex="4" value="{{ withdrawal_total_cheque }}"> 
                         </div>
                     </div>
                     
                     <div class="row mb-3 mt-2">                        
                         <div class="col-md-3">
                             <label>Withdrawal Total</label>
-                            <div class="bg-light p-2 rounded">{{bank_deposit_amount}}</div>
-                            <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
+                            <div class="bg-light p-2 rounded">{{total_withdrawal_amount}}</div>
+                            <input type="hidden" name="withdrawal" value="{{total_withdrawal_amount}}" required class="form-control bg-light" id="id_withdrawal_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal">Add </button>
@@ -576,7 +576,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for withdrawal in withdrawals %}
+                                {% for withdrawal in withdrawal %}
                                 <tr>
                                     <td>{{ withdrawal.bank.name }}</td>
                                     <td>{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>

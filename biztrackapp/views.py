@@ -710,6 +710,8 @@ def save_after_submit(request):
     supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
     expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
 
     expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
     receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
@@ -784,6 +786,11 @@ def save_after_submit(request):
     bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    withdrawal_total_cheque = Withdrawal.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    withdrawal_total_cash = Withdrawal.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
+
 
     daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
     print('daily_summary_today', list(daily_summary_today.__dict__.values()))
@@ -869,6 +876,11 @@ def save_after_submit(request):
         'bank_deposit_total_bank': bank_deposit_total_bank,
         'bank_deposit_total_card': bank_deposit_total_card,
         'bank_deposit_amount': bank_deposit_amount,
+
+        'withdrawal_total_cheque':withdrawal_total_cheque,
+        'withdrawal_total_cash':withdrawal_total_cash,
+        'total_withdrawal_amount':total_withdrawal_amount,
+
 
         'id': id
     })

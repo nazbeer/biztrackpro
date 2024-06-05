@@ -1104,7 +1104,7 @@ def create_daily_summary(request):
                     (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
                 )
     else:
-        closing_balance = 0
+        closing_balance = bankdata or 0
 
     return render(request, 'create_daily_summary.html',
         {

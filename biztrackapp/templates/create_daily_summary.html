@@ -233,57 +233,57 @@
     //         $('#modal_daily_summary_id7').val(dailySummaryId);
     //     });
     // });
-    {% comment %} $(document).ready(function() {
-    function toggleChequeDetails() {
-        const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-        const chequeDetails = document.getElementById('chequeDetails');
-        const chequeDetails1 = document.getElementById('chequeDetails1');
-        // const chequeDetailsd = document.getElementById('chequeDetailsd');
-        // const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
-        const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
+//  $(document).ready(function() {
+//     function toggleChequeDetails() {
+//         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+//         const chequeDetails = document.getElementById('chequeDetails');
+//         const chequeDetails1 = document.getElementById('chequeDetails1');
+//         // const chequeDetailsd = document.getElementById('chequeDetailsd');
+//         // const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
+//         const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
         
-        if (selectedMode === 'cheque') {
-            chequeDetails.classList.remove('d-none');
-            chequeDetails1.classList.remove('d-none');
-            // chequeDetailsd.classList.remove('d-none');
-            // chequeDetailsd1.classList.remove('d-none');
-        } else {
-            chequeDetails.classList.add('d-none');
-            chequeDetails1.classList.add('d-none');
-            // chequeDetailsd.classList.add('d-none');
-            // chequeDetailsd1.classList.add('d-none');
-        }
-    }
+//         if (selectedMode === 'cheque') {
+//             chequeDetails.classList.remove('d-none');
+//             chequeDetails1.classList.remove('d-none');
+//             // chequeDetailsd.classList.remove('d-none');
+//             // chequeDetailsd1.classList.remove('d-none');
+//         } else {
+//             chequeDetails.classList.add('d-none');
+//             chequeDetails1.classList.add('d-none');
+//             // chequeDetailsd.classList.add('d-none');
+//             // chequeDetailsd1.classList.add('d-none');
+//         }
+//     }
 
-    function setDailySummaryId(modalId, inputId) {
-        const modal = $(`#${modalId}`);
-        modal.on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById(inputId).value = dailySummaryId;
-            $(`#${inputId}`).val(dailySummaryId);
-            // Initial check when the modal is opened
-            toggleChequeDetails();
-            // Add change event listener
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-            modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
-        });
-        modal.on('hidden.bs.modal', function() {
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-            modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
-        });
+//     function setDailySummaryId(modalId, inputId) {
+//         const modal = $(`#${modalId}`);
+//         modal.on('show.bs.modal', function (event) {
+//             var urlParams = new URLSearchParams(window.location.search);
+//             var dailySummaryId = urlParams.get('id');
+//             document.getElementById(inputId).value = dailySummaryId;
+//             $(`#${inputId}`).val(dailySummaryId);
+//             // Initial check when the modal is opened
+//             toggleChequeDetails();
+//             // Add change event listener
+//             const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+//             modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
+//         });
+//         modal.on('hidden.bs.modal', function() {
+//             const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+//             modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
+//         });
         
-    }
+//     }
 
-    setDailySummaryId('bankSaleModal', 'modal_daily_summary_id4');
-    setDailySummaryId('bankDepositModal', 'modal_daily_summary_id1');
-    setDailySummaryId('miscIncomeModal', 'modal_daily_summary_id2');
-    setDailySummaryId('creditCollectionModal', 'modal_daily_summary_id3');
-    setDailySummaryId('purchaseModal', 'modal_daily_summary_id5');
-    setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
-    setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
-    setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
-}); {% endcomment %}
+//     setDailySummaryId('bankSaleModal', 'modal_daily_summary_id4');
+//     setDailySummaryId('bankDepositModal', 'modal_daily_summary_id1');
+//     setDailySummaryId('miscIncomeModal', 'modal_daily_summary_id2');
+//     setDailySummaryId('creditCollectionModal', 'modal_daily_summary_id3');
+//     setDailySummaryId('purchaseModal', 'modal_daily_summary_id5');
+//     setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
+//     setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
+//     setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
+// }); 
 
 $(document).ready(function() {
     function toggleChequeDetails() {

@@ -708,10 +708,60 @@ def save_after_submit(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.daily_summary_id = id
+            msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+            withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+            total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+
+
+            # instance.daily_summary_id = id
+
+            bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+            total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            total_cash_sale = (total_bank_sale_amount  - bank_sale_total_credit_sales)
+
+            purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+            supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+            expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+
+            bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+            bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+            bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+            bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+
+
+
+            net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+            net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+            bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
+            print('net_collection',net_collection)
+            print('net_payment',net_payment)
+            print('bank_deposit_collection',bank_deposit_collection)
+            print('withdrawal_total',withdrawal_total)
+
+            print('opening_balance',instance.opening_balance)
+            closing_balance = instance.opening_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
+            print('closing_balance',closing_balance)
+            instance.closing_balance = closing_balance
+
+            # instance.save()
+
             instance.save()
             status = request.POST.get('status')
             if status == "ongoing":
-                return redirect(reverse('edit_daily_summary'+ f'?id={instance.daily_summary_id}', args=[instance.daily_summary_id]))
+                # return redirect(reverse('save_after_submit'+ f'?id={instance.daily_summary_id}', args=[instance.daily_summary_id]))
+                return redirect(reverse('save_after_submit') + f'?id={instance.daily_summary_id}')
+
             instance.status = "completed"
             return redirect('daily_summary_list')
     else:
@@ -1269,14 +1319,24 @@ def list_bank_sales(request):
 def create_credit_collection(request):
     if request.method == 'POST':
         form = CreditCollectionForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_credit_collection(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1291,14 +1351,24 @@ def list_credit_collection(request):
 def create_misc_income(request):
     if request.method == 'POST':
         form = MiscellaneousIncomeForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_msc_income(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1313,14 +1383,24 @@ def list_msc_income(request):
 def create_purchase(request):
     if request.method == 'POST':
         form = PurchaseForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_purchases(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1334,14 +1414,24 @@ def list_purchases(request):
 def create_supplier_payment(request):
     if request.method == 'POST':
         form = SupplierPaymentForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_supplier_payment(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1356,13 +1446,23 @@ def list_supplier_payment(request):
 def create_bank_deposit(request):
     if request.method == 'POST':
         form = BankDepositsForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_bank_deposit(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1376,13 +1476,23 @@ def list_bank_deposit(request):
 def create_expense(request):
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
 
 def list_expense(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1436,13 +1546,23 @@ def fetch_cheque_numbers(request):
 def create_withdrawal(request):
     if request.method == 'POST':
         form = WithdrawalForm(request.POST)
+        daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')
             form.daily_summary_id = daily_summary_id
             form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    return redirect('create_daily_summary')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                # Redirect to the edit page if the daily summary already exists
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
+    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    # return redirect('create_daily_summary')
     # else:
     #     form = WithdrawalForm()
     #     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -1488,3 +1608,92 @@ def list_withdrawal(request):
 #             form.save()
 #             return redirect(reverse('withdrawal_list'))
 #         return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
+
+
+def get_daily_summary_data(request,id):
+    # id = request.GET.get('id')
+    today = date.today()
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    cheque_transaction_mode = None
+    cash_transaction_mode = None
+    bank_transaction_mode = None
+    credit_transaction_mode = None
+    card_transaction_mode = None
+
+    
+    try:
+        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.get(name="card")
+    except TransactionMode.DoesNotExist:
+        pass 
+
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    # purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    # supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    # expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+
+
+    # instance.daily_summary_id = id
+
+    # bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_cash_sale = (total_bank_sale_amount  - bank_sale_total_credit_sales)
+
+    # net_payment calculation
+    purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+    supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+
+    bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+    bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+    bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+
+
+
+    net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+    net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+    bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
+
+    print('net_collection',net_collection)
+    print('net_payment',net_payment)
+    print('bank_deposit_collection',bank_deposit_collection)
+    print('withdrawal_total',withdrawal_total)
+
+    if DailySummary.objects.exists():
+        last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+    else:
+        last_daily_summary = business_profile.opening_balance
+
+    print('opening_balance',last_daily_summary.closing_balance)
+    closing_balance = last_daily_summary.closing_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
+    print('closing_balance',closing_balance)
+    return JsonResponse({'closing_balance':closing_balance}, safe=False)

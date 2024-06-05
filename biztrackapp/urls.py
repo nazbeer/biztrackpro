@@ -7,6 +7,8 @@ from biztrackapp import views
 
 urlpatterns = [
     path('edit/',save_after_submit,name='save_after_submit' ),
+    path('get_closing_balance/<str:id>/',get_daily_summary_data,name='get_closing_balance' ),
+
 
     path('',login_view,name='login' ),
     path('logout/',logout_view,name='logout' ),

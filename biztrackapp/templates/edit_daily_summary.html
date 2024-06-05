@@ -127,10 +127,11 @@
 
         startTimeInput.value = startTimeValue;
         endTimeInput.value = endTimeValue;
+        get_closing_balance()
     });
 </script>
 <script>
-     
+{% comment %}      
     $(document).ready(function() {
         $('#bankDepositModal').on('show.bs.modal', function (event) {
             var urlParams = new URLSearchParams(window.location.search);
@@ -174,10 +175,80 @@
             document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
             $('#modal_daily_summary_id7').val(dailySummaryId);
         });
+        $('#withdrawalModal').on('show.bs.modal', function (event) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var dailySummaryId = urlParams.get('id');
+            document.getElementById('modal_daily_summary_idw').value = dailySummaryId;
+            $('#modal_daily_summary_idw').val(dailySummaryId);
+        });
+    }); {% endcomment %}
+    $(document).ready(function() {
+        function toggleChequeDetails() {
+            const modal = $('.modal.show'); // Get the currently shown modal
+            const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
+            const chequeDetails = modal.find('#chequeDetails');
+            const chequeDetails1 = modal.find('#chequeDetails1');
+            
+            if (modeOfTransactionSelect.length > 0) {
+                const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
+                
+                if (selectedMode === 'cheque') {
+                    chequeDetails.removeClass('d-none');
+                    chequeDetails1.removeClass('d-none');
+                } else {
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                }
+            }
+        }
+    
+        function setDailySummaryId(modalId, inputId) {
+            const modal = $(`#${modalId}`);
+            modal.on('show.bs.modal', function (event) {
+                var urlParams = new URLSearchParams(window.location.search);
+                var dailySummaryId = urlParams.get('id');
+                document.getElementById(inputId).value = dailySummaryId;
+                $(`#${inputId}`).val(dailySummaryId);
+    
+                // Initial check when the modal is opened
+                toggleChequeDetails();
+    
+                // Add change event listener within the context of the modal
+                const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
+                modeOfTransactionSelect.on('change', toggleChequeDetails);
+            });
+    
+            modal.on('hidden.bs.modal', function() {
+                const modeOfTransactionSelect = $(this).find('#id_mode_of_transaction');
+                modeOfTransactionSelect.off('change', toggleChequeDetails);
+            });
+        }
+    
+        setDailySummaryId('bankSaleModal', 'modal_daily_summary_id4');
+        setDailySummaryId('bankDepositModal', 'modal_daily_summary_id1');
+        setDailySummaryId('miscIncomeModal', 'modal_daily_summary_id2');
+        setDailySummaryId('creditCollectionModal', 'modal_daily_summary_id3');
+        setDailySummaryId('purchaseModal', 'modal_daily_summary_id5');
+        setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
+        setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
+        setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
     });
-
+    
 </script>
 <script>
+    function get_closing_balance() {
+        // Modify the function to accept the selected date as a parameter
+        id = document.getElementById('daily_summary_id').value
+        fetch(`/get_closing_balance/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('pp',data.closing_balance)
+            document.getElementById('id_closing_balance').innerHTML = `Closing Balance: ${data.closing_balance}`;
+
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function saveFunction() {
         document.getElementById('status').value = 'ongoing';
         document.getElementById("daily_summary_form").submit();
@@ -789,7 +860,7 @@
 
             <div class="card mt-3">
                 <div class="card-header " style="border-radius:5px; border:transparent;">
-                    <h5 class="text-white mb-0">Closing Balance : {{closing_balance}}</h5>
+                    <h5 class="text-white mb-0" id="id_closing_balance"></h5>
                 </div>
             </div>
         </div>

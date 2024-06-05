@@ -663,6 +663,7 @@ def delete_business_timing(request, id):
     return redirect('business_timing_list')
 
 from django.forms.models import model_to_dict
+from decimal import Decimal
 def save_after_submit(request):
     id = request.GET.get('id')
     today = date.today()
@@ -797,7 +798,7 @@ def save_after_submit(request):
 
     if daily_summary_today:
         closing_balance = (
-                    (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
+                    (Decimal(bankdata) + daily_summary_today.sales + daily_summary_today.bank_deposit +
                     daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
                     (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
                 )
@@ -971,6 +972,10 @@ def create_daily_summary(request):
                 expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
                 bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
                 credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+                withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
                 total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
                 bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
 
@@ -1000,10 +1005,12 @@ def create_daily_summary(request):
                 print('net_collection',net_collection)
                 print('net_payment',net_payment)
                 print('bank_deposit_collection',bank_deposit_collection)
+                print('withdrawal_total',withdrawal_total)
+
                 print('opening_balance',instance.opening_balance)
-                closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
+                closing_balance = instance.opening_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
                 print('closing_balance',closing_balance)
-                instance.closing_balance= closing_balance
+                instance.closing_balance = closing_balance
 
                 instance.save()
                 status = request.POST.get('status')

@@ -110,5 +110,7 @@ admin.site.register(MiscellaneousIncome)
 admin.site.register(Purchase)
 admin.site.register(SupplierPayments)
 admin.site.register(BusinessTiming)
+admin.site.register(Withdrawal)
+admin.site.register(Partners)
 
 

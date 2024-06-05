@@ -694,6 +694,7 @@ def save_after_submit(request):
         supplier_payments_form = SupplierPaymentForm()
         bank_deposit_form = BankDepositsForm()
         expense_form = ExpenseForm()
+        withdrawal_form = WithdrawalForm()
 
     try:
         previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
@@ -810,6 +811,7 @@ def save_after_submit(request):
         'supplier_payments_form': supplier_payments_form,
         'bank_deposit_form': bank_deposit_form,
         'expense_form': expense_form,
+        'withdrawal_form':withdrawal_form,
 
         'msc_income': msc_income,
         'credit_collections': credit_collections,
@@ -1011,6 +1013,7 @@ def create_daily_summary(request):
         supplier_payments_form = SupplierPaymentForm()
         bank_deposit_form = BankDepositsForm()
         expense_form = ExpenseForm()
+        withdrawal_form = WithdrawalForm()
 
     try:
         # Get the latest DailySummary by sorting by date in descending order and taking the first one
@@ -1125,6 +1128,8 @@ def create_daily_summary(request):
             'supplier_payments_form':supplier_payments_form,
             'bank_deposit_form':bank_deposit_form,
             'expense_form':expense_form,
+            'withdrawal_form':withdrawal_form,
+            
             #listings
             'msc_income': msc_income,
             'credit_collections':credit_collections,
@@ -1396,35 +1401,58 @@ def fetch_cheque_numbers(request):
     cheque_numbers = list(cheque_numbers)
     return JsonResponse(cheque_numbers, safe=False)
 
-
-class WithdrawalListView(View):
-    def get(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-        shop = shop_admin.shop
-        
-        # Retrieve the business profile associated with the shop
-        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        withdrawals = Withdrawal.objects.all()
-        return render(request, 'withdrawal_list.html', {'withdrawals': withdrawals, 'business_profile':business_profile.id})
-
-class WithdrawalCreateView(View):
-    def get(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-        shop = shop_admin.shop
-        
-        # Retrieve the business profile associated with the shop
-        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        form = WithdrawalForm()
-        return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
-
-    def post(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-        shop = shop_admin.shop
-        
-        # Retrieve the business profile associated with the shop
-        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+def create_withdrawal(request):
+    if request.method == 'POST':
         form = WithdrawalForm(request.POST)
         if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')
+            form.daily_summary_id = daily_summary_id
             form.save()
-            return redirect(reverse('withdrawal_list'))
-        return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    return redirect('create_daily_summary')
+    # else:
+    #     form = WithdrawalForm()
+    #     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    #     shop = shop_admin.shop
+    #     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    #     return render(request, 'withdrawal_form.html', {'form': form, 'business_profile': business_profile.id})
+
+def list_withdrawal(request):
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    withdrawals = Withdrawal.objects.filter(business_profile=business_profile.id)
+    return render(request, 'create_daily_summary.html', {'withdrawals': withdrawals, 'business_profile': business_profile.id})
+
+# class WithdrawalListView(View):
+#     def get(self, request):
+#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#         shop = shop_admin.shop
+        
+#         # Retrieve the business profile associated with the shop
+#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+#         withdrawals = Withdrawal.objects.all()
+#         return render(request, 'withdrawal_list.html', {'withdrawals': withdrawals, 'business_profile':business_profile.id})
+
+# class WithdrawalCreateView(View):
+#     def get(self, request):
+#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#         shop = shop_admin.shop
+        
+#         # Retrieve the business profile associated with the shop
+#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+#         form = WithdrawalForm()
+#         return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
+
+#     def post(self, request):
+#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#         shop = shop_admin.shop
+        
+#         # Retrieve the business profile associated with the shop
+#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+#         form = WithdrawalForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect(reverse('withdrawal_list'))
+#         return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})

@@ -19,8 +19,8 @@ urlpatterns = [
     path('partners/', PartnerListView.as_view(), name='partner_list'),
     path('partners/create/', PartnerCreateView.as_view(), name='partner_create'),
 
-    path('withdrawals/', WithdrawalListView.as_view(), name='withdrawal_list'),
-    path('withdrawals/create/', WithdrawalCreateView.as_view(), name='withdrawal_create'),
+    path('withdrawals/', list_withdrawal, name='withdrawal_list'),
+    path('withdrawals/create/', create_withdrawal, name='withdrawal_create'),
 
     path('expense-type/', ExpenseTypeListView.as_view(), name='expense_type_list'),
     path('expense-type/create/', create_expense_type, name='create_expense_type'),

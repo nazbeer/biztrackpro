@@ -1395,3 +1395,36 @@ def fetch_cheque_numbers(request):
     print(cheque_numbers)
     cheque_numbers = list(cheque_numbers)
     return JsonResponse(cheque_numbers, safe=False)
+
+
+class WithdrawalListView(View):
+    def get(self, request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        
+        # Retrieve the business profile associated with the shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        withdrawals = Withdrawal.objects.all()
+        return render(request, 'withdrawal_list.html', {'withdrawals': withdrawals, 'business_profile':business_profile.id})
+
+class WithdrawalCreateView(View):
+    def get(self, request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        
+        # Retrieve the business profile associated with the shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        form = WithdrawalForm()
+        return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
+
+    def post(self, request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        
+        # Retrieve the business profile associated with the shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        form = WithdrawalForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('withdrawal_list'))
+        return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})

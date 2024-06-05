@@ -384,6 +384,21 @@ class Expense(models.Model):
         return f"{self.amount}"
 
 
+
+class Withdrawal(models.Model):
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    withdrawal_date = models.DateField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
+    daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
+    business_profile = models.CharField(max_length=255, null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.amount}"
+
+
 @receiver(pre_save)
 def set_created_on_timezone(sender, instance, **kwargs):
     if hasattr(instance, 'created_on') and not instance.created_on:

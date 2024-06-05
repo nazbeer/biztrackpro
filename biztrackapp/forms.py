@@ -44,6 +44,11 @@ class PartnerForm(forms.ModelForm):
         model = Partners
         fields = ['shop', 'user', 'business_profile', 'email_1', 'email_2', 'email_3', 'mobile_1', 'mobile_2', 'mobile_3']
 
+class WithdrawalForm(forms.ModelForm):
+    class Meta:
+        model = Withdrawal
+        fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile']
+        
 class SupplierForm(forms.ModelForm):
     class Meta:
         model = Supplier

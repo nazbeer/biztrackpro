@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Withdrawal{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Create Withdrawal</h5>
+        </div>
+        <form method="post">
+        <div class="card-body">
+            
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="bank">Bank</label>
+                        <select id="bank" name="bank" class="form-control">
+                            {% for bank in form.bank.field.queryset %}
+                                <option value="{{ bank.id }}" {% if bank.id == form.bank.value %}selected{% endif %}>{{ bank.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="withdrawal_date">Withdrawal Date</label>
+                        <input type="date" id="withdrawal_date" name="withdrawal_date" class="form-control" value="{{ form.withdrawal_date.value|date:'Y-m-d' }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" name="amount" class="form-control" value="{{ form.amount.value }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="mode_of_transaction">Mode of Transaction</label>
+                        <select id="mode_of_transaction" name="mode_of_transaction" class="form-control">
+                            {% for mode in form.mode_of_transaction.field.queryset %}
+                                <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <input type="hidden" id="daily_summary_id" name="daily_summary_id" class="form-control" value="{{ form.daily_summary_id.value }}">
+                <input type="hidden" id="business_profile" name="business_profile" class="form-control" value="{{ form.business_profile.value }}">
+               
+          
+        </div>
+        <div class="card-footer">
+            <div class="form-group mb-0 d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{% url 'withdrawal_list' %}" class="btn btn-secondary float-right">Withdrawal List</a>
+        </div>
+        </div>
+    </form>
+    </div>
+</div>
+{% endblock %}

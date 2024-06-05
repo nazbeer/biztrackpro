@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdrawal List{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Withdrawal List</h5>
+            <a href="{% url 'withdrawal_create' %}" class="btn btn-primary float-right">Create Withdrawal</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped nowrap" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Bank</th>
+                            <th>Withdrawal Date</th>
+                            <th>Amount</th>
+                            <th>Mode of Transaction</th>
+                            <th>Daily Summary ID</th>
+                            <th>Business Profile</th>
+                            <th>Created On</th>
+                            <th>Updated On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for withdrawal in withdrawals %}
+                        <tr>
+                            <td>{{ withdrawal.bank }}</td>
+                            <td>{{ withdrawal.withdrawal_date }}</td>
+                            <td>{{ withdrawal.amount }}</td>
+                            <td>{{ withdrawal.mode_of_transaction }}</td>
+                            <td>{{ withdrawal.daily_summary_id }}</td>
+                            <td>{{ withdrawal.business_profile }}</td>
+                            <td>{{ withdrawal.created_on }}</td>
+                            <td>{{ withdrawal.updated_on }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -136,91 +136,141 @@
 </script>
 <script>
      
-    $(document).ready(function() {
-        function toggleChequeDetails() {
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-            const chequeDetails = document.getElementById('chequeDetails');
-            const chequeDetails1 = document.getElementById('chequeDetails1');
-            const chequeDetailsd = document.getElementById('chequeDetailsd');
-            const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
-            const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
+    // $(document).ready(function() {
+    //     function toggleChequeDetails() {
+    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+    //         const chequeDetails = document.getElementById('chequeDetails');
+    //         const chequeDetails1 = document.getElementById('chequeDetails1');
+    //         const chequeDetailsd = document.getElementById('chequeDetailsd');
+    //         const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
+    //         const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
             
-            if (selectedMode === 'cheque') {
-                chequeDetails.classList.remove('d-none');
-                chequeDetails1.classList.remove('d-none');
+    //         if (selectedMode === 'cheque') {
+    //             chequeDetails.classList.remove('d-none');
+    //             chequeDetails1.classList.remove('d-none');
 
-                chequeDetailsd.classList.remove('d-none');
-                chequeDetailsd1.classList.remove('d-none');
-            } else {
-                chequeDetails.classList.add('d-none');
-                chequeDetails1.classList.add('d-none');
-                chequeDetailsd.classList.add('d-none');
-                chequeDetailsd1.classList.add('d-none');
-            }
+    //             chequeDetailsd.classList.remove('d-none');
+    //             chequeDetailsd1.classList.remove('d-none');
+    //         } else {
+    //             chequeDetails.classList.add('d-none');
+    //             chequeDetails1.classList.add('d-none');
+    //             chequeDetailsd.classList.add('d-none');
+    //             chequeDetailsd1.classList.add('d-none');
+    //         }
+    //     }
+    //     $('#bankSaleModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
+    //         $('#modal_daily_summary_id4').val(dailySummaryId);
+    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+    //         // Initial check when the modal is opened
+    //         toggleChequeDetails();
+    //         // Add change event listener
+    //         modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
+    //     });
+    //     $('#bankSaleModal').on('hidden.bs.modal', function() {
+    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+    //         modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
+    //     });
+    //     $('#bankDepositModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id1').value = dailySummaryId;
+    //         $('#modal_daily_summary_id1').val(dailySummaryId);
+    //         const modeOfTransactionSelect1 = document.getElementById('id_mode_of_transaction');
+    //         // Initial check when the modal is opened
+    //         toggleChequeDetails();
+    //         // Add change event listener
+    //         modeOfTransactionSelect1.addEventListener('change', toggleChequeDetails);
+      
+    //     });
+    //     $('#bankDepositModal').on('hidden.bs.modal', function() {
+    //         const modeOfTransactionSelect1 = document.getElementById('id_mode_of_transaction');
+    //         modeOfTransactionSelect1.removeEventListener('change', toggleChequeDetails);
+    //     });
+    //     $('#miscIncomeModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
+    //         $('#modal_daily_summary_id2').val(dailySummaryId);
+    //     });
+    //     $('#creditCollectionModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
+    //         $('#modal_daily_summary_id3').val(dailySummaryId);
+    //     });
+      
+    //     $('#purchaseModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
+    //         $('#modal_daily_summary_id5').val(dailySummaryId);
+    //     });
+    //     $('#supplierPaymentModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
+    //         $('#modal_daily_summary_id6').val(dailySummaryId);
+    //     });
+    //     $('#expenseModal').on('show.bs.modal', function (event) {
+    //         var urlParams = new URLSearchParams(window.location.search);
+    //         var dailySummaryId = urlParams.get('id');
+    //         document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
+    //         $('#modal_daily_summary_id7').val(dailySummaryId);
+    //     });
+    // });
+    $(document).ready(function() {
+    function toggleChequeDetails() {
+        const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+        const chequeDetails = document.getElementById('chequeDetails');
+        const chequeDetails1 = document.getElementById('chequeDetails1');
+        // const chequeDetailsd = document.getElementById('chequeDetailsd');
+        // const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
+        const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
+        
+        if (selectedMode === 'cheque') {
+            chequeDetails.classList.remove('d-none');
+            chequeDetails1.classList.remove('d-none');
+            // chequeDetailsd.classList.remove('d-none');
+            // chequeDetailsd1.classList.remove('d-none');
+        } else {
+            chequeDetails.classList.add('d-none');
+            chequeDetails1.classList.add('d-none');
+            // chequeDetailsd.classList.add('d-none');
+            // chequeDetailsd1.classList.add('d-none');
         }
-        $('#bankSaleModal').on('show.bs.modal', function (event) {
+    }
+
+    function setDailySummaryId(modalId, inputId) {
+        const modal = $(`#${modalId}`);
+        modal.on('show.bs.modal', function (event) {
             var urlParams = new URLSearchParams(window.location.search);
             var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
-            $('#modal_daily_summary_id4').val(dailySummaryId);
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
+            document.getElementById(inputId).value = dailySummaryId;
+            $(`#${inputId}`).val(dailySummaryId);
             // Initial check when the modal is opened
             toggleChequeDetails();
             // Add change event listener
+            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
             modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
         });
-        $('#bankSaleModal').on('hidden.bs.modal', function() {
+        modal.on('hidden.bs.modal', function() {
             const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
             modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
         });
-        $('#bankDepositModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id1').value = dailySummaryId;
-            $('#modal_daily_summary_id1').val(dailySummaryId);
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-            // Initial check when the modal is opened
-            toggleChequeDetails();
-            // Add change event listener
-            modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
-      
-        });
-        $('#bankDepositModal').on('hidden.bs.modal', function() {
-            const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-            modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
-        });
-        $('#miscIncomeModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
-            $('#modal_daily_summary_id2').val(dailySummaryId);
-        });
-        $('#creditCollectionModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
-            $('#modal_daily_summary_id3').val(dailySummaryId);
-        });
-      
-        $('#purchaseModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
-            $('#modal_daily_summary_id5').val(dailySummaryId);
-        });
-        $('#supplierPaymentModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
-            $('#modal_daily_summary_id6').val(dailySummaryId);
-        });
-        $('#expenseModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
-            $('#modal_daily_summary_id7').val(dailySummaryId);
-        });
-    });
+    }
+
+    setDailySummaryId('bankSaleModal', 'modal_daily_summary_id4');
+    setDailySummaryId('bankDepositModal', 'modal_daily_summary_id1');
+    setDailySummaryId('miscIncomeModal', 'modal_daily_summary_id2');
+    setDailySummaryId('creditCollectionModal', 'modal_daily_summary_id3');
+    setDailySummaryId('purchaseModal', 'modal_daily_summary_id5');
+    setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
+    setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
+    setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
+});
 
 </script>
 <script>
@@ -268,7 +318,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="id_date">Opening Balance <small class="text-muted">(cash on hand)</small>:</label>
+                                <label for="id_date">Opening Balance:</label>
                                 <input type="number" name="opening_balance" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
                             </div>
                         </div>
@@ -478,6 +528,79 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card  mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Withdrawal</h5>
+                </div>
+                <div class="card-body bg-white  br-5">
+                    
+                    <div class="row ">
+                        <div class="col-md-3">
+                            <label>Cash </label>
+                            <input type="number" name="cash_bank_deposit" required class="form-control bg-light" id="id_cash_bank_deposit" tabindex="1" value="{{ bank_deposit_total_cash }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_bank_deposit" required class="form-control bg-light" id="id_bank_bank_deposit" tabindex="2" value="{{ bank_deposit_total_bank }}" > 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_bank_deposit" required class="form-control bg-light" id="id_card_bank_deposit" tabindex="3" value="{{ bank_deposit_total_card }}"> 
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_bank_deposit" required class="form-control bg-light" id="id_cheque_bank_deposit" tabindex="4" value="{{ bank_deposit_total_cheque }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">                        
+                        <div class="col-md-3">
+                            <label>Withdrawal Total</label>
+                            <div class="bg-light p-2 rounded">{{bank_deposit_amount}}</div>
+                            <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal">Add </button>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="table-responsive">
+                    <table id="tablewithdrawal"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                        <thead class="thead-light" style="border-color: transparent !important;">
+                            <tr>
+                                <!-- <th>Customer</th> -->
+                                <th>Bank</th>
+                                <th>With. Date</th>
+                                <th>Amount</th>
+                                <th>Mode of Transaction</th>
+                                <th>Created On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for bank_deposit in bank_deposits %}
+                            <tr>
+                                <!-- <td>{{ bank_deposit.customer.name }}</td> -->
+                                <td>{{ bank_deposit.bank_deposit_bank.name }}</td>
+                                <td>{{ bank_deposit.cheque_date|date:"d/m/Y" }}</td>
+                                <td>{{ bank_deposit.amount }}</td>
+                                <td  class="text-capitalize">{{ bank_deposit.mode_of_transaction.name }}</td>
+                               
+                                <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
+                                
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+
+
+
 
 
             <div class="card  mt-4">
@@ -766,6 +889,7 @@
                     </div>
                 </div>
             </div>
+            
             <div class="card mt-3">
                 <div class="card-header " style="border-radius:5px; border:transparent;">
                     <h5 class="text-white mb-0">Closing Balance : {{closing_balance}}</h5>
@@ -795,6 +919,7 @@
 {% include 'modals/supplier_payment_modal.html' %}
 {% include 'modals/expense_modal.html' %}
 {% include 'modals/bank_deposit_modal.html' %}
+{% include 'modals/withdrawal_modal.html' %}
 
 
 {% endblock %}
@@ -805,7 +930,7 @@
 <script>
    $(document).ready(function() {
     // Initialize DataTables
-    $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
+    $('#tablebanksale, #tablecreditcollection, #tablewithdrawal, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
         responsive: true,
         dom: 'lBfrtip',
         buttons: [

@@ -794,7 +794,7 @@ def save_after_submit(request):
                     (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
                 )
     else:
-        closing_balance = 0
+        closing_balance = bankdata or 0
     return render(request, 'edit_daily_summary.html', {
         'business_profile': business_profile.id,
         'today': today,

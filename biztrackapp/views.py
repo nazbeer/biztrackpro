@@ -669,6 +669,34 @@ def save_after_submit(request):
     today = date.today()
     yesterday = datetime.now() - timedelta(days=1)
     yesterday_date = yesterday.date()
+
+    cheque_transaction_mode = None
+    cash_transaction_mode = None
+    bank_transaction_mode = None
+    credit_transaction_mode = None
+    card_transaction_mode = None
+
+    try:
+        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        card_transaction_mode = TransactionMode.objects.get(name="card")
+    except TransactionMode.DoesNotExist:
+        pass
+
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -717,33 +745,6 @@ def save_after_submit(request):
 
     expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
     receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
-
-    cheque_transaction_mode = None
-    cash_transaction_mode = None
-    bank_transaction_mode = None
-    credit_transaction_mode = None
-    card_transaction_mode = None
-
-    try:
-        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        card_transaction_mode = TransactionMode.objects.get(name="card")
-    except TransactionMode.DoesNotExist:
-        pass
 
     bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
@@ -795,7 +796,7 @@ def save_after_submit(request):
 
 
     daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
-    print('daily_summary_today', list(daily_summary_today.__dict__.values()))
+    # print('daily_summary_today', list(daily_summary_today.__dict__.values()))
 
     if daily_summary_today:
         closing_balance = (
@@ -831,6 +832,7 @@ def save_after_submit(request):
         'supplier_payments': supplier_payments,
         'bank_deposits': bank_deposit,
         'expenses': expense,
+        'withdrawal': withdrawal,
 
         'cash_on_hand': bankdata,
         'closing_balance': closing_balance,
@@ -1125,14 +1127,14 @@ def create_daily_summary(request):
 
     # print('daily_summary_today', daily_summary_today)
     # print(daily_summary_today.bank_deposit)
-    if daily_summary_today:
-        closing_balance = (
-                    (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
-                    daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
-                    (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
-                )
-    else:
-        closing_balance = bankdata or 0
+    # if daily_summary_today:
+    #     closing_balance = (
+    #                 (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
+    #                 daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
+    #                 (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
+    #             )
+    # else:
+    closing_balance = bankdata or 0
 
     return render(request, 'create_daily_summary.html',
         {

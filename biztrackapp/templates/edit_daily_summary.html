@@ -434,6 +434,72 @@
             </div>
 
 
+            <div class="card mt-4">
+                <div class="card-header text-white">
+                    <h5 class="text-left mb-0">Withdrawal</h5>
+                </div>
+                <div class="card-body bg-white br-5">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label>Cash </label>
+                            <input type="number" name="cash_withdrawal" required class="form-control bg-light" id="id_cash_withdrawal" tabindex="1" value="{{ withdrawal_total_cash }}"> 
+                        </div>
+                        {% comment %} <div class="col-md-3">
+                            <label>Bank </label>
+                            <input type="number" name="bank_withdrawal" required class="form-control bg-light" id="id_bank_withdrawal" tabindex="2" value="{{ withdrawal_total_bank }}" > 
+                        </div> {% endcomment %}
+                        {% comment %} <div class="col-md-3">
+                            <label>Card </label>
+                            <input type="number" name="card_withdrawal" required class="form-control bg-light" id="id_card_withdrawal" tabindex="3" value="{{ withdrawal_total_card }}"> 
+                        </div> {% endcomment %}
+                        <div class="col-md-3">
+                            <label>Cheque </label>
+                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal" tabindex="4" value="{{ withdrawal_total_cheque }}"> 
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3 mt-2">                        
+                        <div class="col-md-3">
+                            <label>Withdrawal Total</label>
+                            <div class="bg-light p-2 rounded">{{total_withdrawal_amount}}</div>
+                            <input type="hidden" name="withdrawal" value="{{total_withdrawal_amount}}" required class="form-control bg-light" id="id_withdrawal_total" > 
+                        </div> 
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal">Add </button>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="tablewithdrawal"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                            <thead class="thead-light" style="border-color: transparent !important;">
+                                <tr>
+                                    <th>Bank</th>
+                                    <th>With. Date</th>
+                                    <th>Amount</th>
+                                    <th>Mode of Transaction</th>
+                                    <th>Created On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for withdrawal in withdrawal %}
+                                <tr>
+                                    <td>{{ withdrawal.bank.name }}</td>
+                                    <td>{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
+                                    <td>{{ withdrawal.amount }}</td>
+                                    <td class="text-capitalize">{{ withdrawal.mode_of_transaction.name }}</td>
+                                    <td>{{ withdrawal.created_on|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
+
             <div class="card  mt-4">
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Purchases</h5>
@@ -749,6 +815,8 @@
 {% include 'modals/supplier_payment_modal.html' %}
 {% include 'modals/expense_modal.html' %}
 {% include 'modals/bank_deposit_modal.html' %}
+{% include 'modals/withdrawal_modal.html' %}
+
 
 
 {% endblock %}

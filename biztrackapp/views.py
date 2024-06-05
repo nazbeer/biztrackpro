@@ -698,8 +698,9 @@ def save_after_submit(request):
         withdrawal_form = WithdrawalForm()
 
     try:
-        previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
-        bankdata = previous_daily_summary.closing_balance
+        # previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
+        last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+        bankdata = last_daily_summary.closing_balance
         print('yestdays bankdata', bankdata)
     except DailySummary.DoesNotExist:
         bankdata = business_profile.opening_balance

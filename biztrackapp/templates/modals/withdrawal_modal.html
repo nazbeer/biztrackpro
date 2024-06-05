@@ -18,7 +18,7 @@
                         <div class="form-group col-md-6">
                             <label for="bank">Bank</label>
                             <select id="bank" name="bank" class="form-control">
-                                {% for bank in form.bank.field.queryset %}
+                                {% for bank in withdrawal_form.bank.field.queryset %}
                                     <option value="{{ bank.id }}" {% if bank.id == form.bank.value %}selected{% endif %}>{{ bank.name }}</option>
                                 {% endfor %}
                             </select>
@@ -36,7 +36,7 @@
                         <div class="form-group col-md-6">
                             <label for="mode_of_transaction">Mode of Transaction</label>
                             <select id="mode_of_transaction" name="mode_of_transaction" class="form-control">
-                                {% for mode in form.mode_of_transaction.field.queryset %}
+                                {% for mode in withdrawal_form.mode_of_transaction.field.queryset %}
                                     <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
                                 {% endfor %}
                             </select>

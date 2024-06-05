@@ -14,7 +14,7 @@
         <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
           <thead>
             <tr>
-              <!-- <th scope="col">#</th> -->
+              <th scope="col" class="text-center">#</th>
               <th scope="col">Date</th>
               <th scope="col">ID</th>
               
@@ -39,7 +39,7 @@
           <tbody>
             {% for summary in daily_summaries %}
               <tr>
-                <!-- <th scope="row">{{summary.id}}</th> -->
+                <td scope="row" class="text-left">{{summary.id}}</td>
                 <td>{{ summary.date }}</td>
                 <td> 
                   {% if summary.date == today  and summary.status == 'ongoing'  %}
@@ -96,7 +96,7 @@
   new DataTable('#dailysummary', {
     responsive: true,
     dom: 'lBfrtip',
-    // order: [[1, 'desc']], 
+     order: [[0, 'desc']], 
     buttons: [
       {
         text: 'Print',

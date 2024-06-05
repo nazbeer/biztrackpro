@@ -1015,7 +1015,7 @@ def create_daily_summary(request):
     try:
         # Get the latest DailySummary by sorting by date in descending order and taking the first one
         # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
-        daily_summary = DailySummary.objects.get(business_profile=business_profile.id, date=yesterday_date).order_by('-date').first()
+        daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-created_on').first()
 
         print('bankdata submit', daily_summary)
         bankdata = daily_summary.closing_balance or 0

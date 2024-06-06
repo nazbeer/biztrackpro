@@ -40,7 +40,7 @@
                 <div class="form-group">
                   <label for="id_mode_of_transaction">Mode of Transaction</label>
                   <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="1">
-                    <option>-- Mode of Transaction --</option>
+                    <option >-- Mode of Transaction --</option>
                     {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
                       <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                     {% endfor %}
@@ -50,7 +50,7 @@
                 <div class="form-group">
                   <label for="id_bank">Bank</label>
                   <select id="id_bank" name="bank" class="form-control" tabindex="3">
-                    <option>-- Select Bank --</option>
+                    <option value="">-- Select Bank --</option>
                     {% for bank in bank_sale_form.bank.field.queryset %}
                       <option value="{{ bank.id }}">{{ bank.name }}</option>
                     {% endfor %}

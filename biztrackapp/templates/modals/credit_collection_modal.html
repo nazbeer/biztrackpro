@@ -37,22 +37,24 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="id_mode_of_transaction">Payment Mode</label>
-                  <select id="id_mode_of_transaction" name="payment_mode" class="form-control" tabindex="1">
+                  <select id="id_mode_of_transaction" name="payment_mode" class="form-control text-capitalize" tabindex="1">
                     <option>-- Select Payment Mode --</option>
                     {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
                       <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
                     {% endfor %}
                   </select>
                 </div>
+                <div id="chequeDetails2" class="d-none">
                 <div class="form-group">
                   <label for="id_bank">Bank</label>
                   <select id="id_bank" name="bank" class="form-control" tabindex="3">
-                    <option>-- Select Bank --</option>
+                    <option value="">-- Select Bank --</option>
                     {% for bank in credit_collection_form.bank.field.queryset %}
                       <option value="{{ bank.id }}">{{ bank.name }}</option>
                     {% endfor %}
                   </select>
                 </div>
+              </div>
                 <div id="chequeDetails" class="d-none">
                 <div class="form-group">
                   <label for="id_cheque_no">Cheque Number</label>

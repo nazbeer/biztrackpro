@@ -291,6 +291,8 @@ $(document).ready(function() {
         const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
         const chequeDetails = modal.find('#chequeDetails');
         const chequeDetails1 = modal.find('#chequeDetails1');
+        const chequeDetails2 = modal.find('#chequeDetails2');
+
         
         if (modeOfTransactionSelect.length > 0) {
             const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
@@ -298,9 +300,13 @@ $(document).ready(function() {
             if (selectedMode === 'cheque' ) {
                 chequeDetails.removeClass('d-none');
                 chequeDetails1.removeClass('d-none');
+                chequeDetails2.removeClass('d-none');
+
             } else {
                 chequeDetails.addClass('d-none');
                 chequeDetails1.addClass('d-none');
+                chequeDetails2.addClass('d-none');
+
             }
         }
     }

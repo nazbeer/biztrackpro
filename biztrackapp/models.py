@@ -394,7 +394,7 @@ class Expense(models.Model):
 
 
 class Withdrawal(models.Model):
-    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE,null=True, blank=True)
     withdrawal_date = models.DateField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)

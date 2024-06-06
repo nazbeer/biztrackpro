@@ -201,6 +201,14 @@ class Bank(models.Model):
     def __str__(self):
         return f"{self.name} - {self.opening_balance}"
     
+class AllBank(models.Model):
+    name = models.CharField(max_length=255, choices=BANK_CHOICES)
+    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    update_on = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return f"{self.name}"
+    
 class TransactionMode(models.Model):
     CHOICES = [
         ('card', 'Card'),

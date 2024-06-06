@@ -80,6 +80,13 @@ class BankForm(forms.ModelForm):
         model = Bank
         fields = '__all__'
 
+class AllBankForm(forms.ModelForm):
+    name = forms.ChoiceField(choices=BANK_CHOICES, label="Bank Name")
+
+    class Meta:
+        model = AllBank
+        fields = '__all__'
+
 class ModeofTransactionForm(forms.ModelForm):
     class Meta:
         model = TransactionMode

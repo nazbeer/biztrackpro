@@ -267,6 +267,7 @@ class DailySummary(models.Model):
     purchase = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     supplier_payment = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     expense = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    withdrawal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     bank_deposit = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     closing_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)

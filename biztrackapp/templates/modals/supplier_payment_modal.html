@@ -16,9 +16,9 @@
                             <div class="form-group">
                                 <input type="hidden" name="business_profile" value="{{ business_profile }}">
                                 <input type="hidden" id="modal_daily_summary_id6" name="daily_summary_id">
-                              <label for="id_supplier">Supplier</label>
-                              <select id="id_supplier" name="supplier" class="form-control" tabindex="0">
-                                <option>-- Select Supplier --</option>
+                              <label for="id_supplier1">Supplier</label>
+                              <select id="id_supplier1" name="supplier" class="form-control" tabindex="0">
+                                <option value="0">-- Select Supplier --</option>
                                 {% for supplier in supplier_payments_form.supplier.field.queryset %}
                                   <option value="{{ supplier.id }}">{{ supplier.name }}</option>
                                 {% endfor %}
@@ -35,25 +35,27 @@
                                 <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="6">
                               </div>
                             </div>
-                              <div class="form-group">
+                            <div class="form-group">
+                              <div id="bank_detail1" class="d-none">
                                 <label for="id_bank">Bank</label>
                                 <select id="id_bank" name="bank" class="form-control" tabindex="8">
-                                  <option>-- Select Bank --</option>
+                                  <option value="">-- Select Bank --</option>
                                   {% for bank in supplier_payments_form.bank.field.queryset %}
                                     <option value="{{ bank.id }}">{{ bank.name }}</option>
                                   {% endfor %}
                                 </select>
                               </div>
+                            </div>
                           </div>
                           <div class="col-md-6">
                            
                             <div class="form-group">
-                                <label for="id_opening_outstanding">Opening Outstanding</label>
-                                <input type="number" id="id_opening_outstanding" name="opening_outstanding" class="form-control" step="0.01" tabindex="1">
+                                <label for="id_opening_outstanding1">Opening Outstanding</label>
+                                <input type="number" id="id_opening_outstanding1" name="opening_outstanding" class="form-control" step="0.01" tabindex="1" readonly>
                               </div>
                               <div class="form-group">
                                 <label for="id_mode_of_transaction">Payment Mode</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control" tabindex="2">
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="2">
                                   <option>-- Payment Mode --</option>
                                   {% for transaction_mode in supplier_payments_form.mode_of_transaction.field.queryset %}
                                     <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
@@ -64,6 +66,12 @@
                               <div id="chequeDetails1" class="d-none">
                             <div class="form-group">
                               <label for="id_cheque_date">Cheque Date</label>
+                              <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
+                            </div>
+                          </div>
+                          <div id="date_detail1" class="d-none">
+                            <div class="form-group">
+                              <label for="id_cheque_date"> Date</label>
                               <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="4">
                             </div>
                           </div>
@@ -80,3 +88,15 @@
         </div>
     </div>
 </div>
+<script>
+  document.getElementById('id_supplier1').addEventListener('change', function() {
+      var selectedSupplierId = this.value;
+      fetch(`/get_supplier_outstanding/${selectedSupplierId}/`)
+          .then(response => response.json())
+          .then(data => {
+          document.getElementById('id_opening_outstanding1').value = data.outstanding_amount
+
+          })
+          .catch(error => console.error('Error:', error));
+  });
+</script>

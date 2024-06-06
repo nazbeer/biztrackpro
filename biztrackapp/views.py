@@ -942,6 +942,14 @@ def save_after_submit(request):
 from datetime import date, datetime, timedelta
 from django.db.models import Max
 
+def get_supplier_outstanding(request,id):
+    try:
+        supplier_obj = Supplier.objects.get(id=id)
+        outstanding_amount = supplier_obj.outstanding
+    except Supplier.DoesNotExist:   
+        outstanding_amount = 0 
+    return JsonResponse({'outstanding_amount': outstanding_amount})
+
 def create_daily_summary(request):
     id = request.GET.get('id')
     today = date.today()

@@ -292,6 +292,10 @@ $(document).ready(function() {
         const chequeDetails = modal.find('#chequeDetails');
         const chequeDetails1 = modal.find('#chequeDetails1');
         const chequeDetails2 = modal.find('#chequeDetails2');
+        const bank_detail1 = modal.find('#bank_detail1');
+        const date_detail1 = modal.find('#date_detail1');
+
+
 
         
         if (modeOfTransactionSelect.length > 0) {
@@ -301,11 +305,34 @@ $(document).ready(function() {
                 chequeDetails.removeClass('d-none');
                 chequeDetails1.removeClass('d-none');
                 chequeDetails2.removeClass('d-none');
+                bank_detail1.removeClass('d-none');
+                date_detail1.addClass('d-none');
 
-            } else {
+
+            } else if(selectedMode ==='cash'|| selectedMode === 'credit') {
                 chequeDetails.addClass('d-none');
                 chequeDetails1.addClass('d-none');
                 chequeDetails2.addClass('d-none');
+                bank_detail1.addClass('d-none');
+                date_detail1.addClass('d-none');
+
+            }
+            else if(selectedMode === 'bank transfer'){
+                chequeDetails.addClass('d-none');
+                chequeDetails1.addClass('d-none');
+                chequeDetails2.addClass('d-none');
+                bank_detail1.removeClass('d-none');
+                date_detail1.removeClass('d-none');
+
+            }
+            else  {
+                chequeDetails.addClass('d-none');
+                chequeDetails1.addClass('d-none');
+                chequeDetails2.addClass('d-none');
+                bank_detail1.removeClass('d-none');
+                date_detail1.addClass('d-none');
+
+
 
             }
         }

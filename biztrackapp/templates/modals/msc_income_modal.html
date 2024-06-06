@@ -1,4 +1,4 @@
-<div class="modal fade" id="miscIncomeModal" tabindex="-1" aria-labelledby="miscIncomeModalLabel" aria-hidden="true">
+<div class="modal fade" id="miscIncomeModal" tabindex="-81" aria-labelledby="miscIncomeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header text-white bg-primary">
@@ -17,7 +17,7 @@
                                 <label for="id_receipt_type">Income Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="modal_daily_summary_id2" name="daily_summary_id">
-                                <select id="id_receipt_type" name="receipt_type" class="form-control" >
+                                <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="80"  >
                                     <option>-- Select Income Type --</option>
                                     {% for receipt_type in msc_income_form.receipt_type.field.queryset %}
                                         <option value="{{ receipt_type.id }}">{{ receipt_type.name }}</option>
@@ -26,19 +26,19 @@
                             </div>
                             <div class="form-group">
                                 <label for="id_amount">Amount</label>
-                                <input type="number" id="id_amount" name="amount" class="form-control"  >
+                                <input type="number" id="id_amount" name="amount" class="form-control" tabindex="82" >
                             </div>
                             <div id="chequeDetails1" class="d-none">
                             <div class="form-group">
                                 <label for="id_cheque_date">Cheque Date</label>
-                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" >
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="84" >
                             </div>
                         </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_mode_of_transaction">Mode of Transaction</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" >
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="81">
                                     <option>-- Mode of Transaction --</option>
                                     {% for transaction_mode in msc_income_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
@@ -48,7 +48,7 @@
                             <div id="chequeDetails2" class="d-none">
                             <div class="form-group">
                                 <label for="id_bank">Bank</label>
-                                <select id="id_bank" name="bank" class="form-control" >
+                                <select id="id_bank" name="bank" class="form-control" tabindex="83">
                                     <option value="">-- Select Bank --</option>
                                     {% for bank in msc_income_form.bank.field.queryset %}
                                         <option value="{{ bank.id }}">{{ bank.name }}</option>
@@ -59,7 +59,7 @@
                             <div id="chequeDetails" class="d-none">
                             <div class="form-group">
                                 <label for="id_cheque_no">Cheque Number</label>
-                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" >
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="85">
                             </div>
                         </div>
                         </div>
@@ -67,8 +67,8 @@
                     <div id="miscIncomeErrors" class="text-danger"></div>
                 </div>
                 <div class="modal-footer ">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="87">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="86">Save</button>
                 </div>
             </form>
         </div>

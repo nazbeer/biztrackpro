@@ -22,7 +22,7 @@
                             <label for="id_bank_deposit_bank">Deposit Bank</label>
                             <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500">
                               <option>-- Select Deposit Bank --</option>
-                              {% for banks in bank_deposit_form.bank.field.queryset %}
+                              {% for banks in bank_deposit_form.bank_deposit_bank.field.queryset %}
                                 <option value="{{ banks.id }}">{{ banks.name }}</option>
                               {% endfor %}
                             </select>

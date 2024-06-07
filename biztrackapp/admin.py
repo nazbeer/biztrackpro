@@ -112,13 +112,23 @@ class WithdrawalAdmin(admin.ModelAdmin):
 class AllBankAdmin(admin.ModelAdmin):
     list_display = ['id', 'name','created_on', 'update_on']
 
-admin.site.register(CreditCollection)
-admin.site.register(MiscellaneousIncome)
-admin.site.register(Purchase)
-admin.site.register(SupplierPayments)
+@admin.register(CreditCollection)
+class CreditCollectionAdmin(admin.ModelAdmin):
+    list_display = ['id','daily_summary_id', 'customer','payment_mode','amount', 'bank','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
+
+@admin.register(MiscellaneousIncome)
+class MiscellaneousIncomeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'daily_summary_id','mode_of_transaction','receipt_type','amount', 'bank','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
+@admin.register(Purchase)
+class PurchaseAdmin(admin.ModelAdmin):  
+    list_display = ['id','daily_summary_id', 'supplier','mode_of_transaction','invoice_date','invoice_no','invoice_amount', 'bank','cheque_date', 'cheque_no','business_profile', 'created_on', 'updated_on']
+
+@admin.register(SupplierPayments)
+class SupplierPaymentsAdmin(admin.ModelAdmin):
+    list_display = ['id','daily_summary_id', 'supplier','mode_of_transaction','amount', 'bank','business_profile','opening_outstanding','cheque_date', 'cheque_no', 'created_on', 'updated_on']
+
 admin.site.register(BusinessTiming)
 admin.site.register(Partners)
-
 
 
 

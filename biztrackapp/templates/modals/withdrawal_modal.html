@@ -16,31 +16,6 @@
                     <input type="hidden" name="business_profile" value="{{ business_profile }}">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="id_mode_of_transaction">Mode of Transaction</label>
-                            {% comment %} <select id="mode_of_transaction" name="mode_of_transaction" class="form-control">
-                                {% for mode in withdrawal_form.mode_of_transaction.field.queryset %}
-                                <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
-                                {% endfor %}
-                            </select> {% endcomment %}.
-                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize">
-                                <option>-- Mode of Transaction --</option>
-                                {% for transaction_mode in withdrawal_form.mode_of_transaction.field.queryset %}
-                                  <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
-                                {% endfor %}
-                              </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="id_withdrawal_date">Withdrawal Date</label>
-                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" >
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="id_amount">Amount</label>
-                            <input type="number" id="id_amount" name="amount" class="form-control">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <div id="chequeDetails2" class="d-none">
                             {% comment %} <label for="bank">Bank</label>
                             <select id="bank" name="bank" class="form-control">
                                 {% for bank in withdrawal_form.bank.field.queryset %}
@@ -54,8 +29,33 @@
                                 <option value="{{ bank.id }}">{{ bank.name }}</option>
                               {% endfor %}
                             </select>
+                    </div>
+                       
+                        <div class="form-group col-md-6">
+                            <label for="id_withdrawal_date">Withdrawal Date</label>
+                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" >
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="id_amount">Amount</label>
+                            <input type="number" id="id_amount" name="amount" class="form-control">
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="id_mode_of_transaction">Mode of Transaction</label>
+                            {% comment %} <select id="mode_of_transaction" name="mode_of_transaction" class="form-control">
+                                {% for mode in withdrawal_form.mode_of_transaction.field.queryset %}
+                                <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
+                                {% endfor %}
+                            </select> {% endcomment %}.
+                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize">
+                                <option>-- Mode of Transaction --</option>
+                                {% for transaction_mode in withdrawal_form.mode_of_transaction.field.queryset %}
+                                  <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                {% endfor %}
+                              </select>
+                        </div>
                         
                         <div class="form-group col-md-6">
                             <div id="chequeDetails" class="d-none">

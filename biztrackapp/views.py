@@ -1708,9 +1708,11 @@ def get_daily_summary_data(request,id):
 
 
 def create_all_banks(request):
-    for bank_name in BANK_CHOICES:
-        # print(bank_name)
-        # Check if the bank already exists
-        if not AllBank.objects.filter(name=bank_name[0]).exists():
-            AllBank.objects.create(name=bank_name[0])
-    return HttpResponse('all bank')
+    try:
+        for bank_name in BANK_CHOICES:
+            AllBank.objects.get_or_create(name=bank_name[0])
+        messages.success(request, 'All banks created successfully')
+        return redirect('bank_list')
+    except Exception as e:
+        messages.error(request, 'Failed to create banks')
+        return redirect('bank_list')

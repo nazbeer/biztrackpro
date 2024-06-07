@@ -20,7 +20,7 @@
                             <input type="hidden" id="modal_daily_summary_id1" name="daily_summary_id">
     
                             <label for="id_bank_deposit_bank">Deposit Bank</label>
-                            <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" >
+                            <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500">
                               <option>-- Select Deposit Bank --</option>
                               {% for banks in bank_deposit_form.bank.field.queryset %}
                                 <option value="{{ banks.id }}">{{ banks.name }}</option>
@@ -30,18 +30,18 @@
                      
                       <div class="form-group">
                         <label for="id_amount">Amount</label>
-                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" >
+                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="502">
                       </div>
                       <div id="chequeDetails" class="d-none">
                       <div class="form-group">
                         <label for="id_cheque_no">Cheque Number</label>
-                        <input type="text" id="id_cheque_no" name="cheque_no"placeholder="Enter Cheque Number" class="form-control" >
+                        <input type="text" id="id_cheque_no" name="cheque_no"placeholder="Enter Cheque Number" class="form-control"  tabindex="504" >
                       </div>
                       </div>
                       <div class="form-group">
                       <div id="bank_detail1" class="d-none">
                         <label for="id_bank">Bank</label>
-                        <select id="id_bank" name="bank" class="form-control" >
+                        <select id="id_bank" name="bank" class="form-control"  tabindex="506">
                           <option value="">-- Select Bank --</option>
                           {% for bank in bank_deposit_form.bank.field.queryset %}
                             <option value="{{ bank.id }}">{{ bank.name }}</option>
@@ -53,11 +53,11 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_deposit_date">Deposit Date</label>
-                            <input type="date" id="id_deposit_date" name="deposit_date" class="form-control" >
+                            <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="501" >
                           </div>
                       <div class="form-group">
                         <label for="id_mode_of_transaction">Payment Mode</label>
-                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" >
+                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="503">
                           <option>-- Payment Mode --</option>
                           {% for transaction_mode in bank_deposit_form.mode_of_transaction.field.queryset %}
                             <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
@@ -67,7 +67,7 @@
                       <div id="chequeDetails1" class="d-none">
                       <div class="form-group">
                         <label for="id_cheque_date">Cheque Date</label>
-                        <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" >
+                        <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="505" >
                       </div>
                       </div>
                      
@@ -76,8 +76,8 @@
                   <div id="bankDepositErrors" class="text-danger"></div>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary" id="saveBankDeposit">Save</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="509">Close</button>
+                  <button type="submit" class="btn btn-primary" id="saveBankDeposit" tabindex="508">Save</button>
               
                 </div>
               </form>

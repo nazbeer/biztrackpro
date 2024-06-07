@@ -31,14 +31,14 @@
                             <div id="chequeDetails1" class="d-none">
                             <div class="form-group">
                                 <label for="id_cheque_no">Cheque Number</label>
-                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="205">
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="204">
                             </div>
                         </div>
                         
                         <div class="form-group">
                                 <div id="bank_detail1" class="d-none">
                                 <label for="id_bank">Bank</label>
-                                <select id="id_bank" name="bank" class="form-control" tabindex="203">
+                                <select id="id_bank" name="bank" class="form-control" tabindex="206">
                                     <option value="">-- Select Bank --</option>
                                     {% for bank in expense_form.bank.field.queryset %}
                                         <option value="{{ bank.id }}">{{ bank.name }}</option>
@@ -50,11 +50,11 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_invoice_no">Invoice Number</label>
-                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="206">
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="201">
                             </div>
                             <div class="form-group">
                                 <label for="id_mode_of_transaction">Payment Mode</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="201">
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="203">
                                     <option>-- Payment Mode --</option>
                                     {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
@@ -65,7 +65,7 @@
                             <div id="chequeDetails" class="d-none">
                             <div class="form-group">
                                 <label for="id_cheque_date">Cheque Date</label>
-                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="204">
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="205">
                             </div>
                         </div>
                         </div>
@@ -73,8 +73,8 @@
                     <div id="addexpenseErrors" class="text-danger"></div>
                 </div>
                 <div class="modal-footer ">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="209">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="208">Save</button>
                 </div>
             </form>
         </div>

@@ -3,6 +3,14 @@
 {% block title %}Daily Summary List{% endblock %}
 
 {% block content %}
+<style>
+  span.dtr-data {
+    float: right !important;
+  }
+  div.dt-container .dt-search input{
+    border-radius: 1rem !important;
+  }
+</style>
 <div class="container">
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -12,21 +20,22 @@
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
-          <thead>
-            <tr>
+          <thead >
+            <tr style="border-radius: 15rem;">
               <th scope="col" class="text-center">#</th>
               <th scope="col">Date</th>
               <th scope="col">ID</th>
               
               <th scope="col">Op. Balance</th>
-              <th scope="col">Cash Sale</th>
+              <!-- <th scope="col">Cash Sale</th>
               <th scope="col">Credit Sale</th>
-              <th scope="col">Card Sale</th>
+              <th scope="col">Card Sale</th> -->
               <th scope="col">Sales</th>
               <th scope="col">Credit Colln.</th>
               <th scope="col">Msc. Income</th>
+              <th scope="col">Withdrawal</th>
               <th scope="col">Purchase</th>
-              <th scope="col">Sup. Payment</th>
+              <th scope="col">Sup. Pay.</th>
               <th scope="col">Expense</th>
               <th scope="col">Bank Deposit</th>
               <th scope="col">Cl. Balance</th>
@@ -50,20 +59,21 @@
                 </td>
                 
                 <td>{{ summary.opening_balance }}</td>
-                <td>{{ summary.cash_sale }}</td>
+                <!-- <td>{{ summary.cash_sale }}</td>
                 <td>{{ summary.credit_sale }}</td>
-                <td>{{ summary.card_sale }}</td>
+                <td>{{ summary.card_sale }}</td> -->
                 <td>{{ summary.sales }}</td>
                 <td>{{ summary.credit_collection }}</td>
                 <td>{{ summary.miscellaneous_income }}</td>
+                <td>{{ summary.withdrawal }}</td>
                 <td>{{ summary.purchase }}</td>
                 <td>{{ summary.supplier_payment }}</td>
                 <td>{{ summary.expense }}</td>
-                <td>{{ summary.bank_deposit }}</td>
-                <td>{{ summary.closing_balance }}</td>
-                <td>{{ summary.status }}</td>
-                <td>{{ summary.created_on }}</td>
-                <td>{{ summary.updated_on }}</td>
+                <td><span class="text-right">{{ summary.bank_deposit }}</span></td>
+                <td><span class="text-right">{{ summary.closing_balance }}</span></td>
+                <td><span  class="text-capitalize text-right">{{ summary.status }}</span></td>
+                <td><span class="text-right pl-2"> {{ summary.created_on }}</span></td>
+                <td><span class="text-right pl-2"> {{ summary.updated_on }}</span></td>
                 <td>
                   {% if summary.date == today  and summary.status == 'ongoing'  %}
                     <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" target="_blank" class="btn btn-primary btn-sm">Edit</a>

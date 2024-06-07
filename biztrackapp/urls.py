@@ -11,6 +11,7 @@ urlpatterns = [
     path('get_supplier_outstanding/<int:id>/',get_supplier_outstanding,name='get_supplier_outstanding' ),
 
 
+    path('create_all_banks/', create_all_banks, name='create_all_banks'),
 
     path('',login_view,name='login' ),
     path('logout/',logout_view,name='logout' ),

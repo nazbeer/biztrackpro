@@ -1705,3 +1705,12 @@ def get_daily_summary_data(request,id):
     closing_balance = last_daily_summary.closing_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
     print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
+
+
+def create_all_banks(request):
+    for bank_name in BANK_CHOICES:
+        # print(bank_name)
+        # Check if the bank already exists
+        if not AllBank.objects.filter(name=bank_name[0]).exists():
+            AllBank.objects.create(name=bank_name[0])
+    return HttpResponse('all bank')

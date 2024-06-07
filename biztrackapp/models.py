@@ -203,6 +203,7 @@ class Bank(models.Model):
     
 class AllBank(models.Model):
     name = models.CharField(max_length=255, choices=BANK_CHOICES)
+    status = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
     update_on = models.DateTimeField(auto_now=True, null=True)
 

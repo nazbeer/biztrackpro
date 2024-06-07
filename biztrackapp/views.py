@@ -845,17 +845,17 @@ def save_after_submit(request):
     total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
 
 
-    daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
+    # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
     # print('daily_summary_today', list(daily_summary_today.__dict__.values()))
 
-    if daily_summary_today:
-        closing_balance = (
-                    (Decimal(bankdata) + daily_summary_today.sales + daily_summary_today.bank_deposit +
-                    daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
-                    (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
-                )
-    else:
-        closing_balance = bankdata or 0
+    # if daily_summary_today:
+    #     closing_balance = (
+    #                 (Decimal(bankdata) + daily_summary_today.sales + daily_summary_today.bank_deposit +
+    #                 daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
+    #                 (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
+    #             )
+    # else:
+    closing_balance = bankdata or 0
     return render(request, 'edit_daily_summary.html', {
         'business_profile': business_profile.id,
         'today': today,

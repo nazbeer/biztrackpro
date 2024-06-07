@@ -25,6 +25,14 @@
         }
       
     });
+  
+    window.addEventListener('beforeunload', (event) => {
+        const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
+        event.preventDefault();
+        event.returnValue = message; // For modern browsers
+        return message; // For older browsers
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
                 // const toggleBank = document.getElementById("toggleBank");
                 // const toggleBankContent = document.getElementById("toggleBankContent");
@@ -188,16 +196,49 @@
             const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
             const chequeDetails = modal.find('#chequeDetails');
             const chequeDetails1 = modal.find('#chequeDetails1');
+            const chequeDetails2 = modal.find('#chequeDetails2');
+            const bank_detail1 = modal.find('#bank_detail1');
+            const date_detail1 = modal.find('#date_detail1');
+    
+    
+    
             
             if (modeOfTransactionSelect.length > 0) {
                 const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
                 
-                if (selectedMode === 'cheque') {
+                if (selectedMode === 'cheque' ) {
                     chequeDetails.removeClass('d-none');
                     chequeDetails1.removeClass('d-none');
-                } else {
+                    chequeDetails2.removeClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.addClass('d-none');
+    
+    
+                } else if(selectedMode ==='cash'|| selectedMode === 'credit') {
                     chequeDetails.addClass('d-none');
                     chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.addClass('d-none');
+                    date_detail1.addClass('d-none');
+    
+                }
+                else if(selectedMode === 'bank transfer'){
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.removeClass('d-none');
+    
+                }
+                else  {
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.addClass('d-none');
+    
+    
+    
                 }
             }
         }
@@ -234,7 +275,8 @@
         setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
     });
     
-</script>
+    </script>
+    
 <script>
     function get_closing_balance() {
         // Modify the function to accept the selected date as a parameter

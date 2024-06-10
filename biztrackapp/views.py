@@ -741,7 +741,7 @@ def save_after_submit(request):
 
 
 
-            net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+            net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
             net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
             bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
             print('net_collection',net_collection)
@@ -750,7 +750,7 @@ def save_after_submit(request):
             print('withdrawal_total',withdrawal_total)
 
             print('opening_balance',instance.opening_balance)
-            closing_balance = instance.opening_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
+            closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
             print('closing_balance',closing_balance)
             instance.closing_balance = closing_balance
 
@@ -1068,7 +1068,7 @@ def create_daily_summary(request):
 
 
 
-                net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+                net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
                 net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
                 bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
                 print('net_collection',net_collection)
@@ -1077,7 +1077,7 @@ def create_daily_summary(request):
                 print('withdrawal_total',withdrawal_total)
 
                 print('opening_balance',instance.opening_balance)
-                closing_balance = instance.opening_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
+                closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
                 print('closing_balance',closing_balance)
                 instance.closing_balance = closing_balance
 
@@ -1717,7 +1717,7 @@ def get_daily_summary_data(request,id):
 
 
 
-    net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount
+    net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
     net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
     bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
 
@@ -1732,7 +1732,7 @@ def get_daily_summary_data(request,id):
         last_daily_summary = business_profile.opening_balance
 
     print('opening_balance',last_daily_summary.closing_balance)
-    closing_balance = last_daily_summary.closing_balance + withdrawal_total + net_collection - net_payment - bank_deposit_collection
+    closing_balance = last_daily_summary.closing_balance + net_collection - net_payment - bank_deposit_collection
     print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
 

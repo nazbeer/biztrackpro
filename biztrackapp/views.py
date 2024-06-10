@@ -1780,9 +1780,7 @@ class DailyCollectionReportAPIView(APIView):
 
         # Fetch summaries
         summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
-        opening_summary = DailySummary.objects.filter(date__lt=start_date, business_profile=business_profile.id).order_by('-created_on').first()
-        # print(opening_summary.opening_balance)
-        opening_balance = opening_summary.opening_balance if opening_summary else 0
+      
 
         # Initialize totals
         total_opening_balance = 0
@@ -1791,6 +1789,10 @@ class DailyCollectionReportAPIView(APIView):
         total_bank_deposits = 0
         total_closing_balance = 0
 
+        opening_summary = DailySummary.objects.filter(date__lt=start_date, business_profile=business_profile.id).order_by('-date').first()
+        # print(opening_summary.opening_balance)
+        opening_balance = opening_summary.opening_balance if opening_summary else 0
+
         for summary in summaries:
             total_opening_balance = opening_balance or 0
             total_net_collections += summary.credit_collection or 0
@@ -1798,7 +1800,7 @@ class DailyCollectionReportAPIView(APIView):
             total_bank_deposits += summary.bank_deposit or 0
             total_closing_balance = summary.closing_balance or 0
 
-        total_closing_balance = opening_balance + total_net_collections - total_net_payments - total_bank_deposits
+        total_closing_balance = (opening_balance + total_net_collections) - (total_net_payments + total_bank_deposits)
 
         report_data = {
             'start_date': start_date,

@@ -9,6 +9,7 @@ urlpatterns = [
     path('edit/',save_after_submit,name='save_after_submit' ),
     path('get_closing_balance/<str:id>/',get_daily_summary_data,name='get_closing_balance' ),
     path('get_supplier_outstanding/<int:id>/',get_supplier_outstanding,name='get_supplier_outstanding' ),
+    path('get_customer_outstanding/<int:id>/',get_customer_outstanding,name='get_customer_outstanding' ),
 
 
     path('create_all_banks/', create_all_banks, name='create_all_banks'),

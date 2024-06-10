@@ -1,75 +1,93 @@
 <div class="modal fade" id="creditCollectionModal" tabindex="110" aria-labelledby="creditCollectionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header  text-white">
-          <h5 class="modal-title text-white" id="creditCollectionModalLabel">Add Credit Collection</h5>
-          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form id="creditCollectionForm" method="post" action="{% url 'create_credit_collection' %}">
-          <div class="modal-body">
-            {% csrf_token %}
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="id_customer">Customer</label>
-                  <input type="hidden" name="business_profile" value={{business_profile}}>
-                  <input type="hidden" id="modal_daily_summary_id3" name="daily_summary_id">
-                  <select id="id_customer" name="customer" class="form-control" tabindex="111">
-                    <option>-- Select Customer --</option>
-                    {% for customer in credit_collection_form.customer.field.queryset %}
-                      <option value="{{ customer.id }}">{{ customer.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="id_amount">Amount</label>
-                  <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="113">
-                </div>
-                <div id="chequeDetails1" class="d-none">
-                <div class="form-group">
-                  <label for="id_cheque_date">Cheque Date</label>
-                  <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="115">
-                </div>
-              </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="id_mode_of_transaction">Payment Mode</label>
-                  <select id="id_mode_of_transaction" name="payment_mode" class="form-control text-capitalize" tabindex="112">
-                    <option>-- Select Payment Mode --</option>
-                    {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
-                      <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <div id="chequeDetails2" class="d-none">
-                <div class="form-group">
-                  <label for="id_bank">Bank</label>
-                  <select id="id_bank" name="bank" class="form-control" tabindex="114">
-                    <option value="">-- Select Bank --</option>
-                    {% for bank in credit_collection_form.bank.field.queryset %}
-                      <option value="{{ bank.id }}">{{ bank.name }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-                <div id="chequeDetails" class="d-none">
-                <div class="form-group">
-                  <label for="id_cheque_no">Cheque Number</label>
-                  <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="116">
-                </div>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="118">Close</button>
-            <button type="submit" class="btn btn-primary" tabindex="117">Save</button>
-          </div>
-        </form>
-      </div>
+   <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+    <div class="modal-header text-white">
+     <h5 class="modal-title text-white" id="creditCollectionModalLabel">Add Credit Collection</h5>
+     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+     <span aria-hidden="true">&times;</span>
+     </button>
     </div>
-  </div>
+    <form id="creditCollectionForm" method="post" action="{% url 'create_credit_collection' %}">
+     <div class="modal-body">
+     {% csrf_token %}
+     <div class="row">
+      <div class="col-md-6">
+      <div class="form-group">
+       <label for="id_customer1">Customer</label>
+       <input type="hidden" name="business_profile" value={{business_profile}}>
+       <input type="hidden" id="modal_daily_summary_id3" name="daily_summary_id">
+       <select id="id_customer1" name="customer" class="form-control" tabindex="111">
+       <option>-- Select Customer --</option>
+       {% for customer in credit_collection_form.customer.field.queryset %}
+        <option value="{{ customer.id }}">{{ customer.name }}</option>
+       {% endfor %}
+       </select>
+      </div>
+      <div class="form-group">
+       <label for="id_amount">Amount</label>
+       <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="113">
+      </div>
+      <div id="chequeDetails1" class="d-none">
+      <div class="form-group">
+       <label for="id_cheque_date">Cheque Date</label>
+       <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="115">
+      </div>
+      </div>
+      <div id="chequeDetails2" class="d-none">
+      <div class="form-group">
+       <label for="id_bank">Bank</label>
+       <select id="id_bank" name="bank" class="form-control" tabindex="117">
+       <option value="">-- Select Bank --</option>
+       {% for bank in credit_collection_form.bank.field.queryset %}
+        <option value="{{ bank.id }}">{{ bank.name }}</option>
+       {% endfor %}
+       </select>
+      </div>
+      </div>
+      </div>
+      <div class="col-md-6">
+      <div class="form-group">
+       <label for="id_opening_outstanding1">Opening Outstanding</label>
+       <input type="number" id="id_opening_outstanding2" name="opening_outstanding" class="form-control" step="0.01" readonly tabindex="112">
+      </div>
+      <div class="form-group">
+       <label for="id_mode_of_transaction">Payment Mode</label>
+       <select id="id_mode_of_transaction" name="payment_mode" class="form-control text-capitalize" tabindex="114">
+       <option>-- Select Payment Mode --</option>
+       {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
+        <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
+       {% endfor %}
+       </select>
+      </div>
+     
+      <div id="chequeDetails" class="d-none">
+      <div class="form-group">
+       <label for="id_cheque_no">Cheque Number</label>
+       <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="116">
+      </div>
+      </div>
+  
+     </div>
+     </div>
+     </div>
+     <div class="modal-footer">
+     <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="120">Close</button>
+     <button type="submit" class="btn btn-primary" tabindex="119">Save</button>
+     </div>
+    </form>
+    </div>
+   </div>
+   </div>
+   <script>
+   document.getElementById('id_customer1').addEventListener('change', function() {
+    var selectedCustomerId = this.value;
+    fetch(`/get_customer_outstanding/${selectedCustomerId}/`)
+     .then(response => response.json())
+     .then(data => {
+     document.getElementById('id_opening_outstanding2').value = data.outstanding_amount
+   
+     })
+     .catch(error => console.error('Error:', error));
+   });
+   </script>
   

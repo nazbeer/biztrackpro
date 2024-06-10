@@ -950,6 +950,14 @@ def get_supplier_outstanding(request,id):
         outstanding_amount = 0 
     return JsonResponse({'outstanding_amount': outstanding_amount})
 
+def get_customer_outstanding(request, id):
+    try:
+        customer_obj = Customer.objects.get(id=id)
+        outstanding_amount = customer_obj.outstanding
+    except Customer.DoesNotExist:
+        outstanding_amount = 0
+    return JsonResponse({'outstanding_amount': outstanding_amount})
+
 def create_daily_summary(request):
     id = request.GET.get('id')
     today = date.today()
@@ -1299,7 +1307,13 @@ def create_bank_sale(request):
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            if form.mode_of_transaction.name == 'credit':
+                customer = form.customer
+                customer.outstanding = customer.outstanding + form.amount
+                customer.save()
             form.save()
+
             # return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
@@ -1332,7 +1346,12 @@ def create_credit_collection(request):
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            customer = form.customer
+            customer.outstanding = customer.outstanding - form.amount
+            customer.save()
             form.save()
+
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
@@ -1396,7 +1415,13 @@ def create_purchase(request):
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            if form.mode_of_transaction.name == 'credit':
+                supplier = form.supplier
+                supplier.outstanding = supplier.outstanding + form.invoice_amount
+                supplier.save()
             form.save()
+
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
@@ -1427,7 +1452,12 @@ def create_supplier_payment(request):
             form = form.save(commit=False)
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            supplier = form.supplier
+            supplier.outstanding = supplier.outstanding - form.amount
+            supplier.save() 
             form.save()
+
             # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')

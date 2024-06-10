@@ -1782,7 +1782,7 @@ class DailyCollectionReportAPIView(APIView):
 
         # Fetch summaries
         summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
-      
+        
         op_bal = DailySummary.objects.filter(date__gte=start_date, business_profile=business_profile.id).first()
         cl_bal = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id).last()
         # print('cls',cl_bal.values_list('date','opening_balance', 'closing_balance'))
@@ -1800,8 +1800,8 @@ class DailyCollectionReportAPIView(APIView):
 
         for summary in summaries:
             # total_opening_balance = summary.opening_balance or 0
-            total_net_collections += summary.credit_collection or 0
-            total_net_payments += summary.purchase or 0
+            total_net_collections += summary.credit_collection or 0 
+            total_net_payments += (summary.purchase + summary.expense + summary.supplier_payment) or 0 # add the other tables
             total_bank_deposits += summary.bank_deposit or 0
             total_closing_balance = summary.closing_balance or 0
 
@@ -1819,7 +1819,7 @@ class DailyCollectionReportAPIView(APIView):
                 {
                     'date': summary.date,
                     'net_collections': summary.credit_collection or 0,
-                    'net_payments': summary.purchase or 0,
+                    'net_payments': (summary.purchase + summary.expense + summary.supplier_payment) or 0,
                     'bank_deposits': summary.bank_deposit or 0,
                     'opening_balance': summary.opening_balance,
                     'closing_balance': summary.closing_balance

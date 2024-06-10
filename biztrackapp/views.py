@@ -1766,6 +1766,7 @@ class DailyCollectionReportView(View):
 class DailyCollectionReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
+        print('start date1', start_date)
         end_date = request.GET.get('end_date')
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
@@ -1777,39 +1778,43 @@ class DailyCollectionReportAPIView(APIView):
         # Parse dates and add timezone info
         start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+        print('end date', end_date)
 
         # Fetch summaries
         summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
       
-
+        op_bal = DailySummary.objects.filter(date__gte=start_date, business_profile=business_profile.id).first()
+        cl_bal = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id).last()
+        # print('cls',cl_bal.values_list('date','opening_balance', 'closing_balance'))
+        # print(cl_bal.closing_balance)
         # Initialize totals
-        total_opening_balance = 0
+        # total_opening_balance = 0
         total_net_collections = 0
         total_net_payments = 0
         total_bank_deposits = 0
         total_closing_balance = 0
 
-        opening_summary = DailySummary.objects.filter(date__lt=start_date, business_profile=business_profile.id).order_by('-date').first()
-        # print(opening_summary.opening_balance)
-        opening_balance = opening_summary.opening_balance if opening_summary else 0
+        opening_summary = DailySummary.objects.filter(date__lte=start_date, business_profile=business_profile.id).order_by('date').first()
+     
+        opening_balance1 = opening_summary.opening_balance if opening_summary else 0
 
         for summary in summaries:
-            total_opening_balance = opening_balance or 0
+            # total_opening_balance = summary.opening_balance or 0
             total_net_collections += summary.credit_collection or 0
             total_net_payments += summary.purchase or 0
             total_bank_deposits += summary.bank_deposit or 0
             total_closing_balance = summary.closing_balance or 0
 
-        total_closing_balance = (opening_balance + total_net_collections) - (total_net_payments + total_bank_deposits)
+        total_closing_balance = (opening_balance1 + total_net_collections) - (total_net_payments + total_bank_deposits)
 
         report_data = {
             'start_date': start_date,
             'end_date': end_date,
-            'opening_balance': total_opening_balance,
+            'opening_balance': op_bal.opening_balance or 0, #change here
             'net_collections': total_net_collections,
             'net_payments': total_net_payments,
             'bank_deposits': total_bank_deposits,
-            'closing_balance': total_closing_balance,
+            'closing_balance': summary.closing_balance,
             'details': [
                 {
                     'date': summary.date,

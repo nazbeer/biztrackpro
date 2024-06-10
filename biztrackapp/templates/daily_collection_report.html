@@ -62,7 +62,8 @@ document.getElementById('report-form').addEventListener('submit', function(event
     fetch(`/api/daily-collection-report/?start_date=${startDate}&end_date=${endDate}`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log('data',data);
+            
             document.getElementById('report-results').classList.remove('d-none');
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');

@@ -1,0 +1,53 @@
+<!-- templates/pdf_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Collection Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        th { background-color: #f2f2f2; }
+        h2 { text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>Daily Collection Report</h2>
+    <p><strong>Date Range:</strong> {{ data.start_date }} to {{ data.end_date }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Opening Balance</th>
+                <th>Net Collection</th>
+                <th>Net Payment</th>
+                <th>Bank Deposit</th>
+                <th>Closing Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in data.details %}
+                <tr>
+                    <td>{{ detail.date }}</td>
+                    <td>{{ detail.opening_balance }}</td>
+                    <td>{{ detail.net_collections }}</td>
+                    <td>{{ detail.net_payments }}</td>
+                    <td>{{ detail.bank_deposits }}</td>
+                    <td>{{ detail.closing_balance }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Totals</th>
+                <th>{{ data.opening_balance }}</th>
+                <th>{{ data.net_collections }}</th>
+                <th>{{ data.net_payments }}</th>
+                <th>{{ data.bank_deposits }}</th>
+                <th>{{ data.closing_balance }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

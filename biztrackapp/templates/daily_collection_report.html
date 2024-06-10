@@ -1,0 +1,100 @@
+<!-- templates/daily_collection_report.html -->
+{% extends 'base.html' %}
+
+{% block title %}Daily Collection Report{% endblock %}
+
+{% block content %}
+<div class="container ">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="text-white mb-0">Daily Collection Report</h5>
+        </div>
+        <div class="card-body">
+            <form id="report-form" class="form-inline">
+                <div class="row  d-flex justify-content-between align-items-center">
+                    <div class="col-md-4">
+                        <div class="form-group mr-2">
+                            <label for="start_date" class="mr-2">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mr-2">
+                            <label for="end_date" class="mr-2">End Date</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mr-2 mt-2">
+                            <button type="submit" class="btn btn-primary">Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div id="report-results" class="mt-4 d-none">
+                <h5 class="text-dark">Report Results</h5>
+                <table class="table table-bordered table-striped text-right">
+                    <thead >
+                        <tr >
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Date</th>
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Opening Balance</th>
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Collection</th>
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Payment</th>
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Bank Deposit</th>
+                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Closing Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-body"></tbody>
+                    <tfoot id="report-footer"></tfoot>
+                </table>
+                <button id="download-pdf-cc" class="btn btn-success mt-2">Download PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('report-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    fetch(`/api/daily-collection-report/?start_date=${startDate}&end_date=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            document.getElementById('report-results').classList.remove('d-none');
+            const reportBody = document.getElementById('report-body');
+            const reportFooter = document.getElementById('report-footer');
+
+            reportBody.innerHTML = data.details.map(detail => `
+                <tr>
+                    <td>${detail.date}</td>
+                    <td>${detail.opening_balance}</td>
+                    <td>${detail.net_collections}</td>
+                    <td>${detail.net_payments}</td>
+                    <td>${detail.bank_deposits}</td>
+                    <td>${detail.closing_balance}</td>
+                </tr>
+            `).join('');
+
+            reportFooter.innerHTML = `
+                <tr style="background-color: #8a8a8a !important;">
+                    <th colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;">Totals</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.opening_balance}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_collections}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_payments}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.bank_deposits}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.closing_balance}</th>
+                </tr>
+            `;
+        });
+});
+document.getElementById('download-pdf-cc').addEventListener('click', function() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    window.location.href = `/download-pdf-cc/?start_date=${startDate}&end_date=${endDate}`;
+});
+
+</script>
+{% endblock %}

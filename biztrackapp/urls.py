@@ -90,6 +90,12 @@ urlpatterns = [
 
     path('fetch_cheque_numbers/', fetch_cheque_numbers, name='fetch_cheque_numbers'),
 
+    path('daily-collection-report/', DailyCollectionReportView.as_view(), name='daily_collection_report'),
+    path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
+    #API Views
+
+    path('api/daily-collection-report/', DailyCollectionReportAPIView.as_view(), name='daily_collection_report_api'),
+
 ]
 # handler404 = 'custom_404_view'
 if settings.DEBUG:

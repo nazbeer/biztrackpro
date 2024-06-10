@@ -11,8 +11,19 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.db.models import Count, Sum, Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+
 from django.views import View
+from django.utils import timezone
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+from rest_framework.request import Request
+
+
 def index(request):
     print('re',request.user)
     user = request.user
@@ -1746,3 +1757,87 @@ def create_all_banks(request):
     except Exception as e:
         messages.error(request, 'Failed to create banks')
         return redirect('bank_list')
+
+
+class DailyCollectionReportView(View):
+    def get(self, request):
+        return render(request, 'daily_collection_report.html')
+
+class DailyCollectionReportAPIView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        if not start_date or not end_date:
+            return Response({'error': 'Please provide start and end dates'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Parse dates and add timezone info
+        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        # Fetch summaries
+        summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
+        opening_summary = DailySummary.objects.filter(date__lt=start_date, business_profile=business_profile.id).order_by('-created_on').first()
+        # print(opening_summary.opening_balance)
+        opening_balance = opening_summary.opening_balance if opening_summary else 0
+
+        # Initialize totals
+        total_opening_balance = 0
+        total_net_collections = 0
+        total_net_payments = 0
+        total_bank_deposits = 0
+        total_closing_balance = 0
+
+        for summary in summaries:
+            total_opening_balance = opening_balance or 0
+            total_net_collections += summary.credit_collection or 0
+            total_net_payments += summary.purchase or 0
+            total_bank_deposits += summary.bank_deposit or 0
+            total_closing_balance = summary.closing_balance or 0
+
+        total_closing_balance = opening_balance + total_net_collections - total_net_payments - total_bank_deposits
+
+        report_data = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'opening_balance': total_opening_balance,
+            'net_collections': total_net_collections,
+            'net_payments': total_net_payments,
+            'bank_deposits': total_bank_deposits,
+            'closing_balance': total_closing_balance,
+            'details': [
+                {
+                    'date': summary.date,
+                    'net_collections': summary.credit_collection or 0,
+                    'net_payments': summary.purchase or 0,
+                    'bank_deposits': summary.bank_deposit or 0,
+                    'opening_balance': summary.opening_balance,
+                    'closing_balance': summary.closing_balance
+                } for summary in summaries
+            ]
+        }
+
+        return JsonResponse(report_data)
+
+
+def download_pdf_cc(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    api_request = Request(request)
+    api_view = DailyCollectionReportAPIView.as_view()
+    api_response = api_view(api_request)
+    report_data = api_response.data
+    html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
+
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        HTML(string=html_string).write_pdf(output)
+        output.seek(0)
+        pdf = output.read()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="daily_collection_report_{start_date}_to_{end_date}.pdf"'
+    return response

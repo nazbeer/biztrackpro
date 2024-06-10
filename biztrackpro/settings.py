@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 'bootstrap_daterangepicker',
-
+    "rest_framework",
     'biztrackapp',
 ]
 

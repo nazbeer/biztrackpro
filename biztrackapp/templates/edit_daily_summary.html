@@ -139,57 +139,6 @@
     });
 </script>
 <script>
-{% comment %}      
-    $(document).ready(function() {
-        $('#bankDepositModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id1').value = dailySummaryId;
-            $('#modal_daily_summary_id1').val(dailySummaryId);
-        });
-        $('#miscIncomeModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
-            $('#modal_daily_summary_id2').val(dailySummaryId);
-        });
-        $('#creditCollectionModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
-            $('#modal_daily_summary_id3').val(dailySummaryId);
-        });
-        $('#bankSaleModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
-            $('#modal_daily_summary_id4').val(dailySummaryId);
-        });
-        $('#purchaseModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
-            $('#modal_daily_summary_id5').val(dailySummaryId);
-        });
-        $('#supplierPaymentModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
-            $('#modal_daily_summary_id6').val(dailySummaryId);
-        });
-        $('#expenseModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
-            $('#modal_daily_summary_id7').val(dailySummaryId);
-        });
-        $('#withdrawalModal').on('show.bs.modal', function (event) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var dailySummaryId = urlParams.get('id');
-            document.getElementById('modal_daily_summary_idw').value = dailySummaryId;
-            $('#modal_daily_summary_idw').val(dailySummaryId);
-        });
-    }); {% endcomment %}
     $(document).ready(function() {
         function toggleChequeDetails() {
             const modal = $('.modal.show'); // Get the currently shown modal
@@ -199,10 +148,6 @@
             const chequeDetails2 = modal.find('#chequeDetails2');
             const bank_detail1 = modal.find('#bank_detail1');
             const date_detail1 = modal.find('#date_detail1');
-    
-    
-    
-            
             if (modeOfTransactionSelect.length > 0) {
                 const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
                 
@@ -236,8 +181,6 @@
                     chequeDetails2.addClass('d-none');
                     bank_detail1.removeClass('d-none');
                     date_detail1.addClass('d-none');
-    
-    
     
                 }
             }

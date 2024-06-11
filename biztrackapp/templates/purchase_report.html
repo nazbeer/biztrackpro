@@ -1,13 +1,12 @@
-<!-- templates/daily_collection_report.html -->
 {% extends 'base.html' %}
 
-{% block title %}Daily Collection Report{% endblock %}
+{% block title %}Purchase Report{% endblock %}
 
 {% block content %}
 <div class="container ">
     <div class="card">
         <div class="card-header">
-            <h5 class="text-white mb-0">Daily Collection Report</h5>
+            <h5 class="text-white mb-0">Purchase Report</h5>
         </div>
         <div class="card-body">
             <form id="report-form" class="form-inline">
@@ -32,22 +31,26 @@
                 </div>
             </form>
             <div id="report-results" class="mt-4 d-none">
-                <div class="text-center"><h5 class="text-dark">Report Results</h5></div>
+                <div class="text-center">
+                <h5 class="text-dark">Report Results</h5>
+                <p class="d-none">Date: <span id="report-date-range"></span></p>
+            </div>
                 <table class="table table-bordered table-striped text-center">
-                    <thead >
-                        <tr >
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Date</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Opening Balance</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Collection</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Payment</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Bank Deposit</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Closing Balance</th>
+                    <thead>
+                        <tr>
+                            <th style="background-color: #8a8a8a; text-align:center;">Date</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Cash</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Credit</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Card</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Bank Transfer</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Credit Card</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Total</th>
                         </tr>
                     </thead>
                     <tbody id="report-body"></tbody>
                     <tfoot id="report-footer"></tfoot>
                 </table>
-                <button id="download-pdf-cc" class="btn btn-success mt-2">Download PDF</button>
+                <button id="download-pdf-pr" class="btn btn-success mt-2">Download PDF</button>
             </div>
         </div>
     </div>
@@ -59,52 +62,54 @@ document.getElementById('report-form').addEventListener('submit', function(event
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
 
-    fetch(`/api/daily-collection-report/?start_date=${startDate}&end_date=${endDate}`)
+    fetch(`/api/purchase-report/?start_date=${startDate}&end_date=${endDate}`)
         .then(response => response.json())
         .then(data => {
-            // console.log('data',data);
-            
             document.getElementById('report-results').classList.remove('d-none');
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');
+            const reportDateRange = document.getElementById('report-date-range');
+
+            reportDateRange.textContent = `${startDate} - ${endDate}`;
+
             reportBody.innerHTML = data.details.map(detail => {
                 const date = new Date(detail.date);
                 const formattedDate = date.toLocaleDateString('en-UK', {
+                    
                     day: '2-digit',
-                    month: 'short',
+                    month: 'long',
                     year: 'numeric'
                 });
-
                 return `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td>${detail.opening_balance}</td>
-                        <td>${detail.net_collections}</td>
-                        <td>${detail.net_payments}</td>
-                        <td>${detail.bank_deposits}</td>
-                        <td>${detail.closing_balance}</td>
+                        <td>${detail.cash}</td>
+                        <td>${detail.credit}</td>
+                        <td>${detail.card}</td>
+                        <td>${detail.bank_transfer}</td>
+                        <td>${detail.credit_card}</td>
+                        <td>${detail.total}</td>
                     </tr>
                 `;
             }).join('');
-
-
             reportFooter.innerHTML = `
-                <tr style="background-color: #8a8a8a !important;">
+                <tr style="background-color: #8a8a8a  !important;;">
                     <th colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;">Totals</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.opening_balance}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_collections}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_payments}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.bank_deposits}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.closing_balance}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_cash}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_card}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_bank_transfer}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit_card}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_amount}</th>
                 </tr>
             `;
         });
 });
-document.getElementById('download-pdf-cc').addEventListener('click', function() {
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-    window.location.href = `/download-pdf-cc/?start_date=${startDate}&end_date=${endDate}`;
-});
 
+// document.getElementById('download-pdf-pr').addEventListener('click', function() {
+//     const startDate = document.getElementById('start_date').value;
+//     const endDate = document.getElementById('end_date').value;
+//     window.location.href = `/download-pdf-pr/?start_date=${startDate}&end_date=${endDate}`;
+// });
 </script>
 {% endblock %}

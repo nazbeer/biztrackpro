@@ -8,7 +8,7 @@ from django.urls import reverse,reverse_lazy
 from .forms import *
 from django.contrib import messages
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
@@ -1763,6 +1763,47 @@ class DailyCollectionReportView(View):
     def get(self, request):
         return render(request, 'daily_collection_report.html')
 
+
+class SalesReportView(View):
+    def get(self, request):
+        return render(request, 'sales_report.html')
+
+
+class PurchaseReportView(View):
+    def get(self, request):
+        return render(request, 'purchase_report.html')
+
+
+class BankStatementView(View):
+    def get(self, request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        banks = Bank.objects.filter(business_profile=business_profile.id)
+        return render(request, 'bank_statement.html', {'banks': banks})
+
+
+
+def download_pdf_cc(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    api_request = Request(request)
+    api_view = DailyCollectionReportAPIView.as_view()
+    api_response = api_view(api_request)
+    report_data = api_response.data
+    html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
+
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        # HTML(string=html_string).write_pdf(output)
+        output.seek(0)
+        pdf = output.read()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="daily_collection_report_{start_date}_to_{end_date}.pdf"'
+    return response
+
 class DailyCollectionReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -1830,21 +1871,213 @@ class DailyCollectionReportAPIView(APIView):
         return JsonResponse(report_data)
 
 
-def download_pdf_cc(request):
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
 
-    api_request = Request(request)
-    api_view = DailyCollectionReportAPIView.as_view()
-    api_response = api_view(api_request)
-    report_data = api_response.data
-    html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
+class SalesReportAPIView(APIView):
 
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        # HTML(string=html_string).write_pdf(output)
-        output.seek(0)
-        pdf = output.read()
+    def get(self, request, *args, **kwargs):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            except ValueError:
+                return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="daily_collection_report_{start_date}_to_{end_date}.pdf"'
-    return response
+            # Fetch and aggregate data
+            sales_data = (
+                BankSales.objects.filter(created_on__date__range=[start_date, end_date], business_profile=business_profile.id)
+                .values('created_on__date')
+                .annotate(
+                    cash=Sum('amount', filter=Q(mode_of_transaction__name='cash')),
+                    credit=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
+                    card=Sum('amount', filter=Q(mode_of_transaction__name='card')),
+                    bank_transfer=Sum('amount', filter=Q(mode_of_transaction__name='bank transfer')),
+                    credit_card=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
+                    total=Sum('amount')
+                )
+                .order_by('created_on__date')
+            )
+            print('sales', sales_data)
+            report_details = [
+                {
+                    'date': sale['created_on__date'],
+                    'cash': sale['cash'] or 0,
+                    'credit': sale['credit'] or 0,
+                    'card': sale['card'] or 0,
+                    'bank_transfer': sale['bank_transfer'] or 0,
+                    'credit_card': sale['credit_card'] or 0,
+                    'total': sale['total'] or 0
+                } for sale in sales_data
+            ]
+
+            summary = {
+                'total_cash': sum(sale['cash'] for sale in report_details),
+                'total_credit': sum(sale['credit'] for sale in report_details),
+                'total_card': sum(sale['card'] for sale in report_details),
+                'total_bank_transfer': sum(sale['bank_transfer'] for sale in report_details),
+                'total_credit_card': sum(sale['credit_card'] for sale in report_details),
+                'total_amount': sum(sale['total'] for sale in report_details)
+            }
+
+            return Response({
+                'details': report_details,
+                'summary': summary
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class PurchaseReportAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            except ValueError:
+                return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Fetch and aggregate data
+            sales_data = (
+                Purchase.objects.filter(created_on__date__range=[start_date, end_date], business_profile=business_profile.id)
+                .values('created_on__date')
+                .annotate(
+                    cash=Sum('invoice_amount', filter=Q(mode_of_transaction__name='cash')),
+                    credit=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),
+                    card=Sum('invoice_amount', filter=Q(mode_of_transaction__name='card')),
+                    bank_transfer=Sum('invoice_amount', filter=Q(mode_of_transaction__name='bank transfer')),
+                    credit_card=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),
+                    total=Sum('invoice_amount')
+                )
+                .order_by('created_on__date')
+            )
+            print('purchase', sales_data)
+            report_details = [
+                {
+                    'date': sale['created_on__date'],
+                    'cash': sale['cash'] or 0,
+                    'credit': sale['credit'] or 0,
+                    'card': sale['card'] or 0,
+                    'bank_transfer': sale['bank_transfer'] or 0,
+                    'credit_card': sale['credit_card'] or 0,
+                    'total': sale['total'] or 0
+                } for sale in sales_data
+            ]
+
+            summary = {
+                'total_cash': sum(sale['cash'] for sale in report_details),
+                'total_credit': sum(sale['credit'] for sale in report_details),
+                'total_card': sum(sale['card'] for sale in report_details),
+                'total_bank_transfer': sum(sale['bank_transfer'] for sale in report_details),
+                'total_credit_card': sum(sale['credit_card'] for sale in report_details),
+                'total_amount': sum(sale['total'] for sale in report_details)
+            }
+
+            return Response({
+                'details': report_details,
+                'summary': summary
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BankStatementAPIView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        bank_id = request.GET.get('bank')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        if not (start_date and end_date and bank_id):
+            return Response({'error': 'Invalid parameters'}, status=400)
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+        bank = get_object_or_404(Bank, id=bank_id)
+
+        deposits = (
+            BankDeposits.objects.filter(
+                bank_deposit_bank=bank, 
+                deposit_date__range=[start_date, end_date], 
+                business_profile=business_profile.id
+            )
+            .values('deposit_date')
+            .annotate(
+                description=F('mode_of_transaction__name'),
+                deposit=Sum('amount')
+            )
+        )
+
+        withdrawals = (
+            Withdrawal.objects.filter(
+                bank=bank, 
+                withdrawal_date__range=[start_date, end_date], 
+                business_profile=business_profile.id
+            )
+            .values('withdrawal_date')
+            .annotate(
+                description=F('mode_of_transaction__name'),
+                withdrawal=Sum('amount')
+            )
+        )
+
+        all_transactions = sorted(
+            list(deposits) + list(withdrawals),
+            key=lambda x: x.get('deposit_date') or x.get('withdrawal_date')
+        )
+
+        statement_details = []
+        opening_balance = bank.opening_balance
+        balance = opening_balance
+        total_deposits = 0
+        total_withdrawals = 0
+
+        statement_details.append({
+            'date': start_date.strftime('%Y-%m-%d'),
+            'description': 'Opening Balance',
+            'withdrawal': 0,
+            'deposit': 0,
+            'balance': opening_balance,
+            'op_bal': opening_balance
+        })
+
+        for transaction in all_transactions:
+            date = transaction.get('deposit_date') or transaction.get('withdrawal_date')
+            deposit = transaction.get('deposit', 0)
+            withdrawal = transaction.get('withdrawal', 0)
+            balance += deposit - withdrawal
+
+            statement_details.append({
+                'date': date,
+                'description': transaction['description'],
+                'withdrawal': withdrawal,
+                'deposit': deposit,
+                'balance': balance,
+                'op_bal': opening_balance
+            })
+
+            total_deposits += deposit
+            total_withdrawals += withdrawal
+
+        return Response({
+            'details': statement_details,
+            'summary': {
+                'total_deposits': total_deposits,
+                'total_withdrawals': total_withdrawals,
+                'final_balance': balance
+            }
+        })

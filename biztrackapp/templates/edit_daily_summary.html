@@ -332,8 +332,8 @@
                                 <th>Amount</th>
                                 <th>Dep. Date</th>
                                 <th>Chq. Date</th>
-                                
                                 <th>Chq No.</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -346,6 +346,7 @@
                                 <td>{{ sale.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ sale.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ sale.cheque_no }}</td>
+                                <td><a href="{% url 'edit_bank_sale' sale.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
                             </tr>
                             {% endfor %}
                         </tbody>

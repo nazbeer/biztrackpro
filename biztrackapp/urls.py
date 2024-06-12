@@ -10,7 +10,7 @@ urlpatterns = [
     path('get_closing_balance/<str:id>/',get_daily_summary_data,name='get_closing_balance' ),
     path('get_supplier_outstanding/<int:id>/',get_supplier_outstanding,name='get_supplier_outstanding' ),
     path('get_customer_outstanding/<int:id>/',get_customer_outstanding,name='get_customer_outstanding' ),
-
+    path('edit_bank_sale/<int:pk>/',edit_bank_sale,name='edit_bank_sale' ),
 
     path('create_all_banks/', create_all_banks, name='create_all_banks'),
 

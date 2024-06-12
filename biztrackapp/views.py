@@ -1783,6 +1783,26 @@ class BankStatementView(View):
         banks = Bank.objects.filter(business_profile=business_profile.id)
         return render(request, 'bank_statement.html', {'banks': banks})
 
+def edit_bank_sale(request, pk):
+    bank_sale = get_object_or_404(BankSales, pk=pk)
+    daily_summary_id = bank_sale.daily_summary_id
+    if request.method == 'POST':
+        form = BankSaleForm(request.POST, request.FILES, instance=bank_sale)    
+        if form.is_valid():
+            print('daily_summary_id1',daily_summary_id)
+
+            form.save()
+            print('daily_summary_id2',daily_summary_id)
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = BankSaleForm(instance=bank_sale)
+    return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
 
 
 def download_pdf_cc(request):

@@ -93,7 +93,7 @@ class DailySummaryAdmin(admin.ModelAdmin):
 
 @admin.register(BankSales)
 class BankSaleAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'created_on', 'updated_on']
+    list_display = ['id', 'customer','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no', 'updated_on']
 
 @admin.register(BankDeposits)
 class BankDepositAdmin(admin.ModelAdmin):
@@ -101,7 +101,7 @@ class BankDepositAdmin(admin.ModelAdmin):
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_display = ['id', 'expense_type','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no','invoice_no','business_profile', 'created_on', 'updated_on']
+    list_display = ['id', 'expense_type','mode_of_transaction','amount', 'bank','cheque_date', 'cheque_no','invoice_no','business_profile',  'created_on', 'updated_on']
 
 
 @admin.register(Withdrawal)

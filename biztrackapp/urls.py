@@ -93,6 +93,8 @@ urlpatterns = [
     path('daily-collection-report/', DailyCollectionReportView.as_view(), name='daily_collection_report'),
     path('sales-report/', SalesReportView.as_view(), name='sales_report'),
     path('purchase-report/', PurchaseReportView.as_view(), name='purchase_report'),
+    path('msc-income-report/', MscIncomeReportView.as_view(), name='msc_income_report'),
+    path('supplier-payment-report/', SupplierPaymentReportView.as_view(), name='supplier_payment_report'),
     path('bank-statement/', BankStatementView.as_view(), name='bank_statement'),
 
 
@@ -102,6 +104,8 @@ urlpatterns = [
     path('api/daily-collection-report/', DailyCollectionReportAPIView.as_view(), name='daily_collection_report_api'),
     path('api/sales-report/', SalesReportAPIView.as_view(), name='sales_report'),
     path('api/purchase-report/', PurchaseReportAPIView.as_view(), name='purchase_report'),
+    path('api/msc-income-report/', MscIncomeReportAPIView.as_view(), name='msc_income_report'),
+    path('api/supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
 
 ]

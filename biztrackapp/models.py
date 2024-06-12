@@ -355,6 +355,7 @@ class SupplierPayments(models.Model):
     cheque_no = models.CharField(max_length=255, null=True, blank=True)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
+    # create_date = models.DateField(auto_now_add=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -390,6 +391,7 @@ class Expense(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
+    # created_date = models.DateField(auto_now_add=True)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 

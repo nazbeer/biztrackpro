@@ -83,24 +83,24 @@ document.getElementById('report-form').addEventListener('submit', function(event
                 return `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td>${detail.cash}</td>
-                        <td>${detail.credit}</td>
-                        <td>${detail.card}</td>
-                        <td>${detail.bank_transfer}</td>
-                        <td>${detail.credit_card}</td>
-                        <td>${detail.total}</td>
+                        <td>${detail.cash.toFixed(2)}</td>
+                        <td>${detail.credit.toFixed(2)}</td>
+                        <td>${detail.card.toFixed(2)}</td>
+                        <td>${detail.bank_transfer.toFixed(2)}</td>
+                        <td>${detail.credit_card.toFixed(2)}</td>
+                        <td>${detail.total.toFixed(2)}</td>
                     </tr>
                 `;
             }).join('');
             reportFooter.innerHTML = `
                 <tr style="background-color: #8a8a8a  !important;;">
                     <th colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;">Totals</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_cash}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_card}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_bank_transfer}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit_card}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_amount}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_cash.toFixed(2)}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit.toFixed(2)}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_card.toFixed(2)}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_bank_transfer.toFixed(2)}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit_card.toFixed(2)}</th>
+                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_amount.toFixed(2)}</th>
                 </tr>
             `;
         });

@@ -1327,13 +1327,13 @@ def create_bank_sale(request):
 
             # return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#1')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#1')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
 
 
         
@@ -1367,13 +1367,13 @@ def create_credit_collection(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#2')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#2')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#2')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#2')
 
 
 def list_credit_collection(request):
@@ -1399,13 +1399,13 @@ def create_misc_income(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
 
 
 def list_msc_income(request):
@@ -1437,13 +1437,13 @@ def create_purchase(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#5')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#5')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
 
 
 def list_purchases(request):
@@ -1473,13 +1473,13 @@ def create_supplier_payment(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#6')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#6')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
 
 
 def list_supplier_payment(request):
@@ -1504,13 +1504,13 @@ def create_bank_deposit(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#8')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#8')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
 
 
 def list_bank_deposit(request):
@@ -1534,13 +1534,13 @@ def create_expense(request):
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#7')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#7')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
 
 
 def list_expense(request):
@@ -1602,13 +1602,13 @@ def create_withdrawal(request):
             form.daily_summary_id = daily_summary_id
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#4')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 # Redirect to the edit page if the daily summary already exists
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#4')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
 
     #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
     # return redirect('create_daily_summary')
@@ -1806,12 +1806,12 @@ def edit_bank_sale(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#1')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#1')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
     else:
         form = BankSaleForm(instance=bank_sale)
     return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
@@ -1824,12 +1824,12 @@ def edit_credit_collection(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#2')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#2')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#2')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#2')
     else:
         form = CreditCollectionForm(instance=credit_instance)
     return render(request, 'edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
@@ -1843,12 +1843,12 @@ def edit_miscellaneous_income(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
     else:
         form = MiscellaneousIncomeForm(instance=misc_instance)
     return render(request, 'edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
@@ -1861,12 +1861,12 @@ def edit_withdrawal(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#4')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#4')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
     else:
         form = WithdrawalForm(instance=withdrawal_instance)
     return render(request, 'edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
@@ -1879,12 +1879,12 @@ def edit_purchase(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#5')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#5')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
     else:
         form = PurchaseForm(instance=purchase_instance)
     return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
@@ -1898,12 +1898,12 @@ def edit_supplier_payment(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#6')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#6')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
     else:
         form = SupplierPaymentForm(instance=supplier_instance)
     return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
@@ -1916,12 +1916,12 @@ def edit_expense(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#7')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#7')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
     else:
         form = ExpenseForm(instance=expense_instance)
     return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
@@ -1934,12 +1934,12 @@ def edit_bank_deposit(request, pk):
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#8')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#8')
         else:
-            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
     else:
         form = BankDepositsForm(instance=bank_deposit)
     return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
@@ -1960,9 +1960,9 @@ def delete_bank_sale(request, pk):
         bank_sale.delete()
     except BankSales.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#1'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#1'
     return redirect(next_page)
 
 
@@ -1973,9 +1973,9 @@ def delete_credit_collection(request, pk):
         credit.delete()
     except CreditCollection.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#2'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#2'
     return redirect(next_page)
 
 def delete_miscellaneous_income(request, pk):
@@ -1985,9 +1985,9 @@ def delete_miscellaneous_income(request, pk):
         miscellaneous.delete()
     except MiscellaneousIncome.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#3'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#3'
     return redirect(next_page)
 
 
@@ -1998,9 +1998,9 @@ def delete_withdrawal(request, pk):
         withdrawal.delete()
     except Withdrawal.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#4'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#4'
     return redirect(next_page)
 
 def delete_purchase(request, pk):
@@ -2010,9 +2010,9 @@ def delete_purchase(request, pk):
         purchase.delete()
     except Purchase.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#5'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#5'
     return redirect(next_page)
 
 
@@ -2023,9 +2023,9 @@ def delete_supplier_payment(request, pk):
         supplier.delete()
     except SupplierPayments.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#6'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#6'
     return redirect(next_page)
 
 def delete_expense(request, pk):
@@ -2035,9 +2035,9 @@ def delete_expense(request, pk):
         expense.delete()
     except Expense.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#7'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#7'
     return redirect(next_page)
 
 
@@ -2049,9 +2049,9 @@ def delete_bank_deposit(request, pk):
         bank_deposit.delete()
     except BankDeposits.DoesNotExist:
         return render(request, '404.html')
-    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}#8'
     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}#8'
     return redirect(next_page)
 
 

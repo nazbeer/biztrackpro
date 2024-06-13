@@ -47,7 +47,7 @@ class PartnerForm(forms.ModelForm):
 class WithdrawalForm(forms.ModelForm):
     class Meta:
         model = Withdrawal
-        fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile']
+        fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile','cheque_date','cheque_no']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

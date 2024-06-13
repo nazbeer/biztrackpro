@@ -398,8 +398,9 @@
                                 <th>Amount</th>
                                 <th>Dep. Date</th>
                                 <th>Chq. Date</th>
-                                
                                 <th>Chq No.</th>
+                                <th>Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -413,6 +414,8 @@
                                 <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ creditcol.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ creditcol.cheque_no }}</td>
+                                <td><a href="{% url 'edit_credit_collection' creditcol.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -467,8 +470,9 @@
                                 <th>Amount</th>
                                 <th>Dep. Date</th>
                                 <th>Chq. Date</th>
-                                
                                 <th>Chq No.</th>
+                                <th>Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -482,6 +486,8 @@
                                 <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ msc_incomes.cheque_no }}</td>
+                                <td><a href="{% url 'edit_miscellaneous_income' msc_incomes.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -536,6 +542,8 @@
                                     <th>Amount</th>
                                     <th>Mode of Transaction</th>
                                     <th>Created On</th>
+                                    <th>Action</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -546,6 +554,8 @@
                                     <td>{{ withdrawal.amount }}</td>
                                     <td class="text-capitalize">{{ withdrawal.mode_of_transaction.name }}</td>
                                     <td>{{ withdrawal.created_on|date:"d/m/Y" }}</td>
+                                    <td><a href="{% url 'edit_withdrawal' withdrawal.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -610,6 +620,8 @@
                                     <th>Cheque Date</th>
                                     <th>Cheque No</th>
                                     <th>Bank</th>
+                                    <th>Action</th>
+
                                 </tr>                                
                         </thead>
                         <tbody>
@@ -625,6 +637,8 @@
                                 <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ purchase.cheque_no }}</td>
                                 <td>{{ purchase.bank.name }}</td>
+                                <td><a href="{% url 'edit_purchase' purchase.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -680,6 +694,8 @@
                                 <th>Cheque Date</th>
                                 <th>Cheque No</th>
                                 <th>Bank</th>
+                                <th>Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -693,6 +709,8 @@
                                 <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ supplier_payment.cheque_no }}</td>
                                 <td>{{ supplier_payment.bank.name }}</td>
+                                <td><a href="{% url 'edit_supplier_payment' supplier_payment.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -750,6 +768,8 @@
                                 <th>Create Date</th>
                                 <th>Chq. Date</th>
                                 <th>Chq No.</th>
+                                <th>Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -764,6 +784,8 @@
                                 <td>{{ expense.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ expense.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ expense.cheque_no }}</td>
+                                <td><a href="{% url 'edit_expense' expense.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -822,6 +844,8 @@
                                 <th>Dep. Date</th>
                                 <th>Chq. Date</th>
                                 <th>Chq No.</th>
+                                <th>Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -836,6 +860,8 @@
                                 <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ bank_deposit.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ bank_deposit.cheque_no }}</td>
+                                <td><a href="{% url 'edit_bank_deposit' bank_deposit.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+
                             </tr>
                             {% endfor %}
                         </tbody>

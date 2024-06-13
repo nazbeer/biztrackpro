@@ -1797,16 +1797,14 @@ class BankStatementView(View):
         banks = Bank.objects.filter(business_profile=business_profile.id)
         return render(request, 'bank_statement.html', {'banks': banks})
 
+
 def edit_bank_sale(request, pk):
     bank_sale = get_object_or_404(BankSales, pk=pk)
     daily_summary_id = bank_sale.daily_summary_id
     if request.method == 'POST':
         form = BankSaleForm(request.POST, request.FILES, instance=bank_sale)    
         if form.is_valid():
-            print('daily_summary_id1',daily_summary_id)
-
             form.save()
-            print('daily_summary_id2',daily_summary_id)
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
@@ -1817,6 +1815,136 @@ def edit_bank_sale(request, pk):
     else:
         form = BankSaleForm(instance=bank_sale)
     return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
+
+def edit_credit_collection(request, pk):
+    credit_instance = get_object_or_404(CreditCollection, pk=pk)
+    daily_summary_id = credit_instance.daily_summary_id
+    if request.method == 'POST':
+        form = CreditCollectionForm(request.POST, request.FILES, instance=credit_instance)    
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = CreditCollectionForm(instance=credit_instance)
+    return render(request, 'edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
+
+
+def edit_miscellaneous_income(request, pk):
+    misc_instance = get_object_or_404(MiscellaneousIncome, pk=pk)
+    daily_summary_id = misc_instance.daily_summary_id
+    if request.method == 'POST':
+        form = MiscellaneousIncomeForm(request.POST, request.FILES, instance=misc_instance)    
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = MiscellaneousIncomeForm(instance=misc_instance)
+    return render(request, 'edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
+
+def edit_withdrawal(request, pk):
+    withdrawal_instance = get_object_or_404(Withdrawal, pk=pk)
+    daily_summary_id = withdrawal_instance.daily_summary_id
+    if request.method == 'POST':
+        form = WithdrawalForm(request.POST, request.FILES, instance=withdrawal_instance)    
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = WithdrawalForm(instance=withdrawal_instance)
+    return render(request, 'edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
+
+def edit_purchase(request, pk):
+    purchase_instance = get_object_or_404(Purchase, pk=pk)
+    daily_summary_id = purchase_instance.daily_summary_id
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance)
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = PurchaseForm(instance=purchase_instance)
+    return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
+
+
+def edit_supplier_payment(request, pk):
+    supplier_instance = get_object_or_404(SupplierPayments, pk=pk)
+    daily_summary_id = supplier_instance.daily_summary_id
+    if request.method == 'POST':
+        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance)
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = SupplierPaymentForm(instance=supplier_instance)
+    return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
+
+def edit_expense(request, pk):
+    expense_instance = get_object_or_404(Expense, pk=pk)
+    daily_summary_id = expense_instance.daily_summary_id
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance)
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = ExpenseForm(instance=expense_instance)
+    return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
+
+def edit_bank_deposit(request, pk):
+    bank_deposit = get_object_or_404(BankDeposits, pk=pk)
+    daily_summary_id = bank_deposit.daily_summary_id
+    if request.method == 'POST':
+        form = BankDepositsForm(request.POST, request.FILES, instance=bank_deposit)
+        if form.is_valid():
+            form.save()
+            if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+                return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+        elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+            return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+        else:
+            return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+    else:
+        form = BankDepositsForm(instance=bank_deposit)
+    return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
+
+
 
 # import pisa
 

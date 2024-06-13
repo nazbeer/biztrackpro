@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}Update Bank Sale{% endblock %}
+{% block title %}Update Miscellaneous Income{% endblock %}
 {% block content %}
 <div class="container">
   <div class="card">
     <div class="card-header">
-      <h4 class="mb-0 text-white">Update Bank Sale</h4>
+      <h4 class="mb-0 text-white">Update Miscellaneous Income</h4>
     </div>
     <div class="card-body">
       <form method="post">
@@ -14,55 +14,54 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label for="id_customer">Customer</label>
-              <input type="hidden" name="business_profile" value="{{bank_sale.business_profile }}">
-              <input type="hidden" name="daily_summary_id" value="{{ bank_sale.daily_summary_id }}">
-              <select id="id_customer" name="customer" class="form-control" tabindex="020">
-                <option>-- Select Customer --</option>
-                {% for customer in form.customer.field.queryset %}
-                  <option value="{{ customer.id }}" {% if customer.id == bank_sale.customer.id %} selected {% endif %}>{{ customer.name }}</option>
+              <label for="id_customer">Receipt Type</label>
+              <input type="hidden" name="business_profile" value="{{misc_instance.business_profile }}">
+              <input type="hidden" name="daily_summary_id" value="{{ misc_instance.daily_summary_id }}">
+              <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="001">
+                {% for receipt_type in form.receipt_type.field.queryset %}
+                  <option value="{{ receipt_type.id }}" {% if receipt_type.id == misc_instance.receipt_type.id %} selected {% endif %}>{{ receipt_type.name }}</option>
                 {% endfor %}
               </select>
             </div>
             <div class="form-group">
               <label for="id_amount">Amount</label>
-              <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="022" value="{{ bank_sale.amount }}">
+              <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="003" value="{{ misc_instance.amount }}">
             </div>
             <div class="form-group" id="cheque_details">
               <label for="id_cheque_date">Cheque Date</label>
-              <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="024" {% if bank_sale.cheque_date %} value="{{ bank_sale.cheque_date|date:'Y-m-d' }}" {% endif %}>
+              <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="005" {% if misc_instance.cheque_date %} value="{{ misc_instance.cheque_date|date:'Y-m-d' }}" {% endif %}>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="id_mode_of_transaction">Mode of Transaction</label>
-              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="021">
+              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="002">
                 <option>-- Mode of Transaction --</option>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
-                <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == bank_sale.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
+                <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == misc_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
                 {% endfor %}
               </select>
             </div>
             <div class="form-group" id="bank_details">
               <label for="id_bank">Bank</label>
-              <select id="id_bank" name="bank" class="form-control" tabindex="023">
+              <select id="id_bank" name="bank" class="form-control" tabindex="004">
                 <option value="">-- Select Bank --</option>
                 {% for bank in form.bank.field.queryset %}
-                <option value="{{ bank.id }}" {% if bank.id == bank_sale.bank.id %} selected {% endif %}>{{ bank.name }}</option>
+                <option value="{{ bank.id }}" {% if bank.id == misc_instance.bank.id %} selected {% endif %}>{{ bank.name }}</option>
                 {% endfor %}
               </select>
             </div>
             <div class="form-group" id="cheque_no_details">
               <label for="id_cheque_no">Cheque Number</label>
-              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ bank_sale.cheque_no }}" tabindex="025">
+              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ misc_instance.cheque_no }}" tabindex="006">
             </div>
           </div>
         </div>
       </div>
       <div class="card-footer">
         <div class="form-group mb-0">
-            <button type="submit" class="btn btn-primary" tabindex="026">Save</button>
-            <a href="{% url 'save_after_submit' %}?id={{ bank_sale.daily_summary_id }}" tabindex ="027" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary" tabindex="007">Save</button>
+            <a href="{% url 'save_after_submit' %}?id={{ misc_instance.daily_summary_id }}" class="btn btn-secondary" tabindex="008">Cancel</a>
         </div>
     </div>
 </form>
@@ -70,9 +69,9 @@
 </div>
 <script>
 
-  function toggleChequeDetails() {
-    var modeOfTransactionElement = document.getElementById("id_mode_of_transaction");
-    var modeOfTransaction = modeOfTransactionElement.options[modeOfTransactionElement.selectedIndex].textContent;
+  function toggleChequeDetails2() {
+    var modeOfTransactionElement2 = document.getElementById("id_mode_of_transaction");
+    var modeOfTransaction = modeOfTransactionElement2.options[modeOfTransactionElement2.selectedIndex].textContent;
     console.log('modeOfTransaction', modeOfTransaction);
 
     // var modeOfTransaction = document.getElementById("id_mode_of_transaction").value;
@@ -95,8 +94,8 @@
       document.getElementById("id_cheque_no").value = "";
     }
   }
-  document.getElementById("id_mode_of_transaction").addEventListener("change", toggleChequeDetails);
-  toggleChequeDetails();
+  document.getElementById("id_mode_of_transaction").addEventListener("change", toggleChequeDetails2);
+  toggleChequeDetails2();
 </script>
 
 {% endblock %}

@@ -11,6 +11,14 @@ urlpatterns = [
     path('get_supplier_outstanding/<int:id>/',get_supplier_outstanding,name='get_supplier_outstanding' ),
     path('get_customer_outstanding/<int:id>/',get_customer_outstanding,name='get_customer_outstanding' ),
     path('edit_bank_sale/<int:pk>/',edit_bank_sale,name='edit_bank_sale' ),
+    path('edit_credit_collection/<int:pk>/',edit_credit_collection,name='edit_credit_collection'),
+    path('edit_miscellaneous_income/<int:pk>/',edit_miscellaneous_income,name='edit_miscellaneous_income'),
+    path('edit_withdrawal/<int:pk>/',edit_withdrawal,name='edit_withdrawal'),
+    path('edit_purchase/<int:pk>/',edit_purchase,name='edit_purchase'),
+    path('edit_supplier_payment/<int:pk>/',edit_supplier_payment,name='edit_supplier_payment'),
+    path('edit_expense/<int:pk>/',edit_expense,name='edit_expense'),
+    path('edit_bank_deposit/<int:pk>/',edit_bank_deposit,name='edit_bank_deposit'),
+
 
     path('create_all_banks/', create_all_banks, name='create_all_banks'),
 

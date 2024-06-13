@@ -1945,6 +1945,115 @@ def edit_bank_deposit(request, pk):
     return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
 
 
+# def delete_bank_deposit(request, pk):
+#     bank_deposit = get_object_or_404(BankDeposits, pk=pk)
+#     daily_summary_id = bank_deposit.daily_summary_id
+#     bank_deposit.delete()
+#     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+#         return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
+#     return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
+
+def delete_bank_sale(request, pk):
+    try:
+        bank_sale = BankSales.objects.get(pk=pk)    
+        daily_summary_id = bank_sale.daily_summary_id
+        bank_sale.delete()
+    except BankSales.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+
+def delete_credit_collection(request, pk):
+    try:
+        credit = CreditCollection.objects.get(pk=pk)
+        daily_summary_id = credit.daily_summary_id
+        credit.delete()
+    except CreditCollection.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+def delete_miscellaneous_income(request, pk):
+    try:
+        miscellaneous = MiscellaneousIncome.objects.get(pk=pk)
+        daily_summary_id = miscellaneous.daily_summary_id
+        miscellaneous.delete()
+    except MiscellaneousIncome.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+
+def delete_withdrawal(request, pk):
+    try:
+        withdrawal = Withdrawal.objects.get(pk=pk)
+        daily_summary_id = withdrawal.daily_summary_id
+        withdrawal.delete()
+    except Withdrawal.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+def delete_purchase(request, pk):
+    try:
+        purchase = Purchase.objects.get(pk=pk)
+        daily_summary_id = purchase.daily_summary_id
+        purchase.delete()
+    except Purchase.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+
+def delete_supplier_payment(request, pk):
+    try:
+        supplier = SupplierPayments.objects.get(pk=pk)
+        daily_summary_id = supplier.daily_summary_id
+        supplier.delete()
+    except SupplierPayments.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+def delete_expense(request, pk):
+    try:
+        expense = Expense.objects.get(pk=pk)
+        daily_summary_id = expense.daily_summary_id
+        expense.delete()
+    except Expense.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
+
+
+def delete_bank_deposit(request, pk):
+    try:
+        bank_deposit = BankDeposits.objects.get(pk=pk)
+        daily_summary_id = bank_deposit.daily_summary_id
+        bank_deposit.delete()
+    except BankDeposits.DoesNotExist:
+        return render(request, '404.html')
+    next_page = reverse('create_daily_summary') + f'?id={daily_summary_id}'
+    if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
+        next_page = reverse('save_after_submit') + f'?id={daily_summary_id}'
+    return redirect(next_page)
+
 
 # import pisa
 

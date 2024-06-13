@@ -244,6 +244,13 @@
     }
 </script>
 
+<script>
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this bank deposit?');
+    }
+    </script>
+
+
 <style>
     .bg-white{
         color:#000 !important;
@@ -346,7 +353,16 @@
                                 <td>{{ sale.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ sale.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ sale.cheque_no }}</td>
-                                <td><a href="{% url 'edit_bank_sale' sale.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_bank_sale' sale.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_bank_sale' sale.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -414,7 +430,16 @@
                                 <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ creditcol.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ creditcol.cheque_no }}</td>
-                                <td><a href="{% url 'edit_credit_collection' creditcol.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_credit_collection' creditcol.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_credit_collection' creditcol.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
 
                             </tr>
                             {% endfor %}
@@ -486,8 +511,16 @@
                                 <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ msc_incomes.cheque_no }}</td>
-                                <td><a href="{% url 'edit_miscellaneous_income' msc_incomes.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
-
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_miscellaneous_income' msc_incomes.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_miscellaneous_income' msc_incomes.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -554,8 +587,16 @@
                                     <td>{{ withdrawal.amount }}</td>
                                     <td class="text-capitalize">{{ withdrawal.mode_of_transaction.name }}</td>
                                     <td>{{ withdrawal.created_on|date:"d/m/Y" }}</td>
-                                    <td><a href="{% url 'edit_withdrawal' withdrawal.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
-
+                                    <td>
+                                        <div class="d-flex">
+                                            <a href="{% url 'edit_withdrawal' withdrawal.id %}" class="me-2">
+                                                <i class="fas fa-pen text-dark"></i>
+                                            </a>
+                                            <a href="{% url 'delete_withdrawal' withdrawal.id %}" onclick="return confirmDelete();">
+                                                <i class="fas fa-trash text-dark"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -637,8 +678,16 @@
                                 <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ purchase.cheque_no }}</td>
                                 <td>{{ purchase.bank.name }}</td>
-                                <td><a href="{% url 'edit_purchase' purchase.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
-
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_purchase' purchase.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_purchase' purchase.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -709,8 +758,16 @@
                                 <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ supplier_payment.cheque_no }}</td>
                                 <td>{{ supplier_payment.bank.name }}</td>
-                                <td><a href="{% url 'edit_supplier_payment' supplier_payment.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
-
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_supplier_payment' supplier_payment.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_supplier_payment' supplier_payment.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -784,9 +841,17 @@
                                 <td>{{ expense.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ expense.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ expense.cheque_no }}</td>
-                                <td><a href="{% url 'edit_expense' expense.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
-
-                            </tr>
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_expense' expense.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <a href="{% url 'delete_expense' expense.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -860,7 +925,19 @@
                                 <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
                                 <td>{{ bank_deposit.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ bank_deposit.cheque_no }}</td>
-                                <td><a href="{% url 'edit_bank_deposit' bank_deposit.id %}"  class=""><i class="fas fa-pen text-dark"></i></a></td>
+                                <td>
+                                    <div class="d-flex">
+                                        <a href="{% url 'edit_bank_deposit' bank_deposit.id %}" class="me-2">
+                                            <i class="fas fa-pen text-dark"></i>
+                                        </a>
+                                        <!-- <a href="{% url 'delete_bank_deposit' bank_deposit.id %}" class="">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a> -->
+                                        <a href="{% url 'delete_bank_deposit' bank_deposit.id %}" onclick="return confirmDelete();">
+                                            <i class="fas fa-trash text-dark"></i>
+                                        </a>
+                                    </div>
+                                </td>
 
                             </tr>
                             {% endfor %}

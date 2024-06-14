@@ -26,7 +26,7 @@ urlpatterns = [
     #api routers and swagger
     path('api/', include('biztrackapp.api_urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),  # Optional Redoc UI
+    path('readoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),  # Optional Redoc UI
 
 
     path('edit/',save_after_submit,name='save_after_submit' ),

@@ -2,8 +2,7 @@
 from django.urls import path
 from .views import (
     DailyCollectionReportAPIView, SalesReportAPIView, PurchaseReportAPIView,
-    MscIncomeReportAPIView, SupplierPaymentReportAPIView, BankStatementAPIView,
-    BankStatementPDFView, DailyCollectionReportPDFView, PassDSDailySummaryAPIView
+    MscIncomeReportAPIView, SupplierPaymentReportAPIView, BankStatementAPIView
 )
 
 custom_api_urls = [

@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: BizTrackPro API
+  description: Developed by Nasbeer Ahammed
+  version: 1.0.0
+  termsOfService: https://www.tickets2me.com/index.php/privacy-policy-2/
+  contact:
+    email: info@mitesolutions.com
+  license:
+    name: BSD License
+    url: https://opensource.org/licenses/BSD-3-Clause
+paths:
+  api/daily-collection-report/:
+    get:
+      summary: Get daily collection report
+      description: Returns a list of daily collection reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/sales-report/:
+    get:
+      summary: Get sales report
+      description: Returns a list of sales reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/purchase-report/:
+    get:
+      summary: Get purchase report
+      description: Returns a list of purchase reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/msc-income-report/:
+    get:
+      summary: Get MSC income report
+      description: Returns a list of MSC income reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/supplier-payment-report/:
+    get:
+      summary: Get supplier payment report
+      description: Returns a list of supplier payment reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/bank-statement/:
+    get:
+      summary: Get bank statement
+      description: Returns bank statements based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/bank-statement-pdf/:
+    get:
+      summary: Get bank statement PDF
+      description: Generates a PDF of bank statements based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/daily-report-pdf/:
+    get:
+      summary: Get daily report PDF
+      description: Generates a PDF of daily reports based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-01"
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2023-01-31"
+  api/passDS/:
+    get:
+      summary: Get passDS
+      description: Returns passDS based on specified criteria.
+      responses:
+        '200':
+          description: Successful response
+      parameters:
+        - name: parameter_name
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "example_value"

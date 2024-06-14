@@ -1761,10 +1761,10 @@ def get_daily_summary_data(request,id):
     net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
     bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
 
-    # print('net_collection',net_collection)
-    # print('net_payment',net_payment)
-    # print('bank_deposit_collection',bank_deposit_collection)
-    # print('withdrawal_total',withdrawal_total)
+    print('net_collection',net_collection)
+    print('net_payment',net_payment)
+    print('bank_deposit_collection',bank_deposit_collection)
+    print('withdrawal_total',withdrawal_total)
 
     # if DailySummary.objects.exists():
     if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():

@@ -582,7 +582,7 @@
                             <tbody>
                                 {% for withdrawal in withdrawal %}
                                 <tr>
-                                    <td>{{ withdrawal.bank.name }}</td>
+                                    <td>{{ withdrawal.bank.bank.name }}</td>
                                     <td>{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
                                     <td>{{ withdrawal.amount }}</td>
                                     <td class="text-capitalize">{{ withdrawal.mode_of_transaction.name }}</td>
@@ -677,7 +677,7 @@
                                 <td>{{ purchase.invoice_amount }}</td>
                                 <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ purchase.cheque_no }}</td>
-                                <td>{{ purchase.bank.name }}</td>
+                                <td>{{ purchase.bank.bank.name }}</td>
                                 <td>
                                     <div class="d-flex">
                                         <a href="{% url 'edit_purchase' purchase.id %}" class="me-2">
@@ -757,7 +757,7 @@
                                 <td>{{ supplier_payment.amount }}</td>
                                 <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
                                 <td>{{ supplier_payment.cheque_no }}</td>
-                                <td>{{ supplier_payment.bank.name }}</td>
+                                <td>{{ supplier_payment.bank.bank.name }}</td>
                                 <td>
                                     <div class="d-flex">
                                         <a href="{% url 'edit_supplier_payment' supplier_payment.id %}" class="me-2">
@@ -835,7 +835,7 @@
                             <tr>
                                 <td>{{ expense.expense_type.name }}</td>
                                 <td  class="text-capitalize">{{ expense.mode_of_transaction.name }}</td>
-                                <td>{{ expense.bank.name }}</td>
+                                <td>{{ expense.bank.bank.name }}</td>
                                 <td>{{ expense.amount }}</td>
                                 <td>{{ expense.invoice_no}}</td>
                                 <td>{{ expense.created_on|date:"d/m/Y" }}</td>
@@ -918,7 +918,7 @@
                             {% for bank_deposit in bank_deposits %}
                             <tr>
                                 <!-- <td>{{ bank_deposit.customer.name }}</td> -->
-                                <td>{{ bank_deposit.bank_deposit_bank.name }}</td>
+                                <td>{{ bank_deposit.bank_deposit_bank.bank.name }}</td>
                                 <td  class="text-capitalize">{{ bank_deposit.mode_of_transaction.name }}</td>
                                 <td>{{ bank_deposit.bank.name }}</td>
                                 <td>{{ bank_deposit.amount }}</td>

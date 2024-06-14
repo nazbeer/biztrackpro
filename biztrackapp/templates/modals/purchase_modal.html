@@ -51,7 +51,7 @@
                                 <select id="id_bank" name="bank" class="form-control" tabindex="309">
                                   <option value="">-- Select Bank --</option>
                                   {% for bank in purchase_form.bank.field.queryset %}
-                                    <option value="{{ bank.id }}">{{ bank.name }}</option>
+                                    <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
                                   {% endfor %}
                                 </select>
                               </div>

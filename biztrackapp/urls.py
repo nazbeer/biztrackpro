@@ -1,11 +1,34 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import handler404
 from .views import *
 from biztrackapp import views
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="BizTrackPro API",
+        default_version='v1',
+        description="Developed by Nasbeer Ahammed",
+        terms_of_service="https://www.tickets2me.com/index.php/privacy-policy-2/",
+        contact=openapi.Contact(email="info@mitesolutions.com"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
+
+    #api routers and swagger
+    path('api/', include('biztrackapp.api_urls')),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),  # Optional Redoc UI
+
+
     path('edit/',save_after_submit,name='save_after_submit' ),
     path('get_closing_balance/<str:id>/',get_daily_summary_data,name='get_closing_balance' ),
     path('get_supplier_outstanding/<int:id>/',get_supplier_outstanding,name='get_supplier_outstanding' ),

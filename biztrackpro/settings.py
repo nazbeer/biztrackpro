@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 'bootstrap_daterangepicker',
     "rest_framework",
     'biztrackapp',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

@@ -2480,6 +2480,7 @@ class BankStatementAPIView(APIView):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
         bank_id = request.GET.get('bank')
+        
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -2487,28 +2488,28 @@ class BankStatementAPIView(APIView):
         if not (start_date and end_date and bank_id):
             return Response({'error': 'Invalid parameters'}, status=400)
 
-        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()  # Convert to date object
-        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()  # Convert to date object
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        allbank = get_object_or_404(AllBank, id=bank_id)
         bank = get_object_or_404(Bank, id=bank_id)
 
-        def get_transactions(model, date_field, amount_field, description_field, bank_field=None):
+        # Utility function to fetch transactions
+        def get_transactions(model, date_field, amount_field, description_field, allbank_field=None, bank_field=None):
             filters = {
-                date_field + '__range': [start_date, end_date],
+                f'{date_field}__range': [start_date, end_date],
                 'business_profile': business_profile.id,
             }
+            if allbank_field:
+                filters[allbank_field] = allbank.id
             if bank_field:
-                filters[bank_field] = bank
-            else:
-                filters['bank'] = bank
-
-            transactions = model.objects.filter(
-                Q(**filters)
-            ).annotate(
+                filters[bank_field] = bank.id
+            
+            transactions = model.objects.filter(Q(**filters)).annotate(
                 description_field=F(description_field),
                 amount_field=Sum(amount_field)
             ).values(date_field, 'description_field', 'amount_field')
 
-            # Ensure the date is a `date` object
             for transaction in transactions:
                 if isinstance(transaction[date_field], datetime):
                     transaction[date_field] = transaction[date_field].date()
@@ -2516,14 +2517,18 @@ class BankStatementAPIView(APIView):
             return transactions
 
         # Aggregating data from various models
+        banksale = get_transactions(BankSales, 'created_on', 'amount', 'mode_of_transaction__name', 'bank__id')
+        creditcol = get_transactions(CreditCollection, 'created_on', 'amount', 'payment_mode__name', 'bank__id')
         deposits = get_transactions(BankDeposits, 'deposit_date', 'amount', 'mode_of_transaction__name', 'bank_deposit_bank')
         withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'amount', 'mode_of_transaction__name', 'bank')
         purchases = get_transactions(Purchase, 'invoice_date', 'invoice_amount', 'mode_of_transaction__name', 'bank')
         expenses = get_transactions(Expense, 'created_on', 'amount', 'mode_of_transaction__name', 'bank')
 
-        # Convert querysets to lists and process them
+        # Combine transactions into a single list
         transactions_list = []
         for transactions, date_field, amount_key, type_key in [
+            (banksale, 'created_on', 'banksale', 'BankSales'),
+            (creditcol, 'created_on', 'creditcol', 'CreditCollection'),
             (deposits, 'deposit_date', 'deposit', 'Deposit'),
             (withdrawals, 'withdrawal_date', 'withdrawal', 'Withdrawal'),
             (purchases, 'invoice_date', 'purchase', 'Purchase'),
@@ -2538,13 +2543,10 @@ class BankStatementAPIView(APIView):
                 })
 
         # Sort all transactions by date
-        all_transactions = sorted(
-            transactions_list,
-            key=lambda x: x['date']
-        )
+        all_transactions = sorted(transactions_list, key=lambda x: x['date'])
 
         statement_details = []
-        opening_balance = bank.opening_balance
+        opening_balance =  bank.opening_balance
         balance = opening_balance
         total_deposits = 0
         total_withdrawals = 0
@@ -2565,20 +2567,21 @@ class BankStatementAPIView(APIView):
             withdrawal = transaction.get('withdrawal', 0)
             purchase = transaction.get('purchase', 0)
             expense = transaction.get('expense', 0)
+            banksale = transaction.get('banksale', 0)
+            creditcol = transaction.get('creditcol', 0)
 
             # Update balance
-            balance += deposit - withdrawal - purchase - expense
+            balance += (deposit + banksale + creditcol) - (withdrawal + purchase + expense)
 
             statement_details.append({
                 'date': formatted_date,
-                 'description': transaction['description'] or 'nasbeer',
-                # 'description': 'nasbeer',
+                'description': transaction['description'],
                 'withdrawal': withdrawal + purchase + expense,
-                'deposit': deposit,
+                'deposit': deposit + banksale + creditcol,
                 'balance': balance
             })
 
-            total_deposits += deposit
+            total_deposits += deposit + banksale +creditcol
             total_withdrawals += withdrawal + purchase + expense
 
         # Prepare the response

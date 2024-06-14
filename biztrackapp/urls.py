@@ -125,7 +125,7 @@ urlpatterns = [
     path('api/msc-income-report/', MscIncomeReportAPIView.as_view(), name='msc_income_report'),
     path('api/supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
-
+    path('api/bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
 
     path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),

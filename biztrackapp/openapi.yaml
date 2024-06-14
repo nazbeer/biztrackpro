@@ -10,7 +10,7 @@ info:
     name: BSD License
     url: https://opensource.org/licenses/BSD-3-Clause
 paths:
-  api/daily-collection-report/:
+  /api/daily-collection-report/:
     get:
       summary: Get daily collection report
       description: Returns a list of daily collection reports based on specified criteria.
@@ -32,7 +32,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/sales-report/:
+  /api/sales-report/:
     get:
       summary: Get sales report
       description: Returns a list of sales reports based on specified criteria.
@@ -54,7 +54,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/purchase-report/:
+  /api/purchase-report/:
     get:
       summary: Get purchase report
       description: Returns a list of purchase reports based on specified criteria.
@@ -76,7 +76,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/msc-income-report/:
+  /api/msc-income-report/:
     get:
       summary: Get MSC income report
       description: Returns a list of MSC income reports based on specified criteria.
@@ -98,7 +98,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/supplier-payment-report/:
+  /api/supplier-payment-report/:
     get:
       summary: Get supplier payment report
       description: Returns a list of supplier payment reports based on specified criteria.
@@ -120,7 +120,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/bank-statement/:
+  /api/bank-statement/:
     get:
       summary: Get bank statement
       description: Returns bank statements based on specified criteria.
@@ -142,7 +142,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/bank-statement-pdf/:
+  /api/bank-statement-pdf/:
     get:
       summary: Get bank statement PDF
       description: Generates a PDF of bank statements based on specified criteria.
@@ -164,7 +164,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/daily-report-pdf/:
+  /api/daily-report-pdf/:
     get:
       summary: Get daily report PDF
       description: Generates a PDF of daily reports based on specified criteria.
@@ -186,7 +186,7 @@ paths:
             type: string
             format: date
             example: "2023-01-31"
-  api/passDS/:
+  /api/passDS/:
     get:
       summary: Get passDS
       description: Returns passDS based on specified criteria.

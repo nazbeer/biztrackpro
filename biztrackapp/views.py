@@ -427,6 +427,7 @@ class BankListView(ListView):
 
 
 def create_mode_of_transaction(request):
+    choices = TransactionMode.CHOICES  # Accessing the choices from the model
     try:
         # Get the current shop admin
         shop_admin = ShopAdmin.objects.get(user=request.user)
@@ -449,6 +450,7 @@ def create_mode_of_transaction(request):
     context = {
         'form': form,
         'business_profile': business_profile.id,
+        'transaction_modes':choices   
     }
     return render(request, 'create_mode_transaction.html', context)
 

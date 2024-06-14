@@ -18,7 +18,14 @@
                 
                 <div class="form-group">
                     <label for="name" class="mb-3">Mode Transaction Name:</label>
-                    <input type="text" id="name" name="name" class="form-control mb-0" style="width:50% !important;" required>
+                    <!-- <input type="text" id="name" name="name" class="form-control mb-0" style="width:50% !important;" required> -->
+                     <select id="name" name="name" class="form-control mb-0" style="width: 50% !important;" required>
+                        <option value="" disabled selected>Select Transaction Mode</option>
+                        {% for mode, display_name in transaction_modes %}
+                            <option value="{{ mode }}">{{ display_name }}</option>
+                        {% endfor %}
+                    </select>
+            
                     <input type="hidden" name="business_profile" value="{{ business_profile }}">
                 </div>
                 

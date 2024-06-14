@@ -1647,53 +1647,12 @@ def create_withdrawal(request):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
 
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
-    # else:
-    #     form = WithdrawalForm()
-    #     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    #     shop = shop_admin.shop
-    #     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-    #     return render(request, 'withdrawal_form.html', {'form': form, 'business_profile': business_profile.id})
-
 def list_withdrawal(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     withdrawals = Withdrawal.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html', {'withdrawals': withdrawals, 'business_profile': business_profile.id})
-
-# class WithdrawalListView(View):
-#     def get(self, request):
-#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-#         shop = shop_admin.shop
-        
-#         # Retrieve the business profile associated with the shop
-#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-#         withdrawals = Withdrawal.objects.all()
-#         return render(request, 'withdrawal_list.html', {'withdrawals': withdrawals, 'business_profile':business_profile.id})
-
-# class WithdrawalCreateView(View):
-#     def get(self, request):
-#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-#         shop = shop_admin.shop
-        
-#         # Retrieve the business profile associated with the shop
-#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-#         form = WithdrawalForm()
-#         return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
-
-#     def post(self, request):
-#         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-#         shop = shop_admin.shop
-        
-#         # Retrieve the business profile associated with the shop
-#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-#         form = WithdrawalForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect(reverse('withdrawal_list'))
-#         return render(request, 'withdrawal_form.html', {'form': form, 'business_profile':business_profile.id})
 
 
 def get_daily_summary_data(request,id):
@@ -1769,10 +1728,7 @@ def get_daily_summary_data(request,id):
     net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
     bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
 
-    print('net_collection',net_collection)
-    print('net_payment',net_payment)
-    print('bank_deposit_collection',bank_deposit_collection)
-    print('withdrawal_total',withdrawal_total)
+
 
     # if DailySummary.objects.exists():
     if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
@@ -2593,3 +2549,23 @@ class BankStatementAPIView(APIView):
                 'final_balance': balance
             }
         })
+
+
+class PassDSDailySummaryAPIView(APIView):
+    def post(self, request):
+        daily_summary_id = request.data.get('daily_summary_id')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        if daily_summary_id is not None:
+            try:
+                # Create or update DailySummary instance
+                daily_summary, created = DailySummary.objects.create(
+                    defaults={'daily_summary_id': daily_summary_id},
+                    business_profile=business_profile.id,
+                )
+                return Response({'message': 'Daily summary ID saved successfully'}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': 'daily_summary_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)

@@ -26,12 +26,12 @@
       
     });
   
-    window.addEventListener('beforeunload', (event) => {
-        const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
-        event.preventDefault();
-        event.returnValue = message; // For modern browsers
-        return message; // For older browsers
-    });
+    // window.addEventListener('beforeunload', (event) => {
+    //     const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
+    //     event.preventDefault();
+    //     event.returnValue = message; // For modern browsers
+    //     return message; // For older browsers
+    // });
 
     document.addEventListener('DOMContentLoaded', function() {
                 // const toggleBank = document.getElementById("toggleBank");

@@ -32,12 +32,67 @@
         }
       
     });
-    window.addEventListener('beforeunload', (event) => {
-        const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
-        event.preventDefault();
-        event.returnValue = message; // For modern browsers
-        return message; // For older browsers
+    // window.addEventListener('beforeunload', (event) => {
+    //     const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
+    //     event.preventDefault();
+    //     event.returnValue = message; // For modern browsers
+    //     return message; // For older browsers
+    // });
+    document.addEventListener('DOMContentLoaded', function() {
+        const addBtn = document.querySelector('[data-id="passDS"]');
+        const currentUrl = window.location.href;
+        const url = new URL(currentUrl);
+        const id = url.searchParams.get('id');
+
+        addBtn.addEventListener('click', function() {
+            if (id) {
+                // Send POST request to API endpoint
+                fetch('/api/passDS/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')  // Ensure you have CSRF token setup
+                    },
+                    body: JSON.stringify({
+                        daily_summary_id: id
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Failed to save daily summary ID');
+                })
+                .then(data => {
+                    // Handle success response
+                    console.log('Success:', data);
+                    // You can optionally close the modal here if needed
+                    // $('#bankSaleModal').modal('hide');
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error:', error);
+                });
+            } else {
+                console.error('Daily summary ID not found in URL');
+            }
+        });
     });
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
     document.addEventListener('DOMContentLoaded', function() {
             
                 // Initialize Awesomplete for cheque number input
@@ -148,143 +203,6 @@
             .catch(error => console.error('Error:', error));
     }
      
-    // $(document).ready(function() {
-    //     function toggleChequeDetails() {
-    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-    //         const chequeDetails = document.getElementById('chequeDetails');
-    //         const chequeDetails1 = document.getElementById('chequeDetails1');
-    //         const chequeDetailsd = document.getElementById('chequeDetailsd');
-    //         const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
-    //         const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
-            
-    //         if (selectedMode === 'cheque') {
-    //             chequeDetails.classList.remove('d-none');
-    //             chequeDetails1.classList.remove('d-none');
-
-    //             chequeDetailsd.classList.remove('d-none');
-    //             chequeDetailsd1.classList.remove('d-none');
-    //         } else {
-    //             chequeDetails.classList.add('d-none');
-    //             chequeDetails1.classList.add('d-none');
-    //             chequeDetailsd.classList.add('d-none');
-    //             chequeDetailsd1.classList.add('d-none');
-    //         }
-    //     }
-    //     $('#bankSaleModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id4').value = dailySummaryId;
-    //         $('#modal_daily_summary_id4').val(dailySummaryId);
-    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-    //         // Initial check when the modal is opened
-    //         toggleChequeDetails();
-    //         // Add change event listener
-    //         modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
-    //     });
-    //     $('#bankSaleModal').on('hidden.bs.modal', function() {
-    //         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-    //         modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
-    //     });
-    //     $('#bankDepositModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id1').value = dailySummaryId;
-    //         $('#modal_daily_summary_id1').val(dailySummaryId);
-    //         const modeOfTransactionSelect1 = document.getElementById('id_mode_of_transaction');
-    //         // Initial check when the modal is opened
-    //         toggleChequeDetails();
-    //         // Add change event listener
-    //         modeOfTransactionSelect1.addEventListener('change', toggleChequeDetails);
-      
-    //     });
-    //     $('#bankDepositModal').on('hidden.bs.modal', function() {
-    //         const modeOfTransactionSelect1 = document.getElementById('id_mode_of_transaction');
-    //         modeOfTransactionSelect1.removeEventListener('change', toggleChequeDetails);
-    //     });
-    //     $('#miscIncomeModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id2').value = dailySummaryId;
-    //         $('#modal_daily_summary_id2').val(dailySummaryId);
-    //     });
-    //     $('#creditCollectionModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id3').value = dailySummaryId;
-    //         $('#modal_daily_summary_id3').val(dailySummaryId);
-    //     });
-      
-    //     $('#purchaseModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id5').value = dailySummaryId;
-    //         $('#modal_daily_summary_id5').val(dailySummaryId);
-    //     });
-    //     $('#supplierPaymentModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id6').value = dailySummaryId;
-    //         $('#modal_daily_summary_id6').val(dailySummaryId);
-    //     });
-    //     $('#expenseModal').on('show.bs.modal', function (event) {
-    //         var urlParams = new URLSearchParams(window.location.search);
-    //         var dailySummaryId = urlParams.get('id');
-    //         document.getElementById('modal_daily_summary_id7').value = dailySummaryId;
-    //         $('#modal_daily_summary_id7').val(dailySummaryId);
-    //     });
-    // });
-//  $(document).ready(function() {
-//     function toggleChequeDetails() {
-//         const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-//         const chequeDetails = document.getElementById('chequeDetails');
-//         const chequeDetails1 = document.getElementById('chequeDetails1');
-//         // const chequeDetailsd = document.getElementById('chequeDetailsd');
-//         // const chequeDetailsd1 = document.getElementById('chequeDetailsd1');
-//         const selectedMode = modeOfTransactionSelect.options[modeOfTransactionSelect.selectedIndex].text.toLowerCase();
-        
-//         if (selectedMode === 'cheque') {
-//             chequeDetails.classList.remove('d-none');
-//             chequeDetails1.classList.remove('d-none');
-//             // chequeDetailsd.classList.remove('d-none');
-//             // chequeDetailsd1.classList.remove('d-none');
-//         } else {
-//             chequeDetails.classList.add('d-none');
-//             chequeDetails1.classList.add('d-none');
-//             // chequeDetailsd.classList.add('d-none');
-//             // chequeDetailsd1.classList.add('d-none');
-//         }
-//     }
-
-//     function setDailySummaryId(modalId, inputId) {
-//         const modal = $(`#${modalId}`);
-//         modal.on('show.bs.modal', function (event) {
-//             var urlParams = new URLSearchParams(window.location.search);
-//             var dailySummaryId = urlParams.get('id');
-//             document.getElementById(inputId).value = dailySummaryId;
-//             $(`#${inputId}`).val(dailySummaryId);
-//             // Initial check when the modal is opened
-//             toggleChequeDetails();
-//             // Add change event listener
-//             const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-//             modeOfTransactionSelect.addEventListener('change', toggleChequeDetails);
-//         });
-//         modal.on('hidden.bs.modal', function() {
-//             const modeOfTransactionSelect = document.getElementById('id_mode_of_transaction');
-//             modeOfTransactionSelect.removeEventListener('change', toggleChequeDetails);
-//         });
-        
-//     }
-
-//     setDailySummaryId('bankSaleModal', 'modal_daily_summary_id4');
-//     setDailySummaryId('bankDepositModal', 'modal_daily_summary_id1');
-//     setDailySummaryId('miscIncomeModal', 'modal_daily_summary_id2');
-//     setDailySummaryId('creditCollectionModal', 'modal_daily_summary_id3');
-//     setDailySummaryId('purchaseModal', 'modal_daily_summary_id5');
-//     setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
-//     setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
-//     setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
-// }); 
-
 $(document).ready(function() {
     function toggleChequeDetails() {
         const modal = $('.modal.show'); // Get the currently shown modal
@@ -294,9 +212,6 @@ $(document).ready(function() {
         const chequeDetails2 = modal.find('#chequeDetails2');
         const bank_detail1 = modal.find('#bank_detail1');
         const date_detail1 = modal.find('#date_detail1');
-
-
-
         
         if (modeOfTransactionSelect.length > 0) {
             const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
@@ -323,7 +238,6 @@ $(document).ready(function() {
                 chequeDetails2.addClass('d-none');
                 bank_detail1.removeClass('d-none');
                 date_detail1.removeClass('d-none');
-
             }
             else  {
                 chequeDetails.addClass('d-none');
@@ -331,9 +245,6 @@ $(document).ready(function() {
                 chequeDetails2.addClass('d-none');
                 bank_detail1.removeClass('d-none');
                 date_detail1.addClass('d-none');
-
-
-
             }
         }
     }
@@ -382,6 +293,7 @@ $(document).ready(function() {
         document.getElementById('status').value = 'completed';
         document.getElementById("daily_summary_form").submit();
     }
+   
 </script>
 
 <style>
@@ -459,7 +371,7 @@ $(document).ready(function() {
                                 <input type="hidden" name="sales" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" data-id="passDS" data-toggle="modal" data-target="#bankSaleModal">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">

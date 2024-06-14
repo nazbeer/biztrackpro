@@ -128,6 +128,7 @@ urlpatterns = [
 
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
 
+    path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
 ]
 # handler404 = 'custom_404_view'
 if settings.DEBUG:

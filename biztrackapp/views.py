@@ -2216,7 +2216,7 @@ class SalesReportAPIView(APIView):
             # Fetch and aggregate data
             sales_data = (
                 BankSales.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
-                .values('created_on__date')
+                .values('created_on')
                 .annotate(
                     cash=Sum('amount', filter=Q(mode_of_transaction__name='cash')),
                     credit=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
@@ -2450,7 +2450,7 @@ class BankStatementAPIView(APIView):
                 filters[bank_field] = bank
             else:
                 filters['bank'] = bank
-            
+
             transactions = model.objects.filter(
                 Q(**filters)
             ).annotate(

@@ -1021,8 +1021,12 @@ def create_daily_summary(request):
         card_transaction_mode = TransactionMode.objects.get(name="card")
     except TransactionMode.DoesNotExist:
         pass 
-
-    business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
+    if BusinessTiming.objects.filter(business_profile=business_profile.id).exists():
+        business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
+    else:
+        messages.warning(request, "Create business timing first.")
+        return redirect('create_business_timing')
+    # business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     if request.method == 'POST':
         form = DailySummaryForm(request.POST)
         if form.is_valid():

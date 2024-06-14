@@ -2094,35 +2094,7 @@ def delete_bank_deposit(request, pk):
     return redirect(next_page)
 
 
-# import pisa
 
-def download_pdf_cc(request):
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    api_request = Request(request)
-    api_view = DailyCollectionReportAPIView.as_view()
-    api_response = api_view(api_request)
-    report_data = api_response.data
-    html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
-    template_path = 'pdf_template_cc.html'
-    template = get_template(template_path)
-    html = render_to_string('pdf_template_cc.html', {'data': report_data})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
-
-    # pisa_status = pisa.CreatePDF(html, dest=response)
-    # if pisa_status.err:
-    #     return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    
-    # with tempfile.NamedTemporaryFile(delete=True) as output:
-    #     # HTML(string=html_string).write_pdf(output)
-    #     output.seek(0)
-    #     pdf = output.read()
-
-    # response = HttpResponse(pdf, content_type='application/pdf')
-    # response['Content-Disposition'] = f'attachment; filename="daily_collection_report_{start_date}_to_{end_date}.pdf"'
-    return response
 
 class DailyCollectionReportAPIView(APIView):
     def get(self, request):
@@ -2195,7 +2167,32 @@ class DailyCollectionReportAPIView(APIView):
 
         return JsonResponse(report_data)
 
+from xhtml2pdf import pisa
+# # import pisa
+def download_pdf_cc(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
+    api_request = Request(request)
+    api_view = DailyCollectionReportAPIView.as_view()
+    api_response = api_view(api_request)
+    report_data = api_response.data
+    # html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
+    # template_path = 'pdf_template_cc.html'
+    # template = get_template(template_path)
+    # html = render_to_string('pdf_template_cc.html', {'data': report_data})
+    # response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
+    template_path = 'pdf_template_cc.html'
+    template = get_template(template_path)
+    html = template.render(report_data)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
 
 class SalesReportAPIView(APIView):
 
@@ -2277,7 +2274,7 @@ class PurchaseReportAPIView(APIView):
             # Fetch and aggregate data
             sales_data = (
                 Purchase.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
-                .values('created_on__date')
+                .values('created_on')
                 .annotate(
                     cash=Sum('invoice_amount', filter=Q(mode_of_transaction__name='cash')),
                     credit=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),

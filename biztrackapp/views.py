@@ -25,6 +25,9 @@ from rest_framework.request import Request
 
 import xhtml2pdf as pisa
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .serializers import *
 
 def index(request):
     print('re',request.user)
@@ -2055,6 +2058,10 @@ def delete_bank_deposit(request, pk):
 
 
 class DailyCollectionReportAPIView(APIView):
+    @swagger_auto_schema(
+        query_serializer=DailyCollectionReportFilterSerializer,
+        responses={200: openapi.Response('Successful Response')}
+    )
     def get(self, request):
         start_date = request.GET.get('start_date')
         print('start date1', start_date)
@@ -2130,6 +2137,7 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 
 class DailyCollectionReportPDFView(APIView):
+    
     def get(self, request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
@@ -2434,6 +2442,11 @@ class SupplierPaymentReportAPIView(APIView):
         return Response(report_data)
     
 class BankStatementAPIView(APIView):
+    @swagger_auto_schema(
+        query_serializer=BankStatementReportFilterSerializer,
+        operation_description="Get bank statements filtered by date range and bank.",
+        responses={200: 'Your response schema here'}
+    )
     def get(self, request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')

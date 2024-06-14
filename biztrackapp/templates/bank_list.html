@@ -39,7 +39,7 @@
             {% for bank in object_list %}
             <tr>
               <td>{{ bank.id }}</td>
-              <td>{{ bank.name }}</td>
+              <td>{{ bank.bank.name}}</td>
               <td>{{ bank.account_number }}</td>
               <td>{{ bank.opening_balance }}</td>
               <td>{{ bank.created_on }}</td>

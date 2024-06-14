@@ -189,27 +189,26 @@ BANK_CHOICES = [
     ]
 ]
 
-class Bank(models.Model):
-    name = models.CharField(max_length=255, choices=BANK_CHOICES)
-    account_number = models.CharField(max_length=50)
-    opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
-    business_profile = models.CharField(max_length=255, null=True)
-    status = models.BooleanField(default=False)
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
-    update_on = models.DateTimeField(auto_now=True, null=True)
-
-    def __str__(self):
-        return f"{self.name} - {self.opening_balance}"
-    
 class AllBank(models.Model):
     name = models.CharField(max_length=255, choices=BANK_CHOICES)
     status = models.BooleanField(default=True)
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     update_on = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
     
+class Bank(models.Model):
+    bank = models.ForeignKey(AllBank, on_delete=models.CASCADE, null=True)
+    account_number = models.CharField(max_length=50)
+    opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    business_profile = models.CharField(max_length=255, null=True)
+    status = models.BooleanField(default=False)
+    created_on = models.DateField(auto_now_add=True, null=True)
+    update_on = models.DateTimeField(auto_now=True, null=True)
+
+    def __str__(self):
+        return f"{self.bank.name} - {self.opening_balance}"
 class TransactionMode(models.Model):
     CHOICES = [
         ('card', 'Card'),
@@ -222,7 +221,7 @@ class TransactionMode(models.Model):
     name = models.CharField(max_length=255,choices=CHOICES)
     business_profile = models.CharField(max_length=255, null=True)
     status = models.BooleanField(default=False)
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -233,7 +232,7 @@ class Customer(models.Model):
     outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
     status = models.BooleanField(default=True)  # BooleanField to represent True or False
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -245,7 +244,7 @@ class Supplier(models.Model):
     outstanding = models.DecimalField(max_digits=10, decimal_places=2)
     location = models.CharField(max_length=255)
     status = models.BooleanField(default=True)  # BooleanField to represent True or False
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.business_profile} - {self.name}"
@@ -273,7 +272,7 @@ class DailySummary(models.Model):
     closing_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     status = models.CharField(max_length=20, choices=CHOICES)
-    created_on = models.DateTimeField(auto_now_add=True, null=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
@@ -289,7 +288,7 @@ class BankSales(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -305,7 +304,7 @@ class CreditCollection(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -321,7 +320,7 @@ class MiscellaneousIncome(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -339,7 +338,7 @@ class Purchase(models.Model):
     cheque_no = models.CharField(max_length=255, null=True, blank=True)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -356,7 +355,7 @@ class SupplierPayments(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     # create_date = models.DateField(auto_now_add=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -374,7 +373,7 @@ class BankDeposits(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -392,7 +391,7 @@ class Expense(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     # created_date = models.DateField(auto_now_add=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -409,7 +408,7 @@ class Withdrawal(models.Model):
     business_profile = models.CharField(max_length=255, null=True)
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255, null=True,blank=True)
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateField(auto_now_add=True, null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):

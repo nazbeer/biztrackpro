@@ -404,7 +404,7 @@ def create_bank(request):
     context = {
         'form': form,
         'business_profile': business_profile.id,
-        'bank_choices': BANK_CHOICES
+        # 'bank_choices': BANK_CHOICES
     }
     return render(request, 'create_bank.html', context)
 
@@ -1114,19 +1114,35 @@ def create_daily_summary(request):
         expense_form = ExpenseForm()
         withdrawal_form = WithdrawalForm()
 
-    try:
-        # Get the latest DailySummary by sorting by date in descending order and taking the first one
-        # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
-        daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-created_on').first()
+    # try:
+    #     # Get the latest DailySummary by sorting by date in descending order and taking the first one
+    #     # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
+    #     daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-created_on').first()
 
-        print('bankdata submit', daily_summary)
-        bankdata = daily_summary.closing_balance or 0
+    #     print('bankdata submit', daily_summary)
+    #     bankdata = daily_summary.closing_balance or 0
         
-    except DailySummary.DoesNotExist:
-        # If no DailySummary exists at all, get the opening balance from BusinessProfile
-        bankdata = business_profile.opening_balance or 0
+    # except DailySummary.DoesNotExist:
+    #     # If no DailySummary exists at all, get the opening balance from BusinessProfile
+    #     bankdata = business_profile.opening_balance or 0
+    if DailySummary.objects.exists():
+        last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+        print('last_daily_summary', last_daily_summary)
+        # if last_daily_summary is not None:
+        #     bankdata = last_daily_summary.closing_balance
+        # else:
+        #     pass
+            # Handle case where no daily summary exists
+            # bankdata = None  # Or set to a default value or handle differently
 
-    daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
+        bankdata = last_daily_summary.closing_balance
+    else:
+        last_daily_summary = business_profile.opening_balance
+        bankdata = last_daily_summary
+        print(type(bankdata),'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
+
+
+    # daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
 
     # bankdata = business_profile.opening_balance
     # print('today', today)
@@ -1200,7 +1216,7 @@ def create_daily_summary(request):
     total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
 
     # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
-    daily_summary_today = DailySummary.objects.filter(business_profile=business_profile.id, status='ongoing')
+    # daily_summary_today = DailySummary.objects.filter(business_profile=business_profile.id, status='ongoing')
 
     # print('daily_summary_today', daily_summary_today)
     # print(daily_summary_today.bank_deposit)
@@ -1732,19 +1748,20 @@ def get_daily_summary_data(request,id):
     net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
     bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
 
-    print('net_collection',net_collection)
-    print('net_payment',net_payment)
-    print('bank_deposit_collection',bank_deposit_collection)
-    print('withdrawal_total',withdrawal_total)
+    # print('net_collection',net_collection)
+    # print('net_payment',net_payment)
+    # print('bank_deposit_collection',bank_deposit_collection)
+    # print('withdrawal_total',withdrawal_total)
 
     if DailySummary.objects.exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+        last_daily_summary_data = last_daily_summary.closing_balance
     else:
         last_daily_summary = business_profile.opening_balance
+        last_daily_summary_data = last_daily_summary
 
-    print('opening_balance',last_daily_summary.closing_balance)
-    closing_balance = last_daily_summary.closing_balance + net_collection - net_payment - bank_deposit_collection
-    print('closing_balance',closing_balance)
+    closing_balance = Decimal(last_daily_summary_data) + net_collection - net_payment - bank_deposit_collection
+    # print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
 
 

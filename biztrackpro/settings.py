@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-qx4_hp!=u4(mfx-+f=()wy(p5475mt==or2(6c9nff8#ei7)d%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['biztrackpro.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['biztrackpro.onrender.com', 'localhost', '127.0.0.1', '43.204.96.251']
 
 AUTH_USER_MODEL = "biztrackapp.User"
 

@@ -23,6 +23,8 @@ from django.template.loader import render_to_string
 import tempfile
 from rest_framework.request import Request
 
+import xhtml2pdf as pisa
+
 
 def index(request):
     print('re',request.user)
@@ -2167,32 +2169,83 @@ class DailyCollectionReportAPIView(APIView):
 
         return JsonResponse(report_data)
 
-from xhtml2pdf import pisa
-# # import pisa
-def download_pdf_cc(request):
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
 
-    api_request = Request(request)
-    api_view = DailyCollectionReportAPIView.as_view()
-    api_response = api_view(api_request)
-    report_data = api_response.data
-    # html_string = render_to_string('pdf_template_cc.html', {'data': report_data})
-    # template_path = 'pdf_template_cc.html'
-    # template = get_template(template_path)
-    # html = render_to_string('pdf_template_cc.html', {'data': report_data})
-    # response = HttpResponse(content_type='application/pdf')
-    # response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
-    template_path = 'pdf_template_cc.html'
-    template = get_template(template_path)
-    html = template.render(report_data)
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
+class DailyCollectionReportPDFView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        if not start_date or not end_date:
+            return Response({'error': 'Please provide start and end dates'}, status=status.HTTP_400_BAD_REQUEST)
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
-    if pisa_status.err:
-        return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    return response
+        # Parse dates and add timezone info
+        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        # Fetch summaries
+        summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
+        
+        op_bal = DailySummary.objects.filter(date__gte=start_date, business_profile=business_profile.id).first()
+        cl_bal = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id).last()
+
+        # Initialize totals
+        total_net_collections = 0
+        total_net_payments = 0
+        total_bank_deposits = 0
+        total_msc_income = 0
+
+        opening_summary = DailySummary.objects.filter(date__lte=start_date, business_profile=business_profile.id).order_by('date').first()
+        opening_balance1 = opening_summary.opening_balance if opening_summary else 0
+
+        for summary in summaries:
+            total_net_collections += summary.credit_collection or 0 
+            total_net_payments += (summary.purchase + summary.supplier_payment) or 0
+            total_msc_income += summary.miscellaneous_income or 0
+            total_bank_deposits += summary.bank_deposit or 0
+
+        total_closing_balance = (opening_balance1 + total_net_collections + total_msc_income) - (total_net_payments + total_bank_deposits)
+
+        report_data = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'opening_balance': op_bal.opening_balance if op_bal else 0,
+            'net_collections': total_net_collections,
+            'net_payments': total_net_payments,
+            'msc_income' : total_msc_income,
+            'bank_deposits': total_bank_deposits,
+            'closing_balance': total_closing_balance,
+            'details': [
+                {
+                    'date': summary.date,
+                    'net_collections': summary.credit_collection or 0,
+                    'net_payments': (summary.purchase + summary.supplier_payment) or 0,
+                    'msc_income': summary.miscellaneous_income or 0,
+                    'bank_deposits': summary.bank_deposit or 0,
+                    'opening_balance': summary.opening_balance,
+                    'closing_balance': summary.closing_balance
+                } for summary in summaries
+            ]
+        }
+
+        # Render HTML to string
+        html_string = render_to_string('pdf_template_cc.html', report_data)
+        
+        # Create PDF
+        pdf = HTML(string=html_string).write_pdf()
+
+        # Create HTTP response with PDF
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Daily_Collection_Report_{start_date}_to_{end_date}.pdf"'
+        return response
+    
+import json
+
 
 class SalesReportAPIView(APIView):
 
@@ -2285,7 +2338,7 @@ class PurchaseReportAPIView(APIView):
                 )
                 .order_by('created_on')
             )
-            print('purchase', sales_data)
+           
             report_details = [
                 {
                     'date': sale['created_on'],
@@ -2451,9 +2504,9 @@ class BankStatementAPIView(APIView):
             transactions = model.objects.filter(
                 Q(**filters)
             ).annotate(
-                description=F(description_field),
-                amount=Sum(amount_field)
-            ).values(date_field, 'description', 'amount')
+                description_field=F(description_field),
+                amount_field=Sum(amount_field)
+            ).values(date_field, 'description_field', 'amount_field')
 
             # Ensure the date is a `date` object
             for transaction in transactions:
@@ -2466,7 +2519,7 @@ class BankStatementAPIView(APIView):
         deposits = get_transactions(BankDeposits, 'deposit_date', 'amount', 'mode_of_transaction__name', 'bank_deposit_bank')
         withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'amount', 'mode_of_transaction__name', 'bank')
         purchases = get_transactions(Purchase, 'invoice_date', 'invoice_amount', 'mode_of_transaction__name', 'bank')
-        # expenses = get_transactions(Expense, 'created_on', 'amount', 'mode_of_transaction__name', 'bank')
+        expenses = get_transactions(Expense, 'created_on', 'amount', 'mode_of_transaction__name', 'bank')
 
         # Convert querysets to lists and process them
         transactions_list = []
@@ -2474,13 +2527,13 @@ class BankStatementAPIView(APIView):
             (deposits, 'deposit_date', 'deposit', 'Deposit'),
             (withdrawals, 'withdrawal_date', 'withdrawal', 'Withdrawal'),
             (purchases, 'invoice_date', 'purchase', 'Purchase'),
-            # (expenses, 'created_on', 'expense', 'Expense')
+            (expenses, 'created_on', 'expense', 'Expense')
         ]:
             for transaction in transactions:
                 transactions_list.append({
                     'date': transaction[date_field],
-                    'description': transaction['description'],
-                    amount_key: transaction['amount'],
+                    'description': transaction['description_field'],
+                    amount_key: transaction['amount_field'],
                     'transaction_type': type_key
                 })
 
@@ -2511,21 +2564,22 @@ class BankStatementAPIView(APIView):
             deposit = transaction.get('deposit', 0)
             withdrawal = transaction.get('withdrawal', 0)
             purchase = transaction.get('purchase', 0)
-            # expense = transaction.get('expense', 0)
+            expense = transaction.get('expense', 0)
 
             # Update balance
-            balance += deposit - withdrawal - purchase 
+            balance += deposit - withdrawal - purchase - expense
 
             statement_details.append({
                 'date': formatted_date,
-                'description': transaction['description'],
-                'withdrawal': withdrawal + purchase,
+                 'description': transaction['description'] or 'nasbeer',
+                # 'description': 'nasbeer',
+                'withdrawal': withdrawal + purchase + expense,
                 'deposit': deposit,
                 'balance': balance
             })
 
             total_deposits += deposit
-            total_withdrawals += withdrawal + purchase 
+            total_withdrawals += withdrawal + purchase + expense
 
         # Prepare the response
         return Response({

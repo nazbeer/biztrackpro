@@ -116,7 +116,7 @@ urlpatterns = [
     path('bank-statement/', BankStatementView.as_view(), name='bank_statement'),
 
 
-    path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
+    # path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
     #API Views
 
     path('api/daily-collection-report/', DailyCollectionReportAPIView.as_view(), name='daily_collection_report_api'),
@@ -125,6 +125,8 @@ urlpatterns = [
     path('api/msc-income-report/', MscIncomeReportAPIView.as_view(), name='msc_income_report'),
     path('api/supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
+
+    path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
 
 ]
 # handler404 = 'custom_404_view'

@@ -1,4 +1,3 @@
-<!-- templates/pdf_template.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,48 +5,63 @@
     <title>Daily Collection Report</title>
     <style>
         body { font-family: Arial, sans-serif; }
+        h1, h2 { text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-        th { background-color: #f2f2f2; }
-        h2 { text-align: center; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 8px; text-align: center; }
     </style>
 </head>
 <body>
-    <h2>Daily Collection Report</h2>
-    <p><strong>Date Range:</strong> {{ data.start_date }} to {{ data.end_date }}</p>
+    <h1>Daily Collection Report</h1>
+    <h2>{{ start_date }} - {{ end_date }}</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Opening Balance</th>
-                <th>Net Collection</th>
-                <th>Net Payment</th>
-                <th>Bank Deposit</th>
-                <th>Closing Balance</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for detail in data.details %}
-                <tr>
-                    <td>{{ detail.date }}</td>
-                    <td>{{ detail.opening_balance }}</td>
-                    <td>{{ detail.net_collections }}</td>
-                    <td>{{ detail.net_payments }}</td>
-                    <td>{{ detail.bank_deposits }}</td>
-                    <td>{{ detail.closing_balance }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th>Totals</th>
-                <th>{{ data.opening_balance }}</th>
-                <th>{{ data.net_collections }}</th>
-                <th>{{ data.net_payments }}</th>
-                <th>{{ data.bank_deposits }}</th>
-                <th>{{ data.closing_balance }}</th>
-            </tr>
-        </tfoot>
+        <tr>
+            <th>Opening Balance</th>
+            <td>{{ opening_balance }}</td>
+        </tr>
+        <tr>
+            <th>Net Collections</th>
+            <td>{{ net_collections }}</td>
+        </tr>
+        <tr>
+            <th>Net Payments</th>
+            <td>{{ net_payments }}</td>
+        </tr>
+        <tr>
+            <th>Miscellaneous Income</th>
+            <td>{{ msc_income }}</td>
+        </tr>
+        <tr>
+            <th>Bank Deposits</th>
+            <td>{{ bank_deposits }}</td>
+        </tr>
+        <tr>
+            <th>Closing Balance</th>
+            <td>{{ closing_balance }}</td>
+        </tr>
+    </table>
+    <h2>Details</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Net Collections</th>
+            <th>Net Payments</th>
+            <th>Miscellaneous Income</th>
+            <th>Bank Deposits</th>
+            <th>Opening Balance</th>
+            <th>Closing Balance</th>
+        </tr>
+        {% for detail in details %}
+        <tr>
+            <td>{{ detail.date }}</td>
+            <td>{{ detail.net_collections }}</td>
+            <td>{{ detail.net_payments }}</td>
+            <td>{{ detail.msc_income }}</td>
+            <td>{{ detail.bank_deposits }}</td>
+            <td>{{ detail.opening_balance }}</td>
+            <td>{{ detail.closing_balance }}</td>
+        </tr>
+        {% endfor %}
     </table>
 </body>
 </html>

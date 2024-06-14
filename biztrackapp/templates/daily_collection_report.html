@@ -106,7 +106,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
 document.getElementById('download-pdf-cc').addEventListener('click', function() {
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
-    window.location.href = `/download-pdf-cc/?start_date=${startDate}&end_date=${endDate}`;
+    window.location.href = `/api/daily-report-pdf/?start_date=${startDate}&end_date=${endDate}`;
 });
 
 </script>

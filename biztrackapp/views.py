@@ -2215,7 +2215,7 @@ class SalesReportAPIView(APIView):
 
             # Fetch and aggregate data
             sales_data = (
-                BankSales.objects.filter(created_on__date__range=[start_date, end_date], business_profile=business_profile.id)
+                BankSales.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
                 .values('created_on__date')
                 .annotate(
                     cash=Sum('amount', filter=Q(mode_of_transaction__name='cash')),
@@ -2225,12 +2225,12 @@ class SalesReportAPIView(APIView):
                     credit_card=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
                     total=Sum('amount')
                 )
-                .order_by('created_on__date')
+                .order_by('created_on')
             )
             print('sales', sales_data)
             report_details = [
                 {
-                    'date': sale['created_on__date'],
+                    'date': sale['created_on'],
                     'cash': sale['cash'] or 0,
                     'credit': sale['credit'] or 0,
                     'card': sale['card'] or 0,
@@ -2276,7 +2276,7 @@ class PurchaseReportAPIView(APIView):
 
             # Fetch and aggregate data
             sales_data = (
-                Purchase.objects.filter(created_on__date__range=[start_date, end_date], business_profile=business_profile.id)
+                Purchase.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
                 .values('created_on__date')
                 .annotate(
                     cash=Sum('invoice_amount', filter=Q(mode_of_transaction__name='cash')),
@@ -2286,12 +2286,12 @@ class PurchaseReportAPIView(APIView):
                     credit_card=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),
                     total=Sum('invoice_amount')
                 )
-                .order_by('created_on__date')
+                .order_by('created_on')
             )
             print('purchase', sales_data)
             report_details = [
                 {
-                    'date': sale['created_on__date'],
+                    'date': sale['created_on'],
                     'cash': sale['cash'] or 0,
                     'credit': sale['credit'] or 0,
                     'card': sale['card'] or 0,
@@ -2450,7 +2450,7 @@ class BankStatementAPIView(APIView):
                 filters[bank_field] = bank
             else:
                 filters['bank'] = bank
-
+            
             transactions = model.objects.filter(
                 Q(**filters)
             ).annotate(

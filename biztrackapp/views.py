@@ -2316,9 +2316,12 @@ class MscIncomeReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
         # Query the database for Miscellaneous Income within the provided date range
-        msc_income = MiscellaneousIncome.objects.filter(created_on__range=[start_date, end_date])
+        msc_income = MiscellaneousIncome.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
         
         # Prepare the data to be returned
         report_data = {
@@ -2340,11 +2343,14 @@ class SupplierPaymentReportAPIView(APIView):
         supplier_id = request.GET.get('supplier_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
         supplier = get_object_or_404(Supplier, id=supplier_id)
         
         # Get supplier payments for the specified supplier
-        supplier_payments = SupplierPayments.objects.filter(supplier=supplier, created_on__range=[start_date, end_date])
+        supplier_payments = SupplierPayments.objects.filter(supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id)
         
         
         # Calculate total purchases for the supplier within the specified date range
@@ -2364,7 +2370,7 @@ class SupplierPaymentReportAPIView(APIView):
         cash_purchases = Purchase.objects.filter(
             supplier=supplier, 
             invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='cash'
+            mode_of_transaction__name='cash', business_profile=business_profile.id
         ).values(
             'invoice_date', 
             'invoice_amount', 
@@ -2375,7 +2381,7 @@ class SupplierPaymentReportAPIView(APIView):
         credit_purchases = Purchase.objects.filter(
             supplier=supplier, 
             invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='credit'
+            mode_of_transaction__name='credit', business_profile=business_profile.id
         ).values(
             'invoice_date', 
             'invoice_amount', 
@@ -2404,12 +2410,15 @@ class SupplierPaymentReportAPIView(APIView):
             'summary': {
                 'total_purchases': total_purchases,
                 'total_supplier_payments': total_supplier_payments,
-                'closing_balance': closing_balance
+                'closing_balance': closing_balance,
+                'opening_balance': opening_balance,
+                 'total_cash_purchases': sum(item['invoice_amount'] for item in cash_purchases_list),
+                'total_credit_purchases': sum(item['invoice_amount'] for item in credit_purchases_list),
             }
         }
         
         return Response(report_data)
-
+    
 class BankStatementAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -2436,26 +2445,33 @@ class BankStatementAPIView(APIView):
             else:
                 filters['bank'] = bank
 
-            return model.objects.filter(
+            transactions = model.objects.filter(
                 Q(**filters)
-            ).values(date_field).annotate(
+            ).annotate(
                 description=F(description_field),
                 amount=Sum(amount_field)
-            )
+            ).values(date_field, 'description', 'amount')
+
+            # Ensure the date is a `date` object
+            for transaction in transactions:
+                if isinstance(transaction[date_field], datetime):
+                    transaction[date_field] = transaction[date_field].date()
+
+            return transactions
 
         # Aggregating data from various models
         deposits = get_transactions(BankDeposits, 'deposit_date', 'amount', 'mode_of_transaction__name', 'bank_deposit_bank')
         withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'amount', 'mode_of_transaction__name', 'bank')
         purchases = get_transactions(Purchase, 'invoice_date', 'invoice_amount', 'mode_of_transaction__name', 'bank')
-        expenses = get_transactions(Expense, 'created_on', 'amount', 'mode_of_transaction__name', 'bank')
+        # expenses = get_transactions(Expense, 'created_on', 'amount', 'mode_of_transaction__name', 'bank')
 
-        # Convert querysets to lists
+        # Convert querysets to lists and process them
         transactions_list = []
         for transactions, date_field, amount_key, type_key in [
             (deposits, 'deposit_date', 'deposit', 'Deposit'),
             (withdrawals, 'withdrawal_date', 'withdrawal', 'Withdrawal'),
             (purchases, 'invoice_date', 'purchase', 'Purchase'),
-            (expenses, 'created_on', 'expense', 'Expense')
+            # (expenses, 'created_on', 'expense', 'Expense')
         ]:
             for transaction in transactions:
                 transactions_list.append({
@@ -2488,25 +2504,25 @@ class BankStatementAPIView(APIView):
 
         for transaction in all_transactions:
             date = transaction['date']
-            formatted_date = date.strftime('%d %b %Y')  
+            formatted_date = date.strftime('%d %b %Y')
             deposit = transaction.get('deposit', 0)
             withdrawal = transaction.get('withdrawal', 0)
             purchase = transaction.get('purchase', 0)
-            expense = transaction.get('expense', 0)
+            # expense = transaction.get('expense', 0)
 
             # Update balance
-            balance += deposit - withdrawal - purchase - expense
+            balance += deposit - withdrawal - purchase 
 
             statement_details.append({
                 'date': formatted_date,
                 'description': transaction['description'],
-                'withdrawal': withdrawal + purchase + expense,
+                'withdrawal': withdrawal + purchase,
                 'deposit': deposit,
                 'balance': balance
             })
 
             total_deposits += deposit
-            total_withdrawals += withdrawal + purchase + expense
+            total_withdrawals += withdrawal + purchase 
 
         # Prepare the response
         return Response({

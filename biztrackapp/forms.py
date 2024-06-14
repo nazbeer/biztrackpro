@@ -79,6 +79,17 @@ class BankForm(forms.ModelForm):
     class Meta:
         model = Bank
         fields = '__all__'
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        bank = cleaned_data.get('bank')
+        business_profile = cleaned_data.get('business_profile')
+
+        if Bank.objects.filter(bank=bank, business_profile=business_profile).exists():
+            raise forms.ValidationError("This AllBank instance is already associated with this business profile.")
+
+        return cleaned_data
+
 
 class AllBankForm(forms.ModelForm):
     name = forms.ChoiceField(choices=BANK_CHOICES, label="Bank Name")

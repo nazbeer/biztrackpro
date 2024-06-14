@@ -9,6 +9,15 @@
     <form method="post" enctype="multipart/form-data" class="form">
       <div class="card-body">
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for error in form.non_field_errors %}
+                    {{ error }}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <div class="form-group">
           <label for="name">Bank Name:</label>
           <div class="searchable-select">

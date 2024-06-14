@@ -786,13 +786,27 @@ def save_after_submit(request):
         expense_form = ExpenseForm()
         withdrawal_form = WithdrawalForm()
 
-    try:
-        # previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
+    # try:
+    #     # previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
+    #     last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+    #     bankdata = last_daily_summary.closing_balance
+    #     print('yestdays bankdata', bankdata)
+    # except DailySummary.DoesNotExist:
+    #     bankdata = business_profile.opening_balance
+    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+        # if last_daily_summary is not None:
+        print('last_daily_summary', last_daily_summary)
         bankdata = last_daily_summary.closing_balance
-        print('yestdays bankdata', bankdata)
-    except DailySummary.DoesNotExist:
-        bankdata = business_profile.opening_balance
+        # else:
+        #     last_daily_summary = business_profile.opening_balance
+        #     bankdata = last_daily_summary
+
+    else:
+        last_daily_summary = business_profile.opening_balance
+        bankdata = last_daily_summary
+
+
 
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
@@ -1125,7 +1139,8 @@ def create_daily_summary(request):
     # except DailySummary.DoesNotExist:
     #     # If no DailySummary exists at all, get the opening balance from BusinessProfile
     #     bankdata = business_profile.opening_balance or 0
-    if DailySummary.objects.exists():
+    # if DailySummary.objects.exists():
+    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
         print('last_daily_summary', last_daily_summary)
         # if last_daily_summary is not None:
@@ -1139,8 +1154,6 @@ def create_daily_summary(request):
     else:
         last_daily_summary = business_profile.opening_balance
         bankdata = last_daily_summary
-        print(type(bankdata),'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
-
 
     # daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
 
@@ -1753,12 +1766,15 @@ def get_daily_summary_data(request,id):
     # print('bank_deposit_collection',bank_deposit_collection)
     # print('withdrawal_total',withdrawal_total)
 
-    if DailySummary.objects.exists():
+    # if DailySummary.objects.exists():
+    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
+        # last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
         last_daily_summary_data = last_daily_summary.closing_balance
     else:
         last_daily_summary = business_profile.opening_balance
         last_daily_summary_data = last_daily_summary
+    
 
     closing_balance = Decimal(last_daily_summary_data) + net_collection - net_payment - bank_deposit_collection
     # print('closing_balance',closing_balance)

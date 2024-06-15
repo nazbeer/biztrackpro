@@ -17,8 +17,8 @@
               <label for="id_customer">Customer</label>
               <input type="hidden" name="business_profile" value="{{credit_instance.business_profile }}">
               <input type="hidden" name="daily_summary_id" value="{{ credit_instance.daily_summary_id }}">
-              <select id="id_customer" name="customer" class="form-control" tabindex="010">
-                <option>-- Select Customer --</option>
+              <select id="id_customer" name="customer" class="form-control" tabindex="010" required>
+                <option value="">-- Select Customer --</option>
                 {% for customer in form.customer.field.queryset %}
                   <option value="{{ customer.id }}" {% if customer.id == credit_instance.customer.id %} selected {% endif %}>{{ customer.name }}</option>
                 {% endfor %}
@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
               <label for="id_amount">Amount</label>
-              <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="012" value="{{ credit_instance.amount }}">
+              <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="012" value="{{ credit_instance.amount }}" required>
             </div>
             <div class="form-group" id="cheque_details">
               <label for="id_cheque_date">Cheque Date</label>
@@ -36,7 +36,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="id_payment_mode">Mode of Transaction</label>
-              <select id="id_payment_mode" name="payment_mode" class="form-control text-capitalize" tabindex="011">
+              <select id="id_payment_mode" name="payment_mode" class="form-control text-capitalize" tabindex="011" required>
                 <option>-- Mode of Transaction --</option>
                 {% for transaction_mode in form.payment_mode.field.queryset %}
                 <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == credit_instance.payment_mode.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
@@ -54,7 +54,7 @@
             </div>
             <div class="form-group" id="cheque_no_details">
               <label for="id_cheque_no">Cheque Number</label>
-              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ credit_instance.cheque_no }}" tabindex="015">
+              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{% if credit_instance.cheque_no != 'None' %}{{ credit_instance.cheque_no }}{% endif %}" tabindex="015">
             </div>
           </div>
         </div>
@@ -85,16 +85,31 @@
       chequeDetails.style.display = "block";
       bankDetails.style.display = "block";
       chequeNoDetails.style.display = "block";
+
+      setRequired(chequeDetails, true);
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, true);
     } else {
       chequeDetails.style.display = "none";
       bankDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
+
+      setRequired(chequeDetails, false);
+      setRequired(bankDetails, false);
+      setRequired(chequeNoDetails, false);
+      
 
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_bank").value = "";
       document.getElementById("id_cheque_no").value = "";
     }
   }
+  function setRequired(element, isRequired) {
+            var inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.required = isRequired;
+            });
+        }
   document.getElementById("id_payment_mode").addEventListener("change", toggleChequeDetails1);
   toggleChequeDetails1();
 </script>

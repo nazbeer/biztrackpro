@@ -17,7 +17,7 @@
               <label for="id_supplier">Supplier</label>
               <input type="hidden" name="business_profile" value="{{supplier_instance.business_profile }}">
               <input type="hidden" name="daily_summary_id" value="{{ supplier_instance.daily_summary_id }}">
-              <select id="id_supplier" name="supplier" class="form-control" tabindex="042">
+              <select id="id_supplier" name="supplier" class="form-control" tabindex="042" required>
                 {% for supplier in form.supplier.field.queryset %}
                   <option value="{{ supplier.id }}" {% if supplier.id == supplier_instance.supplier.id %} selected {% endif %}>{{ supplier.name }}</option>
                 {% endfor %}
@@ -26,11 +26,11 @@
 
             <div class="form-group">
                 <label for="id_amount">Amount</label>
-                <input type="number" id="id_amount" name="amount" class="form-control" value="{{ supplier_instance.amount }}" tabindex="044">
+                <input type="number" id="id_amount" name="amount" class="form-control" value="{{ supplier_instance.amount }}" tabindex="044"  required>
               </div>
             <div class="form-group" id="cheque_no_details">
                 <label for="id_cheque_no">Cheque Number</label>
-                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ supplier_instance.cheque_no }}" tabindex="046">
+                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{% if supplier_instance.cheque_no != 'None' %}{{ supplier_instance.cheque_no }}{% endif %}" tabindex="046">
               </div>
 
             <div class="form-group" id="bank_details">
@@ -49,7 +49,7 @@
             </div>
             <div class="form-group">
               <label for="id_mode_of_transaction">Mode of Transaction</label>
-              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="045">
+              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="045" required>
                 <option>-- Mode of Transaction --</option>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
                 <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == supplier_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
@@ -89,11 +89,18 @@
       chequeDetails.style.display = "block";
       bankDetails.style.display = "block";
       chequeNoDetails.style.display = "block";
+      setRequired(chequeDetails, true);
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, true);
 
     } else if( modeOfTransaction === "bank transfer" || modeOfTransaction === "card") {
       chequeDetails.style.display = "block";
       chequeNoDetails.style.display = "none";
       bankDetails.style.display = "block";
+
+      setRequired(chequeDetails, true);
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, false);
 
     //   document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
@@ -102,6 +109,9 @@
       chequeDetails.style.display = "none";
       bankDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
+      setRequired(chequeDetails, false);
+      setRequired(bankDetails, false);
+      setRequired(chequeNoDetails, false);
 
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
@@ -109,6 +119,12 @@
 
     }
   }
+  function setRequired(element, isRequired) {
+            var inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.required = isRequired;
+            });
+        }
   document.getElementById("id_mode_of_transaction").addEventListener("change", toggleChequeDetails5);
   toggleChequeDetails5();
 </script>

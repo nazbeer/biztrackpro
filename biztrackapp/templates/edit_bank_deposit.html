@@ -17,7 +17,7 @@
               <label for="id_bank_deposit_bank">Deposit Bank</label>
               <input type="hidden" name="business_profile" value="{{bank_deposit.business_profile }}">
               <input type="hidden" name="daily_summary_id" value="{{ bank_deposit.daily_summary_id }}">
-              <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="071">
+              <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="071" required>
                 {% for bank in form.bank_deposit_bank.field.queryset %}
                   <option value="{{ bank.id }}" {% if bank.id == bank_deposit.bank.id %} selected {% endif %}>{{ bank.name }}</option>
                 {% endfor %}
@@ -26,11 +26,11 @@
 
             <div class="form-group">
                 <label for="id_amount">Amount</label>
-                <input type="number" id="id_amount" name="amount" class="form-control" value="{{ bank_deposit.amount }}" tabindex="073">
+                <input type="number" id="id_amount" name="amount" class="form-control" value="{{ bank_deposit.amount }}" tabindex="073" required>
               </div>
             <div class="form-group" id="cheque_no_details">
                 <label for="id_cheque_no">Cheque Number</label>
-                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ bank_deposit.cheque_no }}" tabindex="075">
+                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{% if bank_deposit.cheque_no != 'None' %}{{ bank_deposit.cheque_no }}{% endif %}" tabindex="075">
               </div>
 
             <div class="form-group" id="bank_details">
@@ -45,12 +45,12 @@
           <div class="col-md-6">
             <div class="form-group">
                 <label for="id_deposit_date">Deposit Date</label>
-                <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="072" value="{{bank_deposit.deposit_date|date:'Y-m-d' }}" >
+                <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="072" value="{{bank_deposit.deposit_date|date:'Y-m-d' }}" required >
 
             </div>
             <div class="form-group">
               <label for="id_mode_of_transaction">Payment Mode</label>
-              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="074">
+              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="074" required>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
                 <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == bank_deposit.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
                 {% endfor %}
@@ -90,10 +90,19 @@
       bankDetails.style.display = "block";
       chequeNoDetails.style.display = "block";
 
+      setRequired(chequeDetails, true);
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, true);
+
     } else if( modeOfTransaction === "bank transfer" || modeOfTransaction === "card") {
       chequeDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
       bankDetails.style.display = "block";
+
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, false);
+      setRequired(chequeDetails, false);
+
 
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
@@ -103,12 +112,22 @@
       bankDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
 
+      setRequired(chequeDetails, false);
+      setRequired(bankDetails, false);
+      setRequired(chequeNoDetails, false);
+
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
       document.getElementById("id_bank").value = "";
 
     }
   }
+  function setRequired(element, isRequired) {
+            var inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.required = isRequired;
+            });
+        }
   document.getElementById("id_mode_of_transaction").addEventListener("change", toggleChequeDetails5);
   toggleChequeDetails5();
 </script>

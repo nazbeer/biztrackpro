@@ -17,7 +17,7 @@
               <label for="id_supplier">Supplier</label>
               <input type="hidden" name="business_profile" value="{{purchase_instance.business_profile }}">
               <input type="hidden" name="daily_summary_id" value="{{ purchase_instance.daily_summary_id }}">
-              <select id="id_supplier" name="supplier" class="form-control" tabindex="030">
+              <select id="id_supplier" name="supplier" class="form-control" tabindex="030" required>
                 {% for supplier in form.supplier.field.queryset %}
                   <option value="{{ supplier.id }}" {% if supplier.id == purchase_instance.supplier.id %} selected {% endif %}>{{ supplier.name }}</option>
                 {% endfor %}
@@ -25,8 +25,8 @@
             </div>
             <div class="form-group">
               <label for="id_mode_of_transaction">Mode of Transaction</label>
-              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="032">
-                <option>-- Mode of Transaction --</option>
+              <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="032" required>
+                <option value="">-- Mode of Transaction --</option>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
                 <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == purchase_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
                 {% endfor %}
@@ -34,7 +34,7 @@
             </div>
             <div class="form-group">
               <label for="id_invoice_no">Invoice Number</label>
-              <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" step="0.01" tabindex="034" value="{{ purchase_instance.invoice_no }}">
+              <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" step="0.01" tabindex="034" value="{{ purchase_instance.invoice_no }}" required>
             </div>
             <div class="form-group" id="cheque_details">
               <label for="id_cheque_date">Cheque Date</label>
@@ -56,15 +56,15 @@
             </div>
             <div class="form-group">
                 <label for="id_invoice_date">Invoice Date</label>
-                <input type="date" id="id_invoice_date" name="invoice_date" class="form-control" tabindex="033" {% if purchase_instance.invoice_date %} value="{{ purchase_instance.invoice_date|date:'Y-m-d' }}" {% endif %}>
+                <input type="date" id="id_invoice_date" name="invoice_date" class="form-control" tabindex="033" {% if purchase_instance.invoice_date %} value="{{ purchase_instance.invoice_date|date:'Y-m-d' }}" {% endif %} required>
               </div>
               <div class="form-group">
                 <label for="id_invoice_amount">Invoice Amount</label>
-                <input type="number" id="id_invoice_amount" name="invoice_amount" class="form-control" value="{{ purchase_instance.invoice_amount }}" tabindex="035">
+                <input type="number" id="id_invoice_amount" name="invoice_amount" class="form-control" value="{{ purchase_instance.invoice_amount }}" tabindex="035" required>
               </div>
             <div class="form-group" id="cheque_no_details">
               <label for="id_cheque_no">Cheque Number</label>
-              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{{ purchase_instance.cheque_no }}" tabindex="037">
+              <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" value="{% if purchase_instance.cheque_no != 'None' %}{{ purchase_instance.cheque_no }}{% endif %}" tabindex="037">
             </div>
           </div>
         </div>
@@ -92,10 +92,18 @@
       chequeDetails.style.display = "block";
       bankDetails.style.display = "block";
       chequeNoDetails.style.display = "block";
+      setRequired(chequeDetails, true);
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, true);
+
     } else if( modeOfTransaction === "bank transfer" || modeOfTransaction === "card") {
       chequeDetails.style.display = "none";
       bankDetails.style.display = "block";
       chequeNoDetails.style.display = "none";
+
+      setRequired(bankDetails, true);
+      setRequired(chequeNoDetails, false);  
+      setRequired(chequeDetails, false);
 
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
@@ -105,11 +113,21 @@
       bankDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
 
+      setRequired(chequeDetails, false);
+      setRequired(bankDetails, false);
+      setRequired(chequeNoDetails, false);
+
       document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
       document.getElementById("id_bank").value = "";
     }
   }
+  function setRequired(element, isRequired) {
+            var inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.required = isRequired;
+            });
+        }
   document.getElementById("id_mode_of_transaction").addEventListener("change", toggleChequeDetails2);
   toggleChequeDetails2();
 </script>

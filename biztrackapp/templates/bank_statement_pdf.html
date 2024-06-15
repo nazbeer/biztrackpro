@@ -65,9 +65,9 @@
             <tr>
                 <td>{{ detail.date }}</td>
                 <td style="text-align:left; text-transform: capitalize;">{{ detail.description }}</td>
-                <td style="text-align:right; ">{{ detail.withdrawal }}</td>
-                <td style="text-align:right; ">{{ detail.deposit }}</td>
-                <td style="text-align:right; ">{{ detail.balance }}</td>
+                <td style="text-align:right; ">{{ detail.withdrawal|floatformat:2 }}</td>
+                <td style="text-align:right; ">{{ detail.deposit|floatformat:2 }}</td>
+                <td style="text-align:right; ">{{ detail.balance|floatformat:2 }}</td>
             </tr>
             {% endfor %}
         </tbody>

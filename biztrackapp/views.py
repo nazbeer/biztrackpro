@@ -2645,7 +2645,7 @@ class BankStatementAPIView(APIView):
             creditcol = transaction.get('creditcol', 0)
             supplierpayment = transaction.get('supplierpayment', 0)
 
-            balance += (deposit + banksale + creditcol + mscincome) - (withdrawal + purchase + expense + supplierpayment)
+            balance += ( withdrawal + banksale + creditcol + mscincome) - (deposit + purchase + expense + supplierpayment)
 
             statement_details.append({
                 'date': formatted_date,
@@ -2787,7 +2787,7 @@ class BankStatementPDFView(APIView):
             supplierpayment = transaction.get('supplierpayment', 0)
 
             # Update balance
-            balance += (deposit + banksale + creditcol + mscincome) - (withdrawal + purchase + expense + supplierpayment)
+            balance += ( withdrawal + banksale + creditcol + mscincome) - (deposit + purchase + expense + supplierpayment)
 
             statement_details.append({
                 'date': formatted_date,

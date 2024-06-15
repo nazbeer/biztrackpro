@@ -98,13 +98,36 @@
   </div>
 </div>
 
-<script>
+<!-- 
   document.getElementById('daily_summary_id').addEventListener('click', function(e) {
     e.preventDefault();
     const id = 'DS_' + Math.random().toString(36).substr(2, 10);
     const url = "{% url 'create_daily_summary' %}?id=" + id;
     window.location.href = url;
+  }); -->
+<script>
+
+  document.getElementById('daily_summary_id').addEventListener('click', function(e) {
+    e.preventDefault();
+    fetch(`/api/daily_summary_exists/`)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data.exists);
+          const dailySummaryLink = document.getElementById("daily_summary_id");
+          if (data.exists === true) {
+            message.style.display = "block";
+            message.innerHTML = "Daily summary already submitted";
+          } else {
+            const id = 'DS_' + Math.random().toString(36).substr(2, 10);
+            const url = "{% url 'create_daily_summary' %}?id=" + id;
+            window.location.href = url;
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
   });
+
 
   new DataTable('#dailysummary', {
     responsive: true,

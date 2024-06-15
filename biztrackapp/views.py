@@ -2733,3 +2733,49 @@ class PassDSDailySummaryAPIView(APIView):
                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({'error': 'daily_summary_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class PassDSDailySummaryAPIView(APIView):
+    def post(self, request):
+        daily_summary_id = request.data.get('daily_summary_id')
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        today = datetime.now().date()
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
+            last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+            last_daily_summary_data = last_daily_summary.closing_balance
+        else:
+            last_daily_summary = business_profile.opening_balance
+            last_daily_summary_data = last_daily_summary
+
+        if daily_summary_id is not None and not DailySummary.objects.filter(business_profile = business_profile.id, daily_summary_id = daily_summary_id).exists():
+            try:
+                # Create or update DailySummary instance
+                DailySummary.objects.create(
+                    daily_summary_id = daily_summary_id,
+                    business_profile=business_profile.id,
+                    status = "ongoing",
+                    date = today,
+                    opening_balance = last_daily_summary_data,
+                    
+                )
+                return Response({'message': 'Daily summary ID saved successfully'}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': 'daily_summary_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CheckDailySummaryExists(APIView):
+    def get(self,request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        businessprofile = get_object_or_404(BusinessProfile, name=shop.name)
+        daily_summary_instance = DailySummary.objects.filter(business_profile = businessprofile.id,date = datetime.now().date())
+        if daily_summary_instance:
+            return Response({'exists': False}) 
+            # return Response({'exists': True})  uncomment this return statement and Remove the above return statement after complete the testing
+        else:
+            return Response({'exists': False})

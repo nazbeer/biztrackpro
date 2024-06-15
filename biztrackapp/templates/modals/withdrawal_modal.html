@@ -23,7 +23,7 @@
                                 {% endfor %}
                             </select>  -->
                             <label for="id_bank">Bank</label>
-                            <select id="id_bank" name="bank" class="form-control">
+                            <select id="id_bank" name="bank" class="form-control" required>
                               <option value="">-- Select Bank --</option>
                               {% for bank in withdrawal_form.bank.field.queryset %}
                                 <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
@@ -33,13 +33,13 @@
                        
                         <div class="form-group col-md-6">
                             <label for="id_withdrawal_date">Withdrawal Date</label>
-                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" >
+                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="id_amount">Amount</label>
-                            <input type="number" id="id_amount" name="amount" class="form-control">
+                            <input type="number" id="id_amount" name="amount" class="form-control" required>
                         </div>
 
                         <div class="form-group col-md-6">
@@ -49,8 +49,8 @@
                                 <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
                                 {% endfor %}
                             </select> {% endcomment %}.
-                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize">
-                                <option>-- Mode of Transaction --</option>
+                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" required>
+                                <option value="">-- Mode of Transaction --</option>
                                 {% for transaction_mode in withdrawal_form.mode_of_transaction.field.queryset %}
                                   <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                 {% endfor %}

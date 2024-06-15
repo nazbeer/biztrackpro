@@ -18,8 +18,8 @@
                   <label for="id_customer">Customer</label>
                   <input type="hidden" name="business_profile" value="{{ business_profile }}">
                   <input type="hidden" id="modal_daily_summary_id4" name="daily_summary_id">
-                  <select id="id_customer" name="customer" class="form-control" tabindex="50">
-                    <option>-- Select Customer --</option>
+                  <select id="id_customer" name="customer" class="form-control" tabindex="50" required >
+                    <option value="">-- Select Customer --</option>
                     {% for customer in bank_sale_form.customer.field.queryset %}
                       <option value="{{ customer.id }}">{{ customer.name }}</option>
                     {% endfor %}
@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-group">
                   <label for="id_amount">Amount</label>
-                  <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="52">
+                  <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="52" required>
                 </div>
                 <div id="chequeDetails" class="d-none">
                 <div class="form-group">
@@ -39,8 +39,8 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="id_mode_of_transaction">Mode of Transaction</label>
-                  <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="51">
-                    <option >-- Mode of Transaction --</option>
+                  <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="51" required>
+                    <option value="">-- Mode of Transaction --</option>
                     {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
                       <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                     {% endfor %}

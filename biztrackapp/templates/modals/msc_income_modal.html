@@ -17,8 +17,8 @@
                                 <label for="id_receipt_type">Income Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="modal_daily_summary_id2" name="daily_summary_id">
-                                <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="80"  >
-                                    <option>-- Select Income Type --</option>
+                                <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="80"  required>
+                                    <option value="">-- Select Income Type --</option>
                                     {% for receipt_type in msc_income_form.receipt_type.field.queryset %}
                                         <option value="{{ receipt_type.id }}">{{ receipt_type.name }}</option>
                                     {% endfor %}
@@ -26,7 +26,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="id_amount">Amount</label>
-                                <input type="number" id="id_amount" name="amount" class="form-control" tabindex="82" >
+                                <input type="number" id="id_amount" name="amount" class="form-control" tabindex="82" required >
                             </div>
                             <div id="chequeDetails1" class="d-none">
                             <div class="form-group">
@@ -38,8 +38,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_mode_of_transaction">Mode of Transaction</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="81">
-                                    <option>-- Mode of Transaction --</option>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="81"  required>
+                                    <option value="">-- Mode of Transaction --</option>
                                     {% for transaction_mode in msc_income_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                     {% endfor %}

@@ -17,8 +17,8 @@
                                 <label for="id_expense_type">Expense Type</label>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="modal_daily_summary_id7" name="daily_summary_id">
-                                <select id="id_expense_type" name="expense_type" class="form-control" tabindex="200">
-                                    <option>-- Select Expense Type --</option>
+                                <select id="id_expense_type" name="expense_type" class="form-control" tabindex="200" required>
+                                    <option value="">-- Select Expense Type --</option>
                                     {% for expense_type in expense_form.expense_type.field.queryset %}
                                         <option value="{{ expense_type.id }}">{{ expense_type.name }}</option>
                                     {% endfor %}
@@ -26,7 +26,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="id_amount">Amount</label>
-                                <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="202">
+                                <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="202" required>
                             </div>
                             <div id="chequeDetails1" class="d-none">
                             <div class="form-group">
@@ -50,12 +50,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_invoice_no">Invoice Number</label>
-                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="201">
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="201" required>
                             </div>
                             <div class="form-group">
                                 <label for="id_mode_of_transaction">Payment Mode</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="203">
-                                    <option>-- Payment Mode --</option>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="203" required>
+                                    <option value="">-- Payment Mode --</option>
                                     {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                     {% endfor %}

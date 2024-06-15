@@ -20,8 +20,8 @@
                             <input type="hidden" id="modal_daily_summary_id1" name="daily_summary_id">
     
                             <label for="id_bank_deposit_bank">Deposit Bank</label>
-                            <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500">
-                              <option>-- Select Deposit Bank --</option>
+                            <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500" required >
+                              <option value="">-- Select Deposit Bank --</option>
                               {% for banks in bank_deposit_form.bank_deposit_bank.field.queryset %}
                                 <option value="{{ banks.id }}">{{ banks.bank.name }}</option>
                               {% endfor %}
@@ -30,7 +30,7 @@
                      
                       <div class="form-group">
                         <label for="id_amount">Amount</label>
-                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="502">
+                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="502" required >
                       </div>
                       <div id="chequeDetails" class="d-none">
                       <div class="form-group">
@@ -53,12 +53,12 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="id_deposit_date">Deposit Date</label>
-                            <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="501" >
+                            <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="501" required>
                           </div>
                       <div class="form-group">
                         <label for="id_mode_of_transaction">Payment Mode</label>
-                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="503">
-                          <option>-- Payment Mode --</option>
+                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="503" required>
+                          <option value="">-- Payment Mode --</option>
                           {% for transaction_mode in bank_deposit_form.mode_of_transaction.field.queryset %}
                             <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                           {% endfor %}

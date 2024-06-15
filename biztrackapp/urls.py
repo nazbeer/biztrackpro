@@ -150,6 +150,7 @@ urlpatterns = [
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
     path('api/bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
+    path('api/supplier-payment-report-pdf/', SupplierPaymentReportPDFAPIView.as_view(), name='supplier-payment-report-pdf'),
 
     path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
     path('api/daily_summary_exists/', CheckDailySummaryExists.as_view(), name='daily_summary_exists'),

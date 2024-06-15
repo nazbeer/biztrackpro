@@ -37,12 +37,12 @@
                     <thead >
                         <tr >
                             <th style="background-color: #8a8a8a !important;text-align:center !important;">Date</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Opening Balance</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Collection</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Msc. Income</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Net Payment</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Bank Deposit</th>
-                            <th style="background-color: #8a8a8a !important;text-align:center !important;">Closing Balance</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Opening Balance</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Net Collection</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Msc. Income</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Net Payment</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Bank Deposit</th>
+                            <th style="background-color: #8a8a8a !important;text-align:right !important;">Closing Balance</th>
                         </tr>
                     </thead>
                     <tbody id="report-body"></tbody>
@@ -79,12 +79,12 @@ document.getElementById('report-form').addEventListener('submit', function(event
                 return `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td>${detail.opening_balance}</td>
-                        <td>${detail.net_collections}</td>
-                        <td>${detail.msc_income}</td>
-                        <td>${detail.net_payments}</td>
-                        <td>${detail.bank_deposits}</td>
-                        <td>${detail.closing_balance}</td>
+                        <td style="text-align:right !important;">${detail.opening_balance}</td>
+                        <td style="text-align:right !important;">${detail.net_collections}</td>
+                        <td style="text-align:right !important;">${detail.msc_income}</td>
+                        <td style="text-align:right !important;">${detail.net_payments}</td>
+                        <td style="text-align:right !important;">${detail.bank_deposits}</td>
+                        <td style="text-align:right !important;">${detail.closing_balance}</td>
                     </tr>
                 `;
             }).join('');
@@ -93,12 +93,12 @@ document.getElementById('report-form').addEventListener('submit', function(event
             reportFooter.innerHTML = `
                 <tr style="background-color: #8a8a8a !important;">
                     <th colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;">Totals</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.opening_balance}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_collections}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.msc_income}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.net_payments}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.bank_deposits}</th>
-                    <th style="background-color: #8a8a8a !important;color: #fff !important;">${data.closing_balance}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.opening_balance}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.net_collections}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.msc_income}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.net_payments}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.bank_deposits}</th>
+                    <th style="text-align:right !important;background-color: #8a8a8a !important;color: #fff !important;">${data.closing_balance}</th>
                 </tr>
             `;
         });

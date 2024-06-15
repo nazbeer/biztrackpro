@@ -19,7 +19,7 @@
               <input type="hidden" name="daily_summary_id" value="{{ withdrawal_instance.daily_summary_id }}">
               <select id="id_bank" name="bank" class="form-control" tabindex="001" required>
                 {% for bank in form.bank.field.queryset %}
-                  <option value="{{ bank.id }}" {% if bank.id == withdrawal_instance.bank.id %} selected {% endif %}>{{ bank.name }}</option>
+                  <option value="{{ bank.id }}" {% if bank.id == withdrawal_instance.bank.id %} selected {% endif %}>{{ bank.bank.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -65,7 +65,7 @@
       <div class="card-footer">
         <div class="form-group mb-0">
             <button type="submit" class="btn btn-primary" tabindex="007">Save</button>
-            <a href="{% url 'save_after_submit' %}?id={{ withdrawal_instance.daily_summary_id }}" class="btn btn-secondary" tabindex="008">Cancel</a>
+            <a href="{% url 'save_after_submit' %}?id={{ withdrawal_instance.daily_summary_id }}#4" class="btn btn-secondary" tabindex="008">Cancel</a>
         </div>
     </div>
 </form>

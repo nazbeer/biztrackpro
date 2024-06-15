@@ -44,7 +44,7 @@
               <label for="id_bank">Bank</label>
               <select id="id_bank" name="bank" class="form-control text-capitalize" tabindex="038">
                 {% for bank in form.bank.field.queryset %}
-                <option value="{{ bank.id }}" {% if bank.id == purchase_instance.bank.id %} selected {% endif %}>{{ bank.name }}</option>
+                <option value="{{ bank.id }}" {% if bank.id == purchase_instance.bank.id %} selected {% endif %}>{{ bank.bank.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -72,7 +72,7 @@
       <div class="card-footer">
         <div class="form-group mb-0">
             <button type="submit" class="btn btn-primary" tabindex="039">Save</button>
-            <a href="{% url 'save_after_submit' %}?id={{ purchase_instance.daily_summary_id }}" class="btn btn-secondary" tabindex="040">Cancel</a>
+            <a href="{% url 'save_after_submit' %}?id={{ purchase_instance.daily_summary_id }}#5" class="btn btn-secondary" tabindex="040">Cancel</a>
         </div>
     </div>
 </form>

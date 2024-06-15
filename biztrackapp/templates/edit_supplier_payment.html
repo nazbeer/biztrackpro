@@ -37,7 +37,7 @@
               <label for="id_bank">Bank</label>
               <select id="id_bank" name="bank" class="form-control text-capitalize" tabindex="048">
                 {% for bank in form.bank.field.queryset %}
-                <option value="{{ bank.id }}" {% if bank.id == supplier_instance.bank.id %} selected {% endif %}>{{ bank.name }}</option>
+                <option value="{{ bank.id }}" {% if bank.id == supplier_instance.bank.id %} selected {% endif %}>{{ bank.bank.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -50,7 +50,7 @@
             <div class="form-group">
               <label for="id_mode_of_transaction">Mode of Transaction</label>
               <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="045" required>
-                <option>-- Mode of Transaction --</option>
+                <option value="">-- Mode of Transaction --</option>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
                 <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == supplier_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
                 {% endfor %}
@@ -68,7 +68,7 @@
       <div class="card-footer">
         <div class="form-group mb-0">
             <button type="submit" class="btn btn-primary" tabindex="049">Save</button>
-            <a href="{% url 'save_after_submit' %}?id={{ supplier_instance.daily_summary_id }}" class="btn btn-secondary" tabindex="050">Cancel</a>
+            <a href="{% url 'save_after_submit' %}?id={{ supplier_instance.daily_summary_id }}#6" class="btn btn-secondary" tabindex="050">Cancel</a>
         </div>
     </div>
 </form>

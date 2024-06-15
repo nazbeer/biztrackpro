@@ -19,7 +19,7 @@
               <input type="hidden" name="daily_summary_id" value="{{ bank_deposit.daily_summary_id }}">
               <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="071" required>
                 {% for bank in form.bank_deposit_bank.field.queryset %}
-                  <option value="{{ bank.id }}" {% if bank.id == bank_deposit.bank.id %} selected {% endif %}>{{ bank.name }}</option>
+                  <option value="{{ bank.id }}" {% if bank.id == bank_deposit.bank.id %} selected {% endif %}>{{bank.bank.name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -58,7 +58,7 @@
             </div>
             <div class="form-group" id="cheque_details">
                 <label for="id_cheque_date">Cheque Date</label>
-                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="076" {% if bank_deposit.cheque_date %} value="{{ supplier_instance.cheque_date|date:'Y-m-d' }}" {% endif %}>
+                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="076" {% if bank_deposit.cheque_date %} value="{{ bank_deposit.cheque_date|date:'Y-m-d' }}" {% endif %}>
                 </div>
                 
 
@@ -68,7 +68,7 @@
       <div class="card-footer">
         <div class="form-group mb-0">
             <button type="submit" class="btn btn-primary" tabindex="078">Save</button>
-            <a href="{% url 'save_after_submit' %}?id={{ bank_deposit.daily_summary_id }}" class="btn btn-secondary" tabindex="079">Cancel</a>
+            <a href="{% url 'save_after_submit' %}?id={{ bank_deposit.daily_summary_id }}#8" class="btn btn-secondary" tabindex="079">Cancel</a>
         </div>
     </div>
 </form>

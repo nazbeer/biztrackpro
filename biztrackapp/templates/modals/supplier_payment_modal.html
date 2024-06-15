@@ -18,7 +18,7 @@
                                 <input type="hidden" id="modal_daily_summary_id6" name="daily_summary_id">
                               <label for="id_supplier1">Supplier</label>
                               <select id="id_supplier1" name="supplier" class="form-control" tabindex="401" required>
-                                <option value="0">-- Select Supplier --</option>
+                                <option value="">-- Select Supplier --</option>
                                 {% for supplier in supplier_payments_form.supplier.field.queryset %}
                                   <option value="{{ supplier.id }}">{{ supplier.name }}</option>
                                 {% endfor %}

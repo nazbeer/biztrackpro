@@ -136,6 +136,7 @@ urlpatterns = [
     path('purchase-report/', PurchaseReportView.as_view(), name='purchase_report'),
     path('msc-income-report/', MscIncomeReportView.as_view(), name='msc_income_report'),
     path('supplier-payment-report/', SupplierPaymentReportView.as_view(), name='supplier_payment_report'),
+    path('customer-payment-report/', CustomerPaymentReportView.as_view(), name='customer_payment_report'),
     path('bank-statement/', BankStatementView.as_view(), name='bank_statement'),
 
 
@@ -148,10 +149,15 @@ urlpatterns = [
     path('api/msc-income-report/', MscIncomeReportAPIView.as_view(), name='msc_income_report'),
     path('api/supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
+    path('api/customer-payment-report/', CustomerPaymentReportAPIView.as_view(), name='customer_payment_report'),
+
+    #pdfapi
     path('api/bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
     path('api/supplier-payment-report-pdf/', SupplierPaymentReportPDFAPIView.as_view(), name='supplier-payment-report-pdf'),
+    path('api/customer-payment-report-pdf/', CustomerPaymentReportPDFAPIView.as_view(), name='customer-payment-report-pdf'),
 
+    #extras
     path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
     path('api/daily_summary_exists/', CheckDailySummaryExists.as_view(), name='daily_summary_exists'),
 ]

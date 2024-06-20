@@ -3,111 +3,130 @@
 {% block title %}Employee List{% endblock %}
 
 {% block content %}
-  <h2>Employee List</h2>
-
-  <!-- Search form -->
-  <form method="get" action="{% url 'employee_list' %}">
-    <div class="form-group">
-      <input type="text" name="q" class="form-control" placeholder="Search by employee ID, name, etc.">
-      <button type="submit" class="btn btn-primary mt-2">Search</button>
+<div class="container">
+<div class="row mt-2 mb-0">
+  <div class="card p-0">
+  <h5 class="card-header d-flex justify-content-between align-items-center"><span>Employee List </span>  <a href="{% url 'create_employee' %}" class="btn btn-secondary text-dark btn-sm" style="color:#000 !important;">Add Employee</a></h5>
+ 
+</div>
+</div>
+<!-- Search form -->
+  
+  <div class="card p-0 mt-0">
+    <form method="get" action="{% url 'employee_list' %}">
+    <div class="card-body">
+      <div class="form-group mb-0">
+        <input type="text" name="q" class="form-control mb-0" placeholder="Search by employee ID, name, etc.">
+       
+    </div>
+   
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+      <button type="submit" class="btn btn-primary ">Search</button>
+      <button type="reset" class="btn btn-secondary " onclick="window.location.href='/employee';">Reset</button>
     </div>
   </form>
-   <!-- Pagination links -->
-   <div class="pagination  mb-3" style="float:right;">
-    <span class="step-links">
-      {% if employees.has_previous %}
-          <a href="?page=1">&laquo; </a>
-          <a href="?page={{ employees.previous_page_number }}"> &lsaquo; </a>
-      {% endif %}
-
-      <span class="current">
-          Page {{ employees.number }} of {{ employees.paginator.num_pages }}
-      </span>
-
-      {% if employees.has_next %}
-          <a href="?page={{ employees.next_page_number }}"> &rsaquo;</a>
-          <a href="?page={{ employees.paginator.num_pages }}"> &raquo;</a>
-      {% endif %}
-    </span>
-    
   </div>
-<div class="table-responsive">
-  <table class="table table-striped table-responsive table-bordered">
-    <thead>
-      <tr>
-        <th><a href="?sort=employee_id">Employee ID</a></th>
-        <th>Business Profile</th>
-        <th><a href="?sort=first_name">First Name</a></th>
-        <th><a href="?sort=second_name">Last Name</a></th>
-        {% comment %} <th>Username</th> {% endcomment %}
-        {% comment %} <th>Password</th> {% endcomment %}
-        <th>Nationality</th>
-        <th>Mobile No</th>
-        <th>Passport No</th>
-        <th>Passport Expiration Date</th>
-        <th>Emirates ID</th>
-        <th>ID Expiration Date</th>
-        <th>Basic Pay</th>
-        <th>House Allowance</th>
-        <th>Transportation Allowance</th>
-        {% comment %} <th>Commission Percentage</th> {% endcomment %}
-        <th>Joining Date</th>
-        <th>Job Role</th>
-        
-        <th>Actions</th>
-        <!-- Add more columns as needed -->
-      </tr>
-    </thead>
-    <tbody>
-      {% for employee in employees %}
-        <tr>
-          <td>{{ employee.employee_id }}</td>
-          <td>{{ employee.business_profile }}</td>
-          <td>{{ employee.first_name }}</td>
-          <td>{{ employee.last_name }}</td>
-          {% comment %} <td>{{ employee.username}}</td> {% endcomment %}
-          {% comment %} <td>{{ employee.password}}</td> {% endcomment %}
-          <td>{{ employee.nationality }}</td>
-          <td>{{ employee.mobile_no }}</td>
-          <td>{{ employee.passport_no }}</td>
-          <td>{{ employee.passport_expiration_date }}</td>
-          <td>{{ employee.emirates_id }}</td>
-          <td>{{ employee.id_expiration_date }}</td>
-          <td>{{ employee.basic_pay }}</td>
-          <td>{{ employee.house_allowance }}</td>
-          <td>{{ employee.transportation_allowance }}</td>
-          {% comment %} <td>{{ employee.commission_percentage }}</td> {% endcomment %}
-          <td>{{ employee.joining_date }}</td>
-          <td>{{ employee.job_role }}</td>
-           <td>
-            <div class="d-flex justify-content-between align-items-center gap-3">
-            <a href="{% url 'employee_edit' employee.pk %}" class="btn btn-primary btn-sm">Edit</a>&nbsp;
-             {% comment %} <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-danger btn-sm">Delete</a> {% endcomment %}
-          </div>
-          </td>
-          <!-- Add more columns as needed -->
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+   
+
+
+<!-- Pagination links -->
+<div class="pagination mb-3" style="float:right;">
+    <span class="step-links">
+        {% if employees.has_previous %}
+            <a href="?page=1">&laquo;</a>
+            <a href="?page={{ employees.previous_page_number }}">&lsaquo;</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ employees.number }} of {{ employees.paginator.num_pages }}
+        </span>
+
+        {% if employees.has_next %}
+            <a href="?page={{ employees.next_page_number }}">&rsaquo;</a>
+            <a href="?page={{ employees.paginator.num_pages }}">&raquo;</a>
+        {% endif %}
+    </span>
 </div>
-   <!-- Pagination links -->
-   <div class="pagination mb-3"  style="float:right;">
+
+<!-- Employee Cards Grid -->
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 pl-0 pr-4">
+        {% for employee in employees %}
+        <div class="col pl-0 pr-4">
+            <div class="card ">
+              <div class="card-header">
+                <h5 class="card-title mb-0">{{ employee.first_name }} {{ employee.last_name }}</h5>
+              </div>
+                <div class="card-body mb-0">
+                    
+                    <p class="card-text mb-0 d-flex justify-content-between align-items-center"><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+                    <p class="card-text mb-0 d-flex justify-content-between align-items-center"><strong>Job Role:</strong> {{ employee.job_role }}</p>
+                    <p class="card-text mb-0 d-flex justify-content-between align-items-center"><strong>Mobile Number:</strong> {{ employee.mobile_no }}</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#employeeModal{{ employee.pk }}">
+                        View
+                    </button>
+                    <a href="{% url 'employee_edit' employee.pk %}" class="btn btn-secondary">Edit</a>
+               
+                    </div>
+            </div>
+
+        </div>
+
+        <!-- Employee Detail Modal -->
+        <div class="modal fade" id="employeeModal{{ employee.pk }}" tabindex="-1" aria-labelledby="employeeModalLabel{{ employee.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-white" id="employeeModalLabel{{ employee.pk }}">{{ employee.first_name }} {{ employee.last_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group ">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                              <strong >Employee ID:</strong> {{ employee.employee_id }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Business Profile:</strong> {{ employee.business_profile }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Nationality:</strong> {{ employee.nationality }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Mobile No:</strong> {{ employee.mobile_no }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Passport No:</strong> {{ employee.passport_no }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Passport Expiration Date:</strong> {{ employee.passport_expiration_date }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Emirates ID:</strong> {{ employee.emirates_id }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>ID Expiration Date:</strong> {{ employee.id_expiration_date }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Basic Pay:</strong> {{ employee.basic_pay }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>House Allowance:</strong> {{ employee.house_allowance }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Transportation Allowance:</strong> {{ employee.transportation_allowance }}</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center"><strong>Joining Date:</strong> {{ employee.joining_date }}</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+<!-- Pagination links -->
+<div class="pagination mb-3 d-none" style="float:right;">
     <span class="step-links">
-      {% if employees.has_previous %}
-          <a href="?page=1">&laquo; </a>
-          <a href="?page={{ employees.previous_page_number }}"> &lsaquo; </a>
-      {% endif %}
+        {% if employees.has_previous %}
+            <a href="?page=1">&laquo;</a>
+            <a href="?page={{ employees.previous_page_number }}">&lsaquo;</a>
+        {% endif %}
 
-      <span class="current">
-          Page {{ employees.number }} of {{ employees.paginator.num_pages }}
-      </span>
+        <span class="current">
+            Page {{ employees.number }} of {{ employees.paginator.num_pages }}
+        </span>
 
-      {% if employees.has_next %}
-          <a href="?page={{ employees.next_page_number }}"> &rsaquo;</a>
-          <a href="?page={{ employees.paginator.num_pages }}"> &raquo;</a>
-      {% endif %}
+        {% if employees.has_next %}
+            <a href="?page={{ employees.next_page_number }}">&rsaquo;</a>
+            <a href="?page={{ employees.paginator.num_pages }}">&raquo;</a>
+        {% endif %}
     </span>
-  </div>
-
+</div>
+</div>
 {% endblock %}

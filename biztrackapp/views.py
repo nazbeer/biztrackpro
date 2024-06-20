@@ -12,7 +12,7 @@ from django.db.models import Count, Sum, Q, F
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.http import JsonResponse, HttpResponse
-
+from collections import defaultdict
 from django.views import View
 from django.utils import timezone
 from rest_framework.views import APIView
@@ -527,7 +527,7 @@ def create_employee(request):
                     employee = form.save(commit=False)
                     # employee.business_profile_id = request.POST.get('business_profile_id')  # Set business_profile_id from POST data
                     employee.save()
-                    return HttpResponse('employee_list') 
+                    return redirect('employee_list') 
                 except Exception as e:
                     # #print("An error occurred while saving the form:", e)
                     error_occurred = True  
@@ -1788,6 +1788,16 @@ class SupplierPaymentReportView(View):
         return render(request, 'supplier_payment_report.html',{'suppliers': suppliers, 'business_profile': business_profile.id} )
 
 
+class CustomerPaymentReportView(View):
+    def get(self, request):
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        customers = Customer.objects.filter(business_profile=business_profile.id)
+        #print('sup',suppliers)
+        return render(request, 'customer_payment_report.html',{'customers': customers, 'business_profile': business_profile.id} )
+
+
 class BankStatementView(View):
     def get(self, request):
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -2360,7 +2370,9 @@ class MscIncomeReportAPIView(APIView):
         
         return Response(report_data)
 
-from collections import defaultdict
+
+
+
 class SupplierPaymentReportAPIView(APIView):
 
     def get(self, request):
@@ -2565,6 +2577,214 @@ class SupplierPaymentReportPDFAPIView(APIView):
 
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Supplier_Payment_Report_{start_date}_to_{end_date}.pdf"'
+        return response
+
+class CustomerPaymentReportAPIView(APIView):
+
+    def get(self, request):
+        customer_id = request.GET.get('customer_id')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        # Validate dates
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        # Get business context
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        # Get supplier and its outstanding balance
+        customer = get_object_or_404(Customer, id=customer_id)
+        opening_balance = customer.outstanding
+
+        # Get all customers in the business profile
+        customers = Customer.objects.filter(business_profile=business_profile.id)
+
+        # Fetch customers payments
+        customer_payments = CreditCollection.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+        ).values('customer', 'created_on', 'amount', 'payment_mode__name')
+        customer_payments_list = list(customer_payments)
+        # Fetch purchases
+        cash_purchases = BankSales.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
+        ).values('customer','created_on', 'amount', 'mode_of_transaction__name')
+
+        credit_purchases = BankSales.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
+        ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
+
+        # Combine data by date
+        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'customer_payment': 0})
+        for cp in cash_purchases:
+            combined_data[cp['created_on']]['cash_purchase'] += cp['amount']
+
+        for crp in credit_purchases:
+            combined_data[crp['created_on']]['credit_purchase'] += crp['amount']
+
+        for sp in customer_payments:
+            combined_data[sp['created_on']]['customer_payment'] += sp['amount']
+
+        combined_data_list = [
+            {
+                'date': date,
+                'cash_purchase': data['cash_purchase'],
+                'credit_purchase': data['credit_purchase'],
+                'customer_payment': data['customer_payment']
+            }
+            for date, data in sorted(combined_data.items())
+        ]
+
+        # Calculate totals and closing balance
+        total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
+        total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_customer_payments = sum(item['customer_payment'] for item in combined_data_list)
+        total_purchases = total_cash_purchases + total_credit_purchases
+        closing_balance = (opening_balance + total_credit_purchases) - total_customer_payments
+
+        # Prepare response data
+        report_data = {
+            'details': {
+                'customer_name': customer.name,
+                'customer_location': customer.location,
+                'customer_list': list(customers.values('id', 'name', 'business_profile', 'outstanding')),
+                'start_date': start_date,
+                'end_date': end_date,
+                'opening_balance': opening_balance,
+                'customer_payment_list':customer_payments_list,
+                'cash_purchases_list': list(cash_purchases),
+                'credit_purchases_list': list(credit_purchases),
+                'combined_data': combined_data_list,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
+                'total_purchases': total_purchases,
+                'closing_balance': closing_balance,
+                
+            },
+            'summary': {
+                'total_purchases': total_purchases,
+                'total_customer_payments': total_customer_payments,
+                'closing_balance': closing_balance,
+                'opening_balance': opening_balance,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
+            }
+        }
+
+        return Response(report_data)
+
+
+class CustomerPaymentReportPDFAPIView(APIView):
+
+    def get(self, request):
+        customer_id = request.GET.get('customer_id')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+         # Validate dates
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        # Get business context
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        # Get supplier and its outstanding balance
+        customer = get_object_or_404(Customer, id=customer_id)
+        opening_balance = customer.outstanding
+
+        # Get all customers in the business profile
+        customers = Customer.objects.filter(business_profile=business_profile.id)
+
+        # Fetch customers payments
+        customer_payments = CreditCollection.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+        ).values('created_on', 'amount', 'payment_mode__name')
+        customer_payments_list = list(customer_payments)
+        # Fetch purchases
+        cash_purchases = BankSales.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
+        ).values('created_on', 'amount', 'mode_of_transaction__name')
+
+        credit_purchases = BankSales.objects.filter(
+            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
+        ).values('created_on', 'amount', 'mode_of_transaction__name')
+
+        # Combine data by date
+        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'total_sales':0, 'customer_payment': 0})
+        for cp in cash_purchases:
+            combined_data[cp['created_on']]['cash_purchase'] += cp['amount']
+
+        for crp in credit_purchases:
+            combined_data[crp['created_on']]['credit_purchase'] += crp['amount']
+        # for ts in total_sales:
+        #     combined_data[ts['created_on']]['total_sales'] += credit_purchase + 
+        for sp in customer_payments:
+            combined_data[sp['created_on']]['customer_payment'] += sp['amount']
+
+        combined_data_list = [
+            {
+                'date': date,
+                'cash_purchase': data['cash_purchase'],
+                'credit_purchase': data['credit_purchase'],
+                'total_sales':data['cash_purchase'] + data['credit_purchase'],
+                'customer_payment': data['customer_payment']
+            }
+            for date, data in sorted(combined_data.items())
+        ]
+
+        # Calculate totals and closing balance
+        total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
+        total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_customer_payments = sum(item['customer_payment'] for item in combined_data_list)
+        total_purchases = total_cash_purchases + total_credit_purchases
+        closing_balance = (opening_balance + total_credit_purchases) - total_customer_payments
+
+        # Prepare response data
+        report_data = {
+            'details': {
+                'business':business_profile.name,
+                'customer_name': customer.name,
+                'customer_location': customer.location,
+                'customer_list': list(customers.values('id', 'name', 'business_profile', 'outstanding')),
+                'start_date': start_date,
+                'end_date': end_date,
+                'opening_balance': opening_balance,
+                'customer_payment_list':customer_payments_list,
+                'cash_purchases_list': list(cash_purchases),
+                'credit_purchases_list': list(credit_purchases),
+                'combined_data': combined_data_list,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
+                'total_sales': total_purchases,
+                'closing_balance': closing_balance,
+                
+            },
+            'summary': {
+                'total_purchases': total_purchases,
+                'total_customer_payments': total_customer_payments,
+                'closing_balance': closing_balance,
+                'opening_balance': opening_balance,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
+            }
+        }
+
+
+        html_string = render_to_string('pdf_template_customer_payment.html', report_data)
+        pdf = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Customer_Payment_Report_{start_date}_to_{end_date}.pdf"'
         return response
 
 class BankStatementAPIView(APIView):

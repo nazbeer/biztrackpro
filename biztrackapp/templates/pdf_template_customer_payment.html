@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Payment Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px !important;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 12px !important;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            border: 0px;
+            font-size: 12px !important;
+        }
+        th {
+            background-color: #8a8a8a;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2>Customer Payment Report</h2>
+   
+    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
+        <h4 style="margin-bottom:0px;">Company Name:</h4>
+        <h4 style="text-align: left; margin-bottom:0px;">{{ details.business }}</h4>
+    </div>
+    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
+        <h4 style="margin-bottom:0px;">Customer Name:</h4>
+        <h4 style="text-align: left; margin-bottom:0px;">{{  details.customer_name }}</h4>
+    </div>
+    <div style="display: flex;justify-content: space-between; align-items: center;" >
+        <h4>Date Range:</h4>
+        <h4 style="text-align: left;">{{ details.start_date }} to {{ details.end_date }}</h4>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align:center;">Date</th>
+                <th style="text-align:right;">Opening Balance</th>
+                <th style="text-align:right;">Cash Sales</th>
+                <th style="text-align:right;">Credit Sales</th>
+                <th style="text-align:right;">Total Sales</th>
+                <th style="text-align:right;">Credit Collection</th>
+                <th style="text-align:right;">Closing Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in details.combined_data %}
+            <tr>
+                <td style="text-align:center;width:100px;">{{ item.date }}</td>
+                <td style="text-align:right;">{{ details.opening_balance|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.cash_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.credit_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.total_sales|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.customer_payment|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ details.closing_balance|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td style="background-color: #8a8a8a;">Total:</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.opening_balance|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cash_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_credit_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_customer_payments|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.closing_balance|floatformat:2 }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

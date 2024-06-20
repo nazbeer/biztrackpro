@@ -44,18 +44,17 @@
             <div id="report-results" class="mt-4 d-none">
                 <div class="text-center">
                     <h5 class="text-dark">Report Results</h5>
-                    <!-- <p id="report-date-range"></p> -->
                 </div>
                 <table class="table table-bordered table-striped text-center">
                     <thead>
                         <tr>
                             <th style="background-color: #8a8a8a !important;">Date</th>
-                            <th style="background-color: #8a8a8a !important;">Opening Balance</th>
-                            <th style="background-color: #8a8a8a !important;">Cash Purchase</th>
-                            <th style="background-color: #8a8a8a !important;">Credit Purchase</th>
-                            <th style="background-color: #8a8a8a !important;">Total Purchases</th>
-                            <th style="background-color: #8a8a8a !important;">Supplier Payments</th>
-                            <th style="background-color: #8a8a8a !important;">Closing Balance</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Opening Balance</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Cash Purchase</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Credit Purchase</th>
+                            <th style="text-align: right; background-color: #8a8a8a !important;">Total Purchases</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Supplier Payments</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Closing Balance</th>
                         </tr>
                     </thead>
                     <tbody id="report-body"></tbody>
@@ -78,72 +77,47 @@ document.getElementById('report-form').addEventListener('submit', function(event
         .then(response => response.json())
         .then(data => {
             document.getElementById('report-results').classList.remove('d-none');
-            // document.getElementById('report-date-range').innerText = `Report for ${startDate} to ${endDate}`;
-            console.log('data',data);
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');
-            
-            // Populate the table body with purchase data
-            reportBody.innerHTML = data.details.cash_purchases.map(cashPurchase => {
-                const cashDate = new Date(cashPurchase.invoice_date);
-                const formattedCashDate = cashDate.toLocaleDateString('en-UK', {
+
+            reportBody.innerHTML = data.details.combined_data.map(d => {
+                const date = new Date(d.date);
+                const formattedDate = date.toLocaleDateString('en-UK', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric'
                 });
                 return `
                     <tr>
-                        <td>${formattedCashDate}</td>
-                        <td>${data.details.opening_balance.toFixed(2)}</td>
-                        <td>${cashPurchase.invoice_amount.toFixed(2)}</td>
-                        <td>0.00</td>
-                        <td>${cashPurchase.invoice_amount.toFixed(2)}</td>
-                        <td>0.00</td>
-                        <td>${data.details.closing_balance.toFixed(2)}</td>
+                        <td>${formattedDate}</td>
+                        <td style="text-align:right;">${data.details.opening_balance.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.cash_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.credit_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase).toFixed(2)}</td>
+                        <td style="text-align:right;">${d.supplier_payment.toFixed(2)}</td>
+                        <td style="text-align:right;">${data.details.closing_balance.toFixed(2)}</td>
                     </tr>
                 `;
             }).join('');
 
-            // Populate the table body with credit purchase data
-            reportBody.innerHTML += data.details.credit_purchases.map(creditPurchase => {
-                const creditDate = new Date(creditPurchase.invoice_date);
-                console.log('creditDate', creditPurchase);
-                const formattedCreditDate = creditDate.toLocaleDateString('en-UK', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric'
-                });
-                return `
-                    <tr>
-                        <td>${formattedCreditDate}</td>
-                        <td>${data.details.opening_balance.toFixed(2)}</td>
-                        <td>0.00</td>
-                        <td>${creditPurchase.invoice_amount.toFixed(2)}</td>
-                        <td>${creditPurchase.invoice_amount.toFixed(2)}</td>
-                        <td>0.00</td>
-                        <td>${data.details.closing_balance.toFixed(2)}</td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Populate the table footer with summary data
             reportFooter.innerHTML = `
                 <tr>
                     <td colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;"><b>Total:</b></td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.opening_balance.toFixed(2)}</td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_cash_purchases.toFixed(2)}</td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_credit_purchases.toFixed(2)}</td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_purchases.toFixed(2)}</td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_supplier_payments.toFixed(2)}</td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.closing_balance.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important; text-align:right;">${data.summary.opening_balance.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_cash_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_credit_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_supplier_payments.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.closing_balance.toFixed(2)}</td>
                 </tr>
             `;
         });
 });
+
 document.getElementById('download-pdf-cc').addEventListener('click', function() {
+    const supplierId = document.getElementById('supplier_id').value;
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
-    const supplierId = document.getElementById('supplier_id').value;
     window.location.href = `/api/supplier-payment-report-pdf/?supplier_id=${supplierId}&start_date=${startDate}&end_date=${endDate}`;
 });
 </script>

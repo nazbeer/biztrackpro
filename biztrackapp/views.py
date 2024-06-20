@@ -30,7 +30,7 @@ from drf_yasg import openapi
 from .serializers import *
 
 def index(request):
-    print('re',request.user)
+    #print('re',request.user)
     user = request.user
     business = ShopAdmin.objects.get(user = user)
     return HttpResponse(f"{user}  {business}")
@@ -43,7 +43,7 @@ def login_view(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        print('usser',user)
+        #print('usser',user)
         if user is not None:
             login(request, user)
             return redirect('home')
@@ -138,7 +138,7 @@ def create_business_profile(request):
         try:
             shop_admin = ShopAdmin.objects.get(user=request.user)
             shop_name = shop_admin.shop.name
-            # print(shop_name)
+            # #print(shop_name)
             context['shop_details'] = shop_admin.shop
             context['license_number'] = shop_admin.shop.license_number
 
@@ -529,7 +529,7 @@ def create_employee(request):
                     employee.save()
                     return HttpResponse('employee_list') 
                 except Exception as e:
-                    # print("An error occurred while saving the form:", e)
+                    # #print("An error occurred while saving the form:", e)
                     error_occurred = True  
                     messages.error(request, "An error occurred while saving the form.")
     else:
@@ -610,7 +610,7 @@ def daily_summary_list(request):
 
 def edit_daily_summary(request, id):
     daily_summaries = get_object_or_404(DailySummary, id=id)
-    print(daily_summaries)
+    #print(daily_summaries)
     if request.method == 'POST':
         form = DailySummaryForm(request.POST, instance=daily_summaries)
         if form.is_valid():
@@ -623,7 +623,7 @@ def edit_daily_summary(request, id):
 
 def delete_daily_summary(request, pk):
     daily_summary = get_object_or_404(DailySummary, id=pk)
-    print(daily_summary)
+    #print(daily_summary)
     daily_summary.delete()
     return redirect('daily_summary_list')
 
@@ -662,7 +662,7 @@ def edit_business_timing(request, id):
     
     # Retrieve the BusinessProfile instance associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop_admin.shop.name)
-    # print(business_timing)
+    # #print(business_timing)
     if request.method == 'POST':
         form = BusinessTimingForm(request.POST, instance=business_timing)
         if form.is_valid():
@@ -676,7 +676,7 @@ def edit_business_timing(request, id):
 
 def delete_business_timing(request, id):
     business_timing = get_object_or_404(BusinessTiming, id=id)
-    print(business_timing)
+    #print(business_timing)
     business_timing.delete()
     return redirect('business_timing_list')
 
@@ -762,14 +762,14 @@ def save_after_submit(request):
             net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
             net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
             bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
-            print('net_collection',net_collection)
-            print('net_payment',net_payment)
-            print('bank_deposit_collection',bank_deposit_collection)
-            print('withdrawal_total',withdrawal_total)
+            #print('net_collection',net_collection)
+            #print('net_payment',net_payment)
+            #print('bank_deposit_collection',bank_deposit_collection)
+            #print('withdrawal_total',withdrawal_total)
 
-            print('opening_balance',instance.opening_balance)
+            #print('opening_balance',instance.opening_balance)
             closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
-            print('closing_balance',closing_balance)
+            #print('closing_balance',closing_balance)
             instance.closing_balance = closing_balance
 
             # instance.save()
@@ -797,13 +797,13 @@ def save_after_submit(request):
     #     # previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
     #     last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
     #     bankdata = last_daily_summary.closing_balance
-    #     print('yestdays bankdata', bankdata)
+    #     #print('yestdays bankdata', bankdata)
     # except DailySummary.DoesNotExist:
     #     bankdata = business_profile.opening_balance
     if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
         # if last_daily_summary is not None:
-        print('last_daily_summary', last_daily_summary)
+        #print('last_daily_summary', last_daily_summary)
         bankdata = last_daily_summary.closing_balance
         # else:
         #     last_daily_summary = business_profile.opening_balance
@@ -878,7 +878,7 @@ def save_after_submit(request):
 
 
     # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
-    # print('daily_summary_today', list(daily_summary_today.__dict__.values()))
+    # #print('daily_summary_today', list(daily_summary_today.__dict__.values()))
 
     # if daily_summary_today:
     #     closing_balance = (
@@ -1107,14 +1107,14 @@ def create_daily_summary(request):
                 net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
                 net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
                 bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
-                print('net_collection',net_collection)
-                print('net_payment',net_payment)
-                print('bank_deposit_collection',bank_deposit_collection)
-                print('withdrawal_total',withdrawal_total)
+                #print('net_collection',net_collection)
+                #print('net_payment',net_payment)
+                #print('bank_deposit_collection',bank_deposit_collection)
+                #print('withdrawal_total',withdrawal_total)
 
-                print('opening_balance',instance.opening_balance)
+                #print('opening_balance',instance.opening_balance)
                 closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
-                print('closing_balance',closing_balance)
+                #print('closing_balance',closing_balance)
                 instance.closing_balance = closing_balance
 
                 instance.save()
@@ -1144,7 +1144,7 @@ def create_daily_summary(request):
     #     # daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id, daily_summary_id = id)
     #     daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-created_on').first()
 
-    #     print('bankdata submit', daily_summary)
+    #     #print('bankdata submit', daily_summary)
     #     bankdata = daily_summary.closing_balance or 0
         
     # except DailySummary.DoesNotExist:
@@ -1153,7 +1153,7 @@ def create_daily_summary(request):
     # if DailySummary.objects.exists():
     if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
-        print('last_daily_summary', last_daily_summary)
+        #print('last_daily_summary', last_daily_summary)
         # if last_daily_summary is not None:
         #     bankdata = last_daily_summary.closing_balance
         # else:
@@ -1169,7 +1169,7 @@ def create_daily_summary(request):
     # daily_summary = DailySummary.objects.filter(business_profile=business_profile.id)
 
     # bankdata = business_profile.opening_balance
-    # print('today', today)
+    # #print('today', today)
        
     # closing_balance = daily_summary_today.closing_balance
     # Query for bank sales created on the current date
@@ -1242,8 +1242,8 @@ def create_daily_summary(request):
     # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
     # daily_summary_today = DailySummary.objects.filter(business_profile=business_profile.id, status='ongoing')
 
-    # print('daily_summary_today', daily_summary_today)
-    # print(daily_summary_today.bank_deposit)
+    # #print('daily_summary_today', daily_summary_today)
+    # #print(daily_summary_today.bank_deposit)
     # if daily_summary_today:
     #     closing_balance = (
     #                 (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
@@ -1386,7 +1386,7 @@ def list_bank_sales(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     bank_sales = BankSales.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    # #print(bank_sales)
     return render(request, 'create_daily_summary.html', {'bank_sales': bank_sales})
 
 def create_credit_collection(request):
@@ -1423,7 +1423,7 @@ def list_credit_collection(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    # #print(bank_sales)
     return render(request, 'create_daily_summary.html', {'credit_collections': credit_collections})
 
 def create_misc_income(request):
@@ -1455,7 +1455,7 @@ def list_msc_income(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    # #print(bank_sales)
     return render(request, 'create_daily_summary.html', {'msc_income': msc_income})
 
 def create_purchase(request):
@@ -1559,7 +1559,7 @@ def list_bank_deposit(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    # #print(bank_sales)
     return render(request, 'create_daily_summary.html', {'bank_deposit': bank_deposit})
 
 def create_expense(request):
@@ -1590,7 +1590,7 @@ def list_expense(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     expense = Expense.objects.filter(business_profile=business_profile.id)
-    # print(bank_sales)
+    # #print(bank_sales)
     return render(request, 'create_daily_summary.html', {'expenses': expense})
 
 def edit_daily_summary(request, id):
@@ -1628,7 +1628,7 @@ def fetch_cheque_numbers(request):
     cheque_numbers.update(Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
     cheque_numbers.update(SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
     cheque_numbers.update(Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    print(cheque_numbers)
+    #print(cheque_numbers)
     cheque_numbers = list(cheque_numbers)
     return JsonResponse(cheque_numbers, safe=False)
 
@@ -1744,7 +1744,7 @@ def get_daily_summary_data(request,id):
     
 
     closing_balance = Decimal(last_daily_summary_data) + net_collection - net_payment - bank_deposit_collection
-    # print('closing_balance',closing_balance)
+    # #print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
 
 
@@ -1784,7 +1784,7 @@ class SupplierPaymentReportView(View):
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         suppliers = Supplier.objects.filter(business_profile=business_profile.id)
-        print('sup',suppliers)
+        #print('sup',suppliers)
         return render(request, 'supplier_payment_report.html',{'suppliers': suppliers, 'business_profile': business_profile.id} )
 
 
@@ -2064,7 +2064,7 @@ class DailyCollectionReportAPIView(APIView):
     )
     def get(self, request):
         start_date = request.GET.get('start_date')
-        print('start date1', start_date)
+        #print('start date1', start_date)
         end_date = request.GET.get('end_date')
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
@@ -2076,15 +2076,15 @@ class DailyCollectionReportAPIView(APIView):
         # Parse dates and add timezone info
         start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
-        print('end date', end_date)
+        #print('end date', end_date)
 
         # Fetch summaries
         summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
         
         op_bal = DailySummary.objects.filter(date__gte=start_date, business_profile=business_profile.id).first()
         cl_bal = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id).last()
-        # print('cls',cl_bal.values_list('date','opening_balance', 'closing_balance'))
-        # print(cl_bal.closing_balance)
+        # #print('cls',cl_bal.values_list('date','opening_balance', 'closing_balance'))
+        # #print(cl_bal.closing_balance)
         # Initialize totals
         # total_opening_balance = 0
         total_net_collections = 0
@@ -2243,7 +2243,7 @@ class SalesReportAPIView(APIView):
                 )
                 .order_by('created_on')
             )
-            print('sales', sales_data)
+            #print('sales', sales_data)
             report_details = [
                 {
                     'date': sale['created_on'],
@@ -2360,171 +2360,209 @@ class MscIncomeReportAPIView(APIView):
         
         return Response(report_data)
 
+from collections import defaultdict
 class SupplierPaymentReportAPIView(APIView):
+
     def get(self, request):
         supplier_id = request.GET.get('supplier_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+
+        # Validate dates
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        # Get business context
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        
+
+        # Get supplier and its outstanding balance
         supplier = get_object_or_404(Supplier, id=supplier_id)
-        
-        # Get supplier payments for the specified supplier
-        supplier_payments = SupplierPayments.objects.filter(supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id)
-        
-        
-        # Calculate total purchases for the supplier within the specified date range
+        opening_balance = supplier.outstanding
 
-        total_cash_purchases = Purchase.objects.filter(supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash').aggregate(Sum('invoice_amount'))['invoice_amount__sum'] or 0
-        total_credit_purchases = Purchase.objects.filter(supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit').aggregate(Sum('invoice_amount'))['invoice_amount__sum'] or 0
-        total_purchases = total_cash_purchases + total_credit_purchases
-        
-        # Calculate total supplier payments for the specified date range
-        total_supplier_payments = supplier_payments.aggregate(Sum('amount'))['amount__sum'] or 0
-        
-        # Calculate opening balance
-        opening_balance = supplier_payments.first().opening_outstanding if supplier_payments.exists() else 0
-        
-        # Calculate closing balance
-        closing_balance = opening_balance + total_purchases - total_supplier_payments
+        # Get all suppliers in the business profile
+        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+
+        # Fetch supplier payments
+        supplier_payments = SupplierPayments.objects.filter(
+            supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
+        ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
+        supplier_payments_list = list(supplier_payments)
+        # Fetch purchases
         cash_purchases = Purchase.objects.filter(
-            supplier=supplier, 
-            invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values(
-            'invoice_date', 
-            'invoice_amount', 
-            'mode_of_transaction__name', 
-        )
+            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
+        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
 
-        # Query credit purchases
         credit_purchases = Purchase.objects.filter(
-            supplier=supplier, 
-            invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values(
-            'invoice_date', 
-            'invoice_amount', 
-            'mode_of_transaction__name', 
-        )
+            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
+        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
 
-        # Convert the querysets to lists to make them JSON serializable
-        cash_purchases_list = list(cash_purchases)
-       
-        credit_purchases_list = list(credit_purchases)
+        # Combine data by date
+        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'supplier_payment': 0})
+        for cp in cash_purchases:
+            combined_data[cp['invoice_date']]['cash_purchase'] += cp['invoice_amount']
 
+        for crp in credit_purchases:
+            combined_data[crp['invoice_date']]['credit_purchase'] += crp['invoice_amount']
+
+        for sp in supplier_payments:
+            combined_data[sp['created_on']]['supplier_payment'] += sp['amount']
+
+        combined_data_list = [
+            {
+                'date': date,
+                'cash_purchase': data['cash_purchase'],
+                'credit_purchase': data['credit_purchase'],
+                'supplier_payment': data['supplier_payment']
+            }
+            for date, data in sorted(combined_data.items())
+        ]
+
+        # Calculate totals and closing balance
+        total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
+        total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_supplier_payments = sum(item['supplier_payment'] for item in combined_data_list)
+        total_purchases = total_cash_purchases + total_credit_purchases
+        closing_balance = (opening_balance + total_credit_purchases) - total_supplier_payments
+
+        # Prepare response data
         report_data = {
             'details': {
                 'supplier_name': supplier.name,
                 'supplier_location': supplier.location,
+                'supplier_list': list(suppliers.values('id', 'name', 'business_profile', 'outstanding')),
                 'start_date': start_date,
                 'end_date': end_date,
                 'opening_balance': opening_balance,
-                'cash_purchases': cash_purchases_list,
-                'credit_purchases': credit_purchases_list,
-                'total_cash_purchases': sum(item['invoice_amount'] for item in cash_purchases_list),
-                'total_credit_purchases': sum(item['invoice_amount'] for item in credit_purchases_list),
+                'supplier_payment_list':supplier_payments_list,
+                'cash_purchases_list': list(cash_purchases),
+                'credit_purchases_list': list(credit_purchases),
+                'combined_data': combined_data_list,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
                 'total_purchases': total_purchases,
-                'total_supplier_payments': total_supplier_payments,
-                'closing_balance': closing_balance
+                'closing_balance': closing_balance,
+                
             },
             'summary': {
                 'total_purchases': total_purchases,
                 'total_supplier_payments': total_supplier_payments,
                 'closing_balance': closing_balance,
                 'opening_balance': opening_balance,
-                 'total_cash_purchases': sum(item['invoice_amount'] for item in cash_purchases_list),
-                'total_credit_purchases': sum(item['invoice_amount'] for item in credit_purchases_list),
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
             }
         }
-        
+
         return Response(report_data)
 
 
 class SupplierPaymentReportPDFAPIView(APIView):
+
     def get(self, request):
         supplier_id = request.GET.get('supplier_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+
+        # Validate dates
+        try:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+        # Get business context
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        supplier = get_object_or_404(Supplier, id=supplier_id)
-        
-        if not start_date or not end_date:
-            return Response({'error': 'Please provide start and end dates'}, status=status.HTTP_400_BAD_REQUEST)
 
-        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
-        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
-        
+        # Get supplier and its outstanding balance
+        supplier = get_object_or_404(Supplier, id=supplier_id)
+        opening_balance = supplier.outstanding
+
+        # Get all suppliers in the business profile
+        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+
+        # Fetch supplier payments
         supplier_payments = SupplierPayments.objects.filter(
             supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        )
-        
-        total_cash_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash'
-        ).aggregate(Sum('invoice_amount'))['invoice_amount__sum'] or 0
-        
-        total_credit_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit'
-        ).aggregate(Sum('invoice_amount'))['invoice_amount__sum'] or 0
-        
-        total_purchases = total_cash_purchases + total_credit_purchases
-        total_supplier_payments = supplier_payments.aggregate(Sum('amount'))['amount__sum'] or 0
-        opening_balance = supplier_payments.first().opening_outstanding if supplier_payments.exists() else 0
-        closing_balance = opening_balance + total_purchases - total_supplier_payments
+        ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
+        supplier_payments_list = list(supplier_payments)
 
+        # Fetch purchases
         cash_purchases = Purchase.objects.filter(
-            supplier=supplier, 
-            invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='cash', business_profile=business_profile.id
+            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
         ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
-        
+
         credit_purchases = Purchase.objects.filter(
-            supplier=supplier, 
-            invoice_date__range=[start_date, end_date], 
-            mode_of_transaction__name='credit', business_profile=business_profile.id
+            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
         ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
-        
-        cash_purchases_list = list(cash_purchases)
-        credit_purchases_list = list(credit_purchases)
-        
+
+        # Combine data by date
+        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'supplier_payment': 0})
+        for cp in cash_purchases:
+            combined_data[cp['invoice_date']]['cash_purchase'] += cp['invoice_amount']
+
+        for crp in credit_purchases:
+            combined_data[crp['invoice_date']]['credit_purchase'] += crp['invoice_amount']
+
+        for sp in supplier_payments:
+            combined_data[sp['created_on']]['supplier_payment'] += sp['amount']
+
+        combined_data_list = [
+            {
+                'date': date,
+                'cash_purchase': data['cash_purchase'],
+                'credit_purchase': data['credit_purchase'],
+                'supplier_payment': data['supplier_payment'],
+                'total_purchases': data['cash_purchase'] + data['credit_purchase']
+            }
+            for date, data in sorted(combined_data.items())
+        ]
+
+        # Calculate totals and closing balance
+        total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
+        total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_supplier_payments = sum(item['supplier_payment'] for item in combined_data_list)
+        total_purchases = total_cash_purchases + total_credit_purchases
+        closing_balance = (opening_balance + total_credit_purchases) - total_supplier_payments
+
+        # Prepare response data for the PDF
         report_data = {
             'details': {
                 'supplier_name': supplier.name,
-                'business':business_profile.name, 
                 'supplier_location': supplier.location,
+                'supplier_list': list(suppliers.values('id', 'name', 'business_profile', 'outstanding')),
                 'start_date': start_date,
                 'end_date': end_date,
                 'opening_balance': opening_balance,
-                'cash_purchases': cash_purchases_list,
-                'credit_purchases': credit_purchases_list,
-                'total_cash_purchases': sum(item['invoice_amount'] for item in cash_purchases_list),
-                'total_credit_purchases': sum(item['invoice_amount'] for item in credit_purchases_list),
+                'supplier_payment_list': supplier_payments_list,
+                'cash_purchases_list': list(cash_purchases),
+                'credit_purchases_list': list(credit_purchases),
+                'combined_data': combined_data_list,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
                 'total_purchases': total_purchases,
-                'total_supplier_payments': total_supplier_payments,
-                'closing_balance': closing_balance
+                'closing_balance': closing_balance,
+                'business': business_profile.name,  # Include business name in report data
             },
             'summary': {
-                'supplier_name': supplier.name,
-                'business':business_profile.name, 
-                'supplier_location': supplier.location,
-                'start_date': start_date,
-                'end_date': end_date,
                 'total_purchases': total_purchases,
                 'total_supplier_payments': total_supplier_payments,
                 'closing_balance': closing_balance,
                 'opening_balance': opening_balance,
-                'total_cash_purchases': sum(item['invoice_amount'] for item in cash_purchases_list),
-                'total_credit_purchases': sum(item['invoice_amount'] for item in credit_purchases_list),
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
             }
         }
-        
+
         html_string = render_to_string('pdf_template_supplier_payment.html', report_data)
         pdf = HTML(string=html_string).write_pdf()
-        
+
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Supplier_Payment_Report_{start_date}_to_{end_date}.pdf"'
         return response

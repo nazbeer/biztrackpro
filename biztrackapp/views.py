@@ -212,7 +212,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
     def get(self, request):
         shop = Shop.objects.filter(shopadmin__user=request.user).first()
         form = PartnerForm(initial={'shop': shop})
-        return render(request, 'partner_form.html', {'form': form})
+        return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
 
     def post(self, request):
         shop = Shop.objects.filter(shopadmin__user=request.user).first()
@@ -222,7 +222,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
             partner.shop = shop
             partner.save()
             return redirect(reverse('partner_list'))
-        return render(request, 'partner_form.html', {'form': form})
+        return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
 def create_supplier(request):
     shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     
@@ -2144,7 +2144,7 @@ class DailyCollectionReportAPIView(APIView):
 
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from weasyprint import HTML
+# from weasyprint import HTML
 
 class DailyCollectionReportPDFView(APIView):
     

@@ -11,7 +11,8 @@
         
             {% csrf_token %}
             <div class="form-row">
-                <div class="form-group col-md-4">
+                <input type="hidden" name="shop" value="{{ shop }}"/>
+                    <div class="form-group col-md-4">
                     <label for="shop">Shop</label>
                     <select id="shop" name="shop" class="form-control" disabled>
                         {% for shop in form.shop.field.queryset %}
@@ -53,15 +54,15 @@
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="mobile_1">Mobile 1</label>
-                    <input type="number" id="mobile_1" name="mobile_1" class="form-control"  value="{{ form.mobile_1.value }}">
+                    <input type="number" id="mobile_1" name="mobile_1" class="form-control" >
                 </div>
                 <div class="form-group col-md-4">
                     <label for="mobile_2">Mobile 2</label>
-                    <input type="number" id="mobile_2" name="mobile_2" class="form-control"value="{{ form.mobile_2.value }}">
+                    <input type="number" id="mobile_2" name="mobile_2" class="form-control">
                 </div>
                 <div class="form-group col-md-4">
                     <label for="mobile_3">Mobile 3</label>
-                    <input type="number" id="mobile_3" name="mobile_3" class="form-control" value="{{ form.mobile_3.value }}">
+                    <input type="number" id="mobile_3" name="mobile_3" class="form-control" >
                 </div>
             </div>
             

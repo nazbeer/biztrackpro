@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Supplier Payment Report{% endblock %}
+{% block title %}Supplier Report{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="card">
         <div class="card-header">
-            <h5 class="text-white mb-0">Supplier Payment Report</h5>
+            <h5 class="text-white mb-0">Supplier Report</h5>
         </div>
         <div class="card-body">
             <form id="report-form" class="form-inline">
@@ -79,7 +79,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
             document.getElementById('report-results').classList.remove('d-none');
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');
-            let openingBalance = data.details.opening_balance;
+            // let openingBalance = data.details.opening_balance;
             reportBody.innerHTML = data.details.combined_data.map(d => {
                 const date = new Date(d.date);
                 const formattedDate = date.toLocaleDateString('en-UK', {
@@ -87,6 +87,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     month: 'long',
                     year: 'numeric'
                 });
+                let openingBalance = d.opening_balance;
                 const closingBalance = openingBalance + d.credit_purchase - d.supplier_payment;
                 const rowHTML = `
                     <tr>

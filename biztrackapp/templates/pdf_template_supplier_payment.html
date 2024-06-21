@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Supplier Payment Report</title>
+    <title>Supplier Report</title>
     <style>
         @page {
             size: A4;
@@ -40,11 +40,15 @@
     </style>
 </head>
 <body>
-    <h2>Supplier Payment Report</h2>
+    <h2>Supplier Report</h2>
    
     <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
         <h4 style="margin-bottom:0px;">Company Name:</h4>
         <h4 style="text-align: left; margin-bottom:0px;">{{ business }}</h4>
+    </div>
+    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
+        <h4 style="margin-bottom:0px;">Supplier Name:</h4>
+        <h4 style="text-align: left; margin-bottom:0px;">{{ supplier_name }}</h4>
     </div>
     <div style="display: flex;justify-content: space-between; align-items: center;" >
         <h4>Date Range:</h4>

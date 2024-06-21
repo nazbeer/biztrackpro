@@ -2372,7 +2372,6 @@ class MscIncomeReportAPIView(APIView):
 
 
 
-
 class SupplierPaymentReportAPIView(APIView):
 
     def get(self, request):
@@ -2397,7 +2396,9 @@ class SupplierPaymentReportAPIView(APIView):
 
         # Get supplier and its outstanding balance
         supplier = get_object_or_404(Supplier, id=supplier_id)
-        # initial_opening_balance = supplier.outstanding
+
+        # Fetch initial opening balance for supplier
+        initial_opening_balance = supplier.outstanding
 
         # Get all suppliers in the business profile
         suppliers = Supplier.objects.filter(business_profile=business_profile.id)
@@ -2407,34 +2408,41 @@ class SupplierPaymentReportAPIView(APIView):
             supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
         ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
         
-        initial_opening_balance_o = SupplierPayments.objects.filter( supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id).order_by('created_on').first()
-
-        initial_opening_balance = initial_opening_balance_o.opening_outstanding or supplier.outstanding
-        # print(initial_opening_balance)
+        # Combine purchases and supplier payments by date
+        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'supplier_payment': 0})
         
-        # Fetch purchases
+        # Fetch cash purchases
         cash_purchases = Purchase.objects.filter(
             supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
+        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
 
+        for cp in cash_purchases:
+            combined_data[cp['created_on']]['cash_purchase'] += cp['invoice_amount']
+
+        # Fetch credit purchases
         credit_purchases = Purchase.objects.filter(
             supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
-
-        # Combine data by date
-        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'supplier_payment': 0})
-        for cp in cash_purchases:
-            combined_data[cp['invoice_date']]['cash_purchase'] += cp['invoice_amount']
+        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
 
         for crp in credit_purchases:
-            combined_data[crp['invoice_date']]['credit_purchase'] += crp['invoice_amount']
+            combined_data[crp['created_on']]['credit_purchase'] += crp['invoice_amount']
 
+        # Add supplier payments
         for sp in supplier_payments:
             combined_data[sp['created_on']]['supplier_payment'] += sp['amount']
 
+        # Calculate opening and closing balances
+        current_opening_balance = initial_opening_balance
+        for date, data in sorted(combined_data.items()):
+            data['opening_balance'] = current_opening_balance
+            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['supplier_payment']
+            current_opening_balance = data['closing_balance']  # Set the next opening balance
+
+        # Prepare combined data list for response
         combined_data_list = [
             {
                 'date': date,
+                'opening_balance': data['opening_balance'],
                 'cash_purchase': data['cash_purchase'],
                 'credit_purchase': data['credit_purchase'],
                 'supplier_payment': data['supplier_payment']
@@ -2442,7 +2450,7 @@ class SupplierPaymentReportAPIView(APIView):
             for date, data in sorted(combined_data.items())
         ]
 
-        # Calculate totals and closing balance
+        # Calculate totals and closing balance for summary
         total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
         total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
         total_supplier_payments = sum(item['supplier_payment'] for item in combined_data_list)
@@ -2504,31 +2512,23 @@ class SupplierPaymentReportPDFAPIView(APIView):
 
         # Get supplier and its outstanding balance
         supplier = get_object_or_404(Supplier, id=supplier_id)
-        
+
         # Fetch initial opening balance for supplier
-        supplier_payments = SupplierPayments.objects.filter(
-            supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        ).order_by('created_on').first()
-
-        initial_opening_balance = supplier_payments.opening_outstanding if supplier_payments else supplier.outstanding
-
-        # Get all suppliers in the business profile
-        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+        initial_opening_balance = supplier.outstanding
 
         # Fetch supplier payments
         supplier_payments = SupplierPayments.objects.filter(
             supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
         ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
-        supplier_payments_list = list(supplier_payments)
-
+        
         # Fetch purchases
         cash_purchases = Purchase.objects.filter(
             supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
+        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
 
         credit_purchases = Purchase.objects.filter(
             supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('invoice_date', 'invoice_amount', 'mode_of_transaction__name')
+        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
 
         # Combine transactions by date
         transactions = list(cash_purchases) + list(credit_purchases) + list(supplier_payments)
@@ -2538,21 +2538,23 @@ class SupplierPaymentReportPDFAPIView(APIView):
         })
 
         for transaction in transactions:
-            date = transaction['invoice_date'] if 'invoice_date' in transaction else transaction['created_on']
+            date = transaction['created_on']
+
             if 'invoice_amount' in transaction:
                 if transaction['mode_of_transaction__name'] == 'cash':
                     transactions_by_date[date]['cash_purchase'] += transaction['invoice_amount']
                 elif transaction['mode_of_transaction__name'] == 'credit':
                     transactions_by_date[date]['credit_purchase'] += transaction['invoice_amount']
-                transactions_by_date[date]['total_purchases'] = transactions_by_date[date]['cash_purchase'] + transactions_by_date[date]['credit_purchase']
+                transactions_by_date[date]['total_purchases'] += transaction['invoice_amount']
+
             if 'amount' in transaction:
                 transactions_by_date[date]['supplier_payment'] += transaction['amount']
 
         # Calculate balances for each date
         current_opening_balance = initial_opening_balance
-        for date, data in transactions_by_date.items():
+        for date, data in sorted(transactions_by_date.items()):
             data['opening_balance'] = current_opening_balance
-            data['closing_balance'] = current_opening_balance + data['credit_purchase'] - data['supplier_payment']
+            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['supplier_payment']
             current_opening_balance = data['closing_balance']
 
         # Calculate totals
@@ -2570,11 +2572,10 @@ class SupplierPaymentReportPDFAPIView(APIView):
             'supplier_name': supplier.name,
             'business': business_profile.name,
             'supplier_location': supplier.location,
-            'supplier_list': list(suppliers.values('id', 'name', 'business_profile', 'outstanding')),
             'start_date': start_date,
             'end_date': end_date,
-            'opening_balance': initial_opening_balance,
             'transactions_by_date': sorted(transactions_by_date.items()),
+            'opening_balance': initial_opening_balance,
             'summary': summary,
         }
 

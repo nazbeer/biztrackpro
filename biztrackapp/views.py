@@ -2605,15 +2605,15 @@ class CustomerPaymentReportAPIView(APIView):
         # Get all customers in the business profile
         customers = Customer.objects.filter(business_profile=business_profile.id)
 
-        # Fetch customers payments
+        # Fetch customer payments
         customer_payments = CreditCollection.objects.filter(
             customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
         ).values('customer', 'created_on', 'amount', 'payment_mode__name')
-        customer_payments_list = list(customer_payments)
+
         # Fetch purchases
         cash_purchases = BankSales.objects.filter(
             customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('customer','created_on', 'amount', 'mode_of_transaction__name')
+        ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
 
         credit_purchases = BankSales.objects.filter(
             customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
@@ -2630,22 +2630,38 @@ class CustomerPaymentReportAPIView(APIView):
         for sp in customer_payments:
             combined_data[sp['created_on']]['customer_payment'] += sp['amount']
 
-        combined_data_list = [
-            {
-                'date': date,
-                'cash_purchase': data['cash_purchase'],
-                'credit_purchase': data['credit_purchase'],
-                'customer_payment': data['customer_payment']
-            }
-            for date, data in sorted(combined_data.items())
-        ]
+        # Sort dates
+        sorted_dates = sorted(combined_data.keys())
 
-        # Calculate totals and closing balance
+        # Prepare combined data with dynamic opening and closing balances
+        combined_data_list = []
+        current_opening_balance = opening_balance
+
+        for date in sorted_dates:
+            data = combined_data[date]
+            cash_purchase = data['cash_purchase']
+            credit_purchase = data['credit_purchase']
+            customer_payment = data['customer_payment']
+
+            closing_balance = current_opening_balance + credit_purchase - customer_payment
+
+            combined_data_list.append({
+                'date': date,
+                'cash_purchase': cash_purchase,
+                'credit_purchase': credit_purchase,
+                'customer_payment': customer_payment,
+                'opening_balance': current_opening_balance,
+                'closing_balance': closing_balance
+            })
+
+            current_opening_balance = closing_balance
+
+        # Calculate totals
         total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
         total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
         total_customer_payments = sum(item['customer_payment'] for item in combined_data_list)
         total_purchases = total_cash_purchases + total_credit_purchases
-        closing_balance = (opening_balance + total_credit_purchases) - total_customer_payments
+        final_closing_balance = combined_data_list[-1]['closing_balance'] if combined_data_list else opening_balance
 
         # Prepare response data
         report_data = {
@@ -2656,20 +2672,19 @@ class CustomerPaymentReportAPIView(APIView):
                 'start_date': start_date,
                 'end_date': end_date,
                 'opening_balance': opening_balance,
-                'customer_payment_list':customer_payments_list,
+                'customer_payment_list': list(customer_payments),
                 'cash_purchases_list': list(cash_purchases),
                 'credit_purchases_list': list(credit_purchases),
                 'combined_data': combined_data_list,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,
                 'total_purchases': total_purchases,
-                'closing_balance': closing_balance,
-                
+                'closing_balance': final_closing_balance,
             },
             'summary': {
                 'total_purchases': total_purchases,
                 'total_customer_payments': total_customer_payments,
-                'closing_balance': closing_balance,
+                'closing_balance': final_closing_balance,
                 'opening_balance': opening_balance,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,

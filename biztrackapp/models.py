@@ -281,6 +281,7 @@ class DailySummary(models.Model):
 class BankSales(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
+    outstanding = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     mode_of_transaction = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     # bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
@@ -297,6 +298,7 @@ class BankSales(models.Model):
 class CreditCollection(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     daily_summary_id = models.CharField(max_length=100, null=True, blank=True)
+    opening_outstanding = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     payment_mode = models.ForeignKey(TransactionMode, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     # bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)

@@ -431,6 +431,7 @@
                         <thead class="thead-light" style="border-color:transparent !important;">
                             <tr>
                                 <th>Customer</th>
+                                <th>Op. Outstanding</th>
                                 <th>Payment Mode</th>
                                 <th>Bank</th>
                                 <th>Amount</th>
@@ -446,6 +447,7 @@
                             {% for creditcol in credit_collections %}
                             <tr>
                                 <td>{{ creditcol.customer.name }}</td>
+                                <td>{{ creditcol.opening_outstanding }}</td>
                                 <td  class="text-capitalize">{{ creditcol.payment_mode.name }}</td>
                                 <td>{{ creditcol.bank.name }}</td>
                                 <td>{{ creditcol.amount }}</td>

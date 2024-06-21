@@ -80,6 +80,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');
 
+            let openingBalance = data.details.opening_balance;
             reportBody.innerHTML = data.details.combined_data.map(d => {
                 const date = new Date(d.date);
                 const formattedDate = date.toLocaleDateString('en-UK', {
@@ -87,17 +88,20 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     month: 'long',
                     year: 'numeric'
                 });
-                return `
+                const closingBalance = openingBalance + d.credit_purchase - d.customer_payment;
+                const rowHTML = `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td style="text-align:right;">${data.details.opening_balance.toFixed(2)}</td>
+                        <td style="text-align:right;">${openingBalance.toFixed(2)}</td>
                         <td style="text-align:right;">${d.cash_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${d.credit_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase).toFixed(2)}</td>
                         <td style="text-align:right;">${d.customer_payment.toFixed(2)}</td>
-                        <td style="text-align:right;">${data.details.closing_balance.toFixed(2)}</td>
+                        <td style="text-align:right;">${closingBalance.toFixed(2)}</td>
                     </tr>
                 `;
+                openingBalance = closingBalance;
+                return rowHTML;
             }).join('');
 
             reportFooter.innerHTML = `
@@ -115,7 +119,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
 });
 
 document.getElementById('download-pdf-cc').addEventListener('click', function() {
-    const customerId= document.getElementById('customer_id').value;
+    const customerId = document.getElementById('customer_id').value;
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
     window.location.href = `/api/customer-payment-report-pdf/?customer_id=${customerId}&start_date=${startDate}&end_date=${endDate}`;

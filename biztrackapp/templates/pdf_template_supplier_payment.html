@@ -34,6 +34,9 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        tfoot {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -41,11 +44,11 @@
    
     <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
         <h4 style="margin-bottom:0px;">Company Name:</h4>
-        <h4 style="text-align: left; margin-bottom:0px;">{{ details.business }}</h4>
+        <h4 style="text-align: left; margin-bottom:0px;">{{ business }}</h4>
     </div>
     <div style="display: flex;justify-content: space-between; align-items: center;" >
         <h4>Date Range:</h4>
-        <h4 style="text-align: left;">{{ details.start_date }} to {{ details.end_date }}</h4>
+        <h4 style="text-align: left;">{{ start_date }} to {{ end_date }}</h4>
     </div>
     <table>
         <thead>
@@ -60,15 +63,15 @@
             </tr>
         </thead>
         <tbody>
-            {% for item in details.combined_data %}
+            {% for item in transactions_by_date %}
             <tr>
-                <td style="text-align:center;width:100px;">{{ item.date }}</td>
-                <td style="text-align:right;">{{ details.opening_balance|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.cash_purchase|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.credit_purchase|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.total_purchases|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.supplier_payment|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ details.closing_balance|floatformat:2 }}</td>
+                <td style="text-align:center;width:100px;">{{ item.0 }}</td>
+                <td style="text-align:right;">{{ item.1.opening_balance|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.cash_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.credit_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.total_purchases|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.supplier_payment|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.closing_balance|floatformat:2 }}</td>
             </tr>
             {% endfor %}
         </tbody>

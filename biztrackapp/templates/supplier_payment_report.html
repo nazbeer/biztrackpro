@@ -79,7 +79,7 @@ document.getElementById('report-form').addEventListener('submit', function(event
             document.getElementById('report-results').classList.remove('d-none');
             const reportBody = document.getElementById('report-body');
             const reportFooter = document.getElementById('report-footer');
-
+            let openingBalance = data.details.opening_balance;
             reportBody.innerHTML = data.details.combined_data.map(d => {
                 const date = new Date(d.date);
                 const formattedDate = date.toLocaleDateString('en-UK', {
@@ -87,17 +87,20 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     month: 'long',
                     year: 'numeric'
                 });
-                return `
+                const closingBalance = openingBalance + d.credit_purchase - d.supplier_payment;
+                const rowHTML = `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td style="text-align:right;">${data.details.opening_balance.toFixed(2)}</td>
+                        <td style="text-align:right;">${openingBalance.toFixed(2)}</td>
                         <td style="text-align:right;">${d.cash_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${d.credit_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase).toFixed(2)}</td>
                         <td style="text-align:right;">${d.supplier_payment.toFixed(2)}</td>
-                        <td style="text-align:right;">${data.details.closing_balance.toFixed(2)}</td>
+                        <td style="text-align:right;">${closingBalance.toFixed(2)}</td>
                     </tr>
                 `;
+                openingBalance = closingBalance;
+                return rowHTML;
             }).join('');
 
             reportFooter.innerHTML = `

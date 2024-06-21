@@ -30,55 +30,61 @@
         th {
             background-color: #8a8a8a;
             color: white;
+            border: 0px;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
+        }
+        tfoot {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h2>Customer Payment Report</h2>
    
-    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
-        <h4 style="margin-bottom:0px;">Company Name:</h4>
-        <h4 style="text-align: left; margin-bottom:0px;">{{ details.business }}</h4>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="margin-bottom: 0px;">Company Name:</h4>
+        <h4 style="text-align: left; margin-bottom: 0px;">{{ business }}</h4>
     </div>
-    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
-        <h4 style="margin-bottom:0px;">Customer Name:</h4>
-        <h4 style="text-align: left; margin-bottom:0px;">{{  details.customer_name }}</h4>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h4 style="margin-bottom: 0px;">Customer Name:</h4>
+        <h4 style="text-align: left; margin-bottom: 0px;">{{ customer_name }}</h4>
     </div>
-    <div style="display: flex;justify-content: space-between; align-items: center;" >
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
         <h4>Date Range:</h4>
-        <h4 style="text-align: left;">{{ details.start_date }} to {{ details.end_date }}</h4>
+        <h4 style="text-align: left;">{{ start_date }} to {{ end_date }}</h4>
     </div>
+    
     <table>
         <thead>
             <tr>
                 <th style="text-align:center;">Date</th>
-                <th style="text-align:right;">Opening Balance</th>
-                <th style="text-align:right;">Cash Sales</th>
-                <th style="text-align:right;">Credit Sales</th>
-                <th style="text-align:right;">Total Sales</th>
-                <th style="text-align:right;">Credit Collection</th>
-                <th style="text-align:right;">Closing Balance</th>
+                <th>Opening Balance</th>
+                <th>Cash Sales</th>
+                <th>Credit Sales</th>
+                <th>Total Sales</th>
+                <th>Credit Collection</th>
+                <th>Closing Balance</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in details.combined_data %}
+            {% for item in transactions_by_date %}
             <tr>
-                <td style="text-align:center;width:100px;">{{ item.date }}</td>
-                <td style="text-align:right;">{{ details.opening_balance|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.cash_purchase|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.credit_purchase|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.total_sales|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ item.customer_payment|floatformat:2 }}</td>
-                <td style="text-align:right;">{{ details.closing_balance|floatformat:2 }}</td>
+                <td style="text-align:center;width:100px;">{{ item.0 }}</td>
+                <td style="text-align:right;">{{ item.1.opening_balance|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.cash_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.credit_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.total_sales|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.customer_payment|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.closing_balance|floatformat:2 }}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
+           
             <tr>
-                <td style="background-color: #8a8a8a;">Total:</td>
+                <td style="background-color: #8a8a8a; color: white; text-align: right;">Total:</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.opening_balance|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cash_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_credit_purchases|floatformat:2 }}</td>

@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
+# from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 
@@ -1720,10 +1720,12 @@ def get_daily_summary_data(request,id):
     supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
 
+
     bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+
 
 
 
@@ -3167,3 +3169,51 @@ class CheckDailySummaryExists(APIView):
             # return Response({'exists': True})  uncomment this return statement and Remove the above return statement after complete the testing
         else:
             return Response({'exists': False})
+
+
+def edit_customer(request,pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list')
+    else:
+        form = CustomerForm(instance=customer)
+    return render(request, 'edit_customer.html', {'form': form,'customer':customer})
+
+
+def edit_supplier(request,pk):
+    supplier = get_object_or_404(Supplier, pk=pk)
+    if request.method == 'POST':
+        form = SupplierForm(request.POST, instance=supplier)
+        if form.is_valid():
+            form.save()
+            return redirect('supplier_list')
+    else:
+        form = SupplierForm(instance=supplier)
+    return render(request, 'edit_supplier.html', {'form': form,'supplier':supplier})
+
+def edit_bank(request, pk):
+    bank = get_object_or_404(Bank, pk=pk)
+
+    if request.method == 'POST':
+        account_number = request.POST.get('account_number')
+        opening_balance = request.POST.get('opening_balance')
+        business_profile = request.POST.get('business_profile')
+        status = request.POST.get('status')
+
+        bank.account_number = account_number
+        bank.opening_balance = opening_balance
+        bank.business_profile = business_profile
+        if status == 'true':
+            bank.status = True
+        else:
+            bank.status = False
+        
+        try:
+            bank.save()
+            return redirect('bank_list')
+        except Exception as e:
+            print(f"Error saving bank details: {str(e)}")
+    return render(request, 'edit_bank.html', {'bank': bank})

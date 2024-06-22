@@ -19,6 +19,7 @@
                         <th>Location</th>
                         <th>Status</th>
                         <th>Created On</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -29,6 +30,9 @@
                         <td>{{ customer.location }}</td>
                         <td>{{ customer.status }}</td>
                         <td>{{ customer.created_on }}</td>
+                        <td>
+                            <a href="{% url 'edit_customer' customer.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -17,6 +17,7 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">Name</th>
+            <th scope="col">Status</th>
             <th scope="col">Created On</th>
             <th scope="col">Actions</th>
 
@@ -27,6 +28,7 @@
             <tr>
               <th scope="row">{{ forloop.counter }}</th>
               <td>{{ receipt_type.name }}</td>
+              <td>{{ receipt_type.status }}</td>
               <td>{{ receipt_type.created_on }}</td>
               <td>
                 <a href="{% url 'edit_receipt_type' receipt_type.id %}" class="btn btn-primary btn-sm">Edit</a>

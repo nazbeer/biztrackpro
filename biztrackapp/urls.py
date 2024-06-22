@@ -89,6 +89,7 @@ urlpatterns = [
    
     path('bank/create/', create_bank, name='create_bank'),
     path('banks/', BankListView.as_view(), name='bank_list'),
+    path('edit-bank/<int:pk>/', edit_bank, name='edit_bank'),
 
     path('employee/', employee_list, name='employee_list'),
     path('employee/create/', create_employee, name='create_employee'),
@@ -99,6 +100,9 @@ urlpatterns = [
     path('create-customer/', create_customer, name='create_customer'),
     path('customer-list/', customer_list, name='customer_list'),
     path('supplier-list/', supplier_list, name='supplier_list'),
+
+    path('edit-customer/<int:pk>/', edit_customer, name='edit_customer'),
+    path('edit-supplier/<int:pk>/', edit_supplier, name='edit_supplier'),
 
     path('success/', success_view, name='success'),
 

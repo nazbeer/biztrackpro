@@ -9,15 +9,23 @@
       <h4 class="mb-0">Update Expense Type</h4>
     </div>
     <div class="card-body">
-      
-  
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Update</button>
-  </form>
-
-</div>
-</div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name" class="mb-3">Expense Name:</label>
+          <input type="text" id="name" name="name" class="form-control mb-3" value="{{ form.name.value }}">
+          <input type="hidden" name="business_profile" value="{{ form.business_profile.value }}">
+        </div>
+        <div class="form-group">
+          <label for="id_status" class="mb-3">Status:</label>
+          <select id="id_status" name="status" class="form-control mb-3" required>
+            <option value="true" {% if form.status.value %} selected {% endif %}>Active</option>
+            <option value="false" {% if not form.status.value %} selected {% endif %}>Inactive</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

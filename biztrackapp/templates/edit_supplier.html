@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Supplier{% endblock %}
+
+{% block content %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="mb-0">Edit Supplier</h4>
+    </div>
+    <form method="POST">
+    <div class="card-body">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name" class="mb-3">Supplier Name:</label>
+            <input type="text" id="name" name="name" class="form-control mb-3" value="{{ supplier.name }}" required>
+            <input type="hidden" name="business_profile" value="{{ supplier.business_profile }}">
+        </div>
+        <div class="form-group">
+            <label for="outstanding" class="mb-3">Outstanding Amount:</label>
+            <input type="text" id="outstanding" name="outstanding" class="form-control mb-3" value="{{ supplier.outstanding }}" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="location" class="mb-3">Location:</label>
+            <input type="text" id="location" name="location" class="form-control mb-3" value="{{ supplier.location }}" required>
+        </div>
+        <div class="form-group">
+            <label for="id_status" class="mb-3">Status:</label>
+            <select id="id_status" name="status" class="form-control mb-3" required>
+                <option value="true" {% if supplier.status %} selected {% endif %}>Active</option>
+                <option value="false" {% if not supplier.status %} selected {% endif %}>Inactive</option>
+            </select>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="form-group mb-0">
+            <button type="submit" value="Submit" class="btn btn-success">Update</button>
+        </div>
+    </div>
+    </form>
+</div>
+{% endblock %}

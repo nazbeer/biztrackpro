@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Bank{% endblock %}
+
+{% block content %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="mb-0">Edit Bank</h4>
+    </div>
+    <form method="POST">
+    <div class="card-body">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_bank" class="mb-3">Bank Name:</label>
+            <input type="text" id="id_bank" name="bank" class="form-control mb-3" value="{{ bank.bank.name }}" required readonly>
+            <input type="hidden" name="business_profile" value="{{ bank.business_profile }}">
+        </div>
+        <div class="form-group">
+            <label for="id_account_number" class="mb-3"> Amount Number:</label>
+            <input type="text" id="id_account_number" name="account_number" class="form-control mb-3" value="{{ bank.account_number }}" required>
+        </div>
+        <div class="form-group">
+            <label for="id_opening_balance" class="mb-3">Opening Balance:</label>
+            <input type="text" id="id_opening_balance" name="opening_balance" class="form-control mb-3" value="{{ bank.opening_balance }}" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="id_status" class="mb-3">Status:</label>
+            <select id="id_status" name="status" class="form-control mb-3">
+                <option value="true" {% if bank.status %} selected {% endif %}>Active</option>
+                <option value="false" {% if not bank.status %} selected {% endif %}>Inactive</option>
+            </select>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="form-group mb-0">
+            <button type="submit" value="Submit" class="btn btn-success">Update</button>
+        </div>
+    </div>
+    </form>
+</div>
+{% endblock %}

@@ -31,8 +31,10 @@
               <th>Name</th>
               <th>Account Number</th>
               <th>Opening Balance</th>
+              <th>Status</th>
               <th>Created On</th>
               <th>Updated On</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -42,8 +44,12 @@
               <td>{{ bank.bank.name}}</td>
               <td>{{ bank.account_number }}</td>
               <td>{{ bank.opening_balance }}</td>
+              <td>{{ bank.status }}</td>
               <td>{{ bank.created_on }}</td>
               <td>{{ bank.update_on }}</td>
+              <td>
+                <a href="{% url 'edit_bank' bank.id %}" class="btn btn-primary btn-sm">Edit</a>
+              </td>
             </tr>
             {% endfor %}
           </tbody>

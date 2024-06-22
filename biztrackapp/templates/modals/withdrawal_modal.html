@@ -1,6 +1,6 @@
 
 <!-- Create Withdrawal Modal -->
-<div class="modal fade" id="withdrawalModal" tabindex="-1" role="dialog" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
+<div class="modal fade" id="withdrawalModal" tabindex="1500" role="dialog" aria-labelledby="withdrawalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -23,7 +23,7 @@
                                 {% endfor %}
                             </select>  -->
                             <label for="id_bank">Bank</label>
-                            <select id="id_bank" name="bank" class="form-control" required>
+                            <select id="id_bank" name="bank" class="form-control" required tabindex="1501">
                               <option value="">-- Select Bank --</option>
                               {% for bank in withdrawal_form.bank.field.queryset %}
                                 <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
@@ -33,23 +33,19 @@
                        
                         <div class="form-group col-md-6">
                             <label for="id_withdrawal_date">Withdrawal Date</label>
-                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" required>
+                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" required tabindex="1502">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="id_amount">Amount</label>
-                            <input type="number" id="id_amount" name="amount" class="form-control" required>
+                            <input type="number" id="id_amount" name="amount" class="form-control" required tabindex="1503">
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="id_mode_of_transaction">Mode of Transaction</label>
-                            {% comment %} <select id="mode_of_transaction" name="mode_of_transaction" class="form-control">
-                                {% for mode in withdrawal_form.mode_of_transaction.field.queryset %}
-                                <option value="{{ mode.id }}" {% if mode.id == form.mode_of_transaction.value %}selected{% endif %}>{{ mode.name }}</option>
-                                {% endfor %}
-                            </select> {% endcomment %}.
-                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" required>
+                           
+                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" required tabindex="1504">
                                 <option value="">-- Mode of Transaction --</option>
                                 {% for transaction_mode in withdrawal_form.mode_of_transaction.field.queryset %}
                                   <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
@@ -60,20 +56,20 @@
                         <div class="form-group col-md-6">
                             <div id="chequeDetails" class="d-none">
                             <label for="id_cheque_date">Cheque Date</label>
-                            <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" >
+                            <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="1505" >
                           </div>
                         </div>
                         <div class="form-group col-md-6">
                             <div id="chequeDetails1" class="d-none">
                             <label for="id_cheque_no">Cheque Number</label>
-                            <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" >
+                            <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="1506">
                           </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="1508">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="1507">Save</button>
                 </div>
             </form>
         </div>

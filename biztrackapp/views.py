@@ -2775,7 +2775,7 @@ class CustomerPaymentReportPDFAPIView(APIView):
         current_opening_balance = initial_opening_balance
         for date, data in transactions_by_date.items():
             data['opening_balance'] = current_opening_balance
-            data['closing_balance'] = current_opening_balance + data['credit_purchase'] - data['customer_payment']
+            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['customer_payment']
             current_opening_balance = data['closing_balance']
 
         # Calculate totals

@@ -12,8 +12,18 @@
         overflow-y: auto;
     }
 </style>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
 <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
+     document.addEventListener('DOMContentLoaded', (event) => {
 
         const currentUrl = window.location.href;        
         const url = new URL(currentUrl);
@@ -23,61 +33,140 @@
             document.getElementById('daily_summary_id').value = id;
             // document.getElementById('modal_daily_summary_id_bank').value = id;
         }
-      
+
     });
+</script>
+<script>
+//   document.addEventListener('DOMContentLoaded', function() {
+//   var selectElements = document.querySelectorAll('.js-cheque-number-select2');
   
-    // window.addEventListener('beforeunload', (event) => {
-    //     const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
-    //     event.preventDefault();
-    //     event.returnValue = message; // For modern browsers
-    //     return message; // For older browsers
-    // });
+//   // Iterate over each select element and initialize Select2
+//   selectElements.forEach(function(selectElement) {
+//     $(selectElement).select2({
+//       placeholder: "-- Select Cheque Number --",
+//       allowClear: true, // Option to clear selection
+//       minimumResultsForSearch: -1 // Enable search
+//     });
+//   });
+// });
+$(document).ready(function() {
+  function fetchChequeNumbers(did) {
+    console.log('Fetching cheque numbers for daily summary ID:', did);
 
-    document.addEventListener('DOMContentLoaded', function() {
-                // const toggleBank = document.getElementById("toggleBank");
-                // const toggleBankContent = document.getElementById("toggleBankContent");
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        var data = JSON.parse(xhr.responseText);
+        console.log('Fetched cheque details:', data);
 
-                // // Add event listener to the button
-                // toggleBank.addEventListener("click", function() {
-                //     console.log(toggleBank);
-                //     // Toggle the display property of the div
-                //     toggleBankContent.style.display = toggleBankContent.style.display === "none" ? "block" : "none";
-                // });
+        $('.js-cheque-number-select2').each(function() {
+          var $select = $(this);
+          $select.empty(); // Clear existing options
+          $select.append($('<option>').attr('value', '').text('-- Select Cheque Number --'));
 
-                // Initialize Awesomplete for cheque number input
-                const input = document.getElementById('id_cheque_no_b');
-                new Awesomplete(input, {
-                    minChars: 2,
-                    // autoFirst: true,
-                    list: [],
-                    data: function (item, input) {
-                        console.log(item.cheque_number);
-                        return { label: item.cheque_number, value: item.id };
-                    },
-                    filter: Awesomplete.FILTER_CONTAINS,
-                    replace: function (item) {
-                        this.input.value = item.label;
-                    }
-                });
+          data.forEach(function(cheque) {
+            $select.append($('<option>').attr('value', cheque.cheque_no).text(cheque.cheque_no));
+          });
 
-                // Fetch cheque numbers dynamically
-                input.addEventListener('input', function () {
-                    const input = this;
-                   
-                    // if (input.value.length >= 2) {
-                    if (input.value.length >=2) {
-                        fetch('/fetch_cheque_numbers/')
-                            .then(response => response.json())
-                            .then(data => {
-                                const list = data.map(item => item.cheque_number);
-                                console.log(list);
-                                input.setAttribute('data-list', list.join(','));
-                            })
-                            .catch(error => console.error('Error fetching cheque numbers:', error));
-                    }
-                });
-                
+          $select.select2({
+            placeholder: "-- Select Cheque Number --",
+            allowClear: true,
+            minimumResultsForSearch: 0,
+            tags: true,
+            tokenSeparators: [',', ' ']
+          });
+        });
+      } else {
+        console.error('Error fetching cheque details:', xhr.statusText);
+      }
+    };
+    xhr.onerror = function() {
+      console.error('Request failed');
+    };
+    xhr.send();
+  }
+
+  $('#bankDepositModal').on('shown.bs.modal', function() {
+    var modalDailySummaryId = $('#modal_daily_summary_id1').val();
+    if (modalDailySummaryId) {
+      fetchChequeNumbers(modalDailySummaryId);
+    }
+
+    $('#modal_daily_summary_id1').on('change', function() {
+      var newDailySummaryId = $(this).val();
+      if (newDailySummaryId) {
+        fetchChequeNumbers(newDailySummaryId);
+      }
     });
+    $('.js-cheque-number-select2').on('change', function() {
+        var selectedChequeNo = $(this).val();
+        var did = document.getElementById('daily_summary_id').value;
+
+        console.log('Selected Cheque No:', selectedChequeNo);
+        console.log('Daily Summary ID:', did);
+
+        // Make an AJAX request to fetch cheque details for the selected cheque number
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                console.log('Fetched cheque details:', data);
+
+                // Find selected cheque details in data array
+                var selectedChequeDetails = data.find(function(cheque) {
+                    return cheque.cheque_no === selectedChequeNo;
+                });
+
+                if (selectedChequeDetails) {
+                    console.log('Cheque Date:', selectedChequeDetails.cheque_date);
+                    console.log('Amount:', selectedChequeDetails.amount);
+                    console.log('Bank:', selectedChequeDetails.bank.id);
+
+                    // Update input fields with selected cheque details using value property
+                    document.getElementById('id_cheque_date').value = selectedChequeDetails.cheque_date;
+                    document.getElementById('id_amount').innerText = selectedChequeDetails.amount;
+
+                    // Optionally, update bank name if available
+                    if (selectedChequeDetails.bank) {
+                        document.getElementById('id_bank').value = selectedChequeDetails.bank.id;
+                    } else {
+                        document.getElementById('id_bank').value = '';
+                    }
+                } else {
+                    console.error('Selected cheque number details not found in fetched data.');
+                }
+            } else {
+                console.error('Error fetching cheque details:', xhr.statusText);
+            }
+        };
+        xhr.onerror = function() {
+            console.error('Request failed');
+        };
+        xhr.send();
+    });
+
+
+  });
+});
+
+</script>
+
+
+    
+<script>
+   
+    
+        // window.addEventListener('beforeunload', (event) => {
+        //     const message = 'Are you sure you want to leave? Any unsaved changes will be lost.';
+        //     event.preventDefault();
+        //     event.returnValue = message; // For modern browsers
+        //     return message; // For older browsers
+        // });
+        
+
+
     document.addEventListener('DOMContentLoaded', (event) => {
         
         const dateInput = document.getElementById('id_date');

@@ -1612,25 +1612,6 @@ def delete_daily_summary(request, id):
     return render(request, 'daily_summary_confirm_delete.html', {'summary': summary})
 
 
-def fetch_cheque_numbers(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    shop = shop_admin.shop
-    
-    # Retrieve the business profile associated with the shop
-    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-    cheque_numbers = set()
-    
-    # Fetch cheque numbers from all specified models
-    cheque_numbers.update(BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-
-    cheque_numbers.update(CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    cheque_numbers.update(MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    cheque_numbers.update(Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    cheque_numbers.update(SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    cheque_numbers.update(Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id).values_list('cheque_no', flat=True))
-    #print(cheque_numbers)
-    cheque_numbers = list(cheque_numbers)
-    return JsonResponse(cheque_numbers, safe=False)
 
 def create_withdrawal(request):
     if request.method == 'POST':
@@ -3217,3 +3198,63 @@ def edit_bank(request, pk):
         except Exception as e:
             print(f"Error saving bank details: {str(e)}")
     return render(request, 'edit_bank.html', {'bank': bank})
+
+
+def fetch_cheque_numbers(request, did):
+    # try:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        cheque_details = []
+        today = datetime.now().date()
+        
+        # Define models to fetch cheque details
+        models = [
+            BankSales,
+            CreditCollection,
+            MiscellaneousIncome,
+            Purchase,
+            SupplierPayments,
+            Expense,
+        ]
+        
+        for model in models:
+            queryset = model.objects.filter(business_profile=business_profile.id, daily_summary_id=did, created_on=today)
+            for obj in queryset:
+                # Check if the model has cheque_no, cheque_date, and amount fields
+                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount'):
+                    if hasattr(obj, 'bank') and hasattr(obj.bank, 'bank'):
+                        bank_name = obj.bank.bank
+                    elif hasattr(obj, 'allbank') and hasattr(obj.allbank, 'name'):
+                        bank_name = obj.allbank.name
+                    else:
+                        bank_name = ''
+                    
+                    # Convert obj.bank and obj.allbank to dictionaries if they exist
+                    bank_dict = {}
+                    if hasattr(obj, 'bank') and obj.bank:
+                        bank_dict['id'] = obj.bank.id
+                        # bank_dict['name'] = obj.bank
+                        # Add other fields as needed
+                    if hasattr(obj, 'allbank') and obj.allbank:
+                        bank_dict['id'] = obj.allbank.id
+                        # bank_dict['name'] = obj.allbank.name
+                        # Add other fields as needed
+                    
+                    cheque_details.append({
+                        'cheque_no': obj.cheque_no,
+                        'bank': bank_dict,
+                        'cheque_date': obj.cheque_date,
+                        'amount': obj.amount,
+                    })
+            print(obj.bank)
+        return JsonResponse(cheque_details, safe=False)
+    
+    # except Exception as e:
+    #     # Log the exception for debugging purposes
+    #     # print(f"Error fetching cheque details: {str(e)}")
+        
+    #     # Return a JSON response with an error message and status code 500 (Internal Server Error)
+    #     return JsonResponse({'error': 'Error fetching cheque details'}, status=500)

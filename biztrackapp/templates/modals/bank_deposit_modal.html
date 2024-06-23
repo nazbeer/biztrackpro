@@ -33,10 +33,15 @@
                         <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="502" required >
                       </div>
                       <div id="chequeDetails" class="d-none">
+                    
                       <div class="form-group">
                         <label for="id_cheque_no">Cheque Number</label>
-                        <input type="text" id="id_cheque_no" name="cheque_no"placeholder="Enter Cheque Number" class="form-control"  tabindex="504" >
-                      </div>
+                        <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2" tabindex="504">
+                            <option value="">-- Select Cheque Number --</option>
+                            <!-- Options will be dynamically populated via JavaScript -->
+                        </select>
+                    </div>
+                    
                       </div>
                       <div class="form-group">
                       <div id="bank_detail1" class="d-none">

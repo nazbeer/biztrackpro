@@ -133,7 +133,7 @@ urlpatterns = [
     path('create-expense/', create_expense, name='create_expense'),
     path('list-expense/', list_expense, name='list_expense'),
 
-    path('fetch_cheque_numbers/', fetch_cheque_numbers, name='fetch_cheque_numbers'),
+    path('fetch_cheque_numbers/<str:did>/', fetch_cheque_numbers, name='fetch_cheque_numbers'),
 
     path('daily-collection-report/', DailyCollectionReportView.as_view(), name='daily_collection_report'),
     path('sales-report/', SalesReportView.as_view(), name='sales_report'),

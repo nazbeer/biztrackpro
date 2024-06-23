@@ -30,13 +30,13 @@
                      
                       <div class="form-group">
                         <label for="id_amount">Amount</label>
-                        <input type="number" id="id_amount" name="amount" class="form-control" step="0.01" tabindex="502" required >
+                        <input type="number" id="id_amount" name="amount" class="form-control" value="0" step="0.01" tabindex="502" required >
                       </div>
                       <div id="chequeDetails" class="d-none">
                     
                       <div class="form-group">
                         <label for="id_cheque_no">Cheque Number</label>
-                        <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2" tabindex="504">
+                        <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2 form-control select2" data-tags="true" data-placeholder="Select Cheque Number" data-allow-clear="true" tabindex="504">
                             <option value="">-- Select Cheque Number --</option>
                             <!-- Options will be dynamically populated via JavaScript -->
                         </select>

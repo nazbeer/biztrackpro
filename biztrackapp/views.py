@@ -3201,6 +3201,7 @@ def edit_bank(request, pk):
 
 
 def fetch_cheque_numbers(request, did):
+        print('did-----------------',did)
     # try:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
@@ -3224,13 +3225,13 @@ def fetch_cheque_numbers(request, did):
             queryset = model.objects.filter(business_profile=business_profile.id, daily_summary_id=did, created_on=today)
             for obj in queryset:
                 # Check if the model has cheque_no, cheque_date, and amount fields
-                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount') and hasattr(obj, 'bank') and hasattr(obj, 'allbank'):
-                    # if hasattr(obj, 'bank') and obj.bank:
-                    #     bank_name = obj.bank.name
-                    # elif hasattr(obj, 'allbank') and obj.allbank:
-                    #     bank_name = obj.allbank
-                    # else:
-                    #     bank_name = ''
+                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount'):
+                    if hasattr(obj, 'bank') and obj.bank:
+                        bank_name = obj.bank.name
+                    elif hasattr(obj, 'allbank') and obj.allbank:
+                        bank_name = obj.allbank
+                    else:
+                        bank_name = ''
                     
                     # Convert obj.bank and obj.allbank to dictionaries if they exist
                     bank_dict = {}

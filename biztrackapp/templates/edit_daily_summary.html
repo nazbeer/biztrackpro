@@ -95,6 +95,12 @@ $(document).ready(function() {
         var selectedChequeNo = $(this).val();
         var did = document.getElementById('daily_summary_id').value;
 
+        const modal = $('.modal.show'); // Get the currently shown modal
+        const amount = modal.find('#id_amount');
+        const chequeDate = modal.find('#id_cheque_date');
+        const bank = modal.find('#id_bank');
+
+
         console.log('Selected Cheque No:', selectedChequeNo);
         console.log('Daily Summary ID:', did);
 
@@ -116,6 +122,10 @@ $(document).ready(function() {
                     console.log('Amount:', selectedChequeDetails.amount);
                     console.log('Bank:', selectedChequeDetails.bank.id);
                     console.log(document.getElementById('id_amount'))
+                    amount.val(selectedChequeDetails.amount);
+                    chequeDate.val(selectedChequeDetails.cheque_date);
+                    bank.val(selectedChequeDetails.bank.id);
+                    
                     // Update input fields with selected cheque details using value property
                     $('#id_cheque_date').val(selectedChequeDetails.cheque_date);
                     $('#id_amount').val(selectedChequeDetails.amount);

@@ -21,6 +21,14 @@
 <!-- Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
+<!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
 
 <script>
      document.addEventListener('DOMContentLoaded', (event) => {
@@ -37,125 +45,139 @@
     });
 </script>
 <script>
-
-$(document).ready(function() {
-  function fetchChequeNumbers(did) {
-    console.log('Fetching cheque numbers for daily summary ID:', did);
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        var data = JSON.parse(xhr.responseText);
-        console.log('Fetched cheque details:', data);
-
-        $('.js-cheque-number-select2').each(function() {
-          var $select = $(this);
-          console.log('$select',$select);
-          $select.empty(); // Clear existing options
-          $select.append($('<option>').attr('value', '').text('-- Select Cheque Number --'));
-
-          data.forEach(function(cheque) {
-            $select.append($('<option>').attr('value', cheque.cheque_no).text(cheque.cheque_no));
-          });
-
-          $('.js-cheque-number-select2').select2({
-            dropdownParent: $('#bankDepositModal'),
-            placeholder: "-- Select Cheque Number --",
-            allowClear: true,
-            minimumResultsForSearch: 0,
-            tags: true,
-            tokenSeparators: [',', ' '],
-            allowClear: true
-          });
-        });
-      } else {
-        console.error('Error fetching cheque details:', xhr.statusText);
-      }
-    };
-    xhr.onerror = function() {
-      console.error('Request failed');
-    };
-    xhr.send();
-  }
-
-  $('#bankDepositModal').on('shown.bs.modal', function() {
-    var modalDailySummaryId = $('#modal_daily_summary_id1').val();
-    if (modalDailySummaryId) {
-      fetchChequeNumbers(modalDailySummaryId);
-    }
-
-    $('#modal_daily_summary_id1').on('change', function() {
-      var newDailySummaryId = $(this).val();
-      if (newDailySummaryId) {
-        fetchChequeNumbers(newDailySummaryId);
-      }
-    });
-    $('#bankDepositModal').on('change', '.js-cheque-number-select2', function() {
-        var selectedChequeNo = $(this).val();
-        var did = document.getElementById('daily_summary_id').value;
-
-        const modal = $('.modal.show'); // Get the currently shown modal
-        const amount = modal.find('#id_amount');
-        const chequeDate = modal.find('#id_cheque_date');
-        const bank = modal.find('#id_bank');
-
-
-        console.log('Selected Cheque No:', selectedChequeNo);
-        console.log('Daily Summary ID:', did);
-
-        // Make an AJAX request to fetch cheque details for the selected cheque number
+    $(document).ready(function() {
+      function fetchChequeNumbers(did) {
+        console.log('Fetching cheque numbers for daily summary ID:', did);
+    
+        if (!did) {
+          console.error('Invalid daily summary ID');
+          return;
+        }
+    
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
         xhr.onload = function() {
-            if (xhr.status === 200) {
-                var data = JSON.parse(xhr.responseText);
-                console.log('Fetched cheque details:', data);
-
-                // Find selected cheque details in data array
-                var selectedChequeDetails = data.find(function(cheque) {
-                    return cheque.cheque_no === selectedChequeNo;
+          if (xhr.status === 200) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              console.log('Fetched cheque details:', data);
+    
+              if (data.length === 0) {
+                console.warn('No cheque details found for given ID:', did);
+              }
+    
+              $('#bankDepositModal .js-cheque-number-select2').each(function() {
+                var $select = $(this);
+                console.log('$select', $select);
+                $select.empty();
+                $select.append($('<option>').attr('value', '').text('-- Select Cheque Number --'));
+                $select.append($('<option>').attr('value', 'other').text('Other'));
+    
+                data.forEach(function(cheque) {
+                  $select.append($('<option>').attr('value', cheque.cheque_no).text(cheque.cheque_no));
                 });
-
-                if (selectedChequeDetails) {
+    
+                $select.select2({
+                  dropdownParent: $('#bankDepositModal'),
+                  placeholder: "-- Select Cheque Number --",
+                  allowClear: true,
+                  minimumResultsForSearch: 0,
+                  tags: true,
+                  tokenSeparators: [',', ' '],
+                });
+              });
+            } catch (error) {
+              console.error('Error parsing response:', error);
+            }
+          } else {
+            console.error('Error fetching cheque details:', xhr.statusText);
+          }
+        };
+        xhr.onerror = function() {
+          console.error('Request failed');
+        };
+        xhr.send();
+      }
+    
+      $('#bankDepositModal').on('shown.bs.modal', function() {
+        var modalDailySummaryId = $('#modal_daily_summary_id1').val();
+        if (modalDailySummaryId) {
+          fetchChequeNumbers(modalDailySummaryId);
+        }
+    
+        $('#modal_daily_summary_id1').on('change', function() {
+          var newDailySummaryId = $(this).val();
+          if (newDailySummaryId) {
+            fetchChequeNumbers(newDailySummaryId);
+          }
+        });
+    
+        $('#bankDepositModal').on('change', '.js-cheque-number-select2', function() {
+          var selectedChequeNo = $(this).val();
+          var did = $('#modal_daily_summary_id1').val();
+    
+          if (!did) {
+            console.error('Invalid daily summary ID');
+            return;
+          }
+    
+          const modal = $('#bankDepositModal');
+          const amount = modal.find('#id_amount');
+          const chequeDate = modal.find('#id_cheque_date');
+          const bank = modal.find('#id_bank');
+          const chequeInputContainer = $('#cheque_no_input_container');
+    
+          if (selectedChequeNo === 'other') {
+            chequeInputContainer.show();
+            $('#id_cheque_no_input').val('');
+            amount.val(''); // Clear amount
+            chequeDate.val(''); // Clear cheque date
+            bank.val(''); // Clear bank
+          } else {
+            chequeInputContainer.hide();
+            $('#id_cheque_no_input').val(selectedChequeNo);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
+            xhr.onload = function() {
+              if (xhr.status === 200) {
+                try {
+                  var data = JSON.parse(xhr.responseText);
+                  console.log('Fetched cheque details:', data);
+    
+                  var selectedChequeDetails = data.find(function(cheque) {
+                    return cheque.cheque_no === selectedChequeNo;
+                  });
+    
+                  if (selectedChequeDetails) {
                     console.log('Cheque Date:', selectedChequeDetails.cheque_date);
                     console.log('Amount:', selectedChequeDetails.amount);
                     console.log('Bank:', selectedChequeDetails.bank.id);
-                    console.log(document.getElementById('id_amount'))
+    
+                    // Update input fields with selected cheque details
                     amount.val(selectedChequeDetails.amount);
                     chequeDate.val(selectedChequeDetails.cheque_date);
                     bank.val(selectedChequeDetails.bank.id);
-                    
-                    // Update input fields with selected cheque details using value property
-                    $('#id_cheque_date').val(selectedChequeDetails.cheque_date);
-                    $('#id_amount').val(selectedChequeDetails.amount);
-                    document.getElementById('id_amount').value = selectedChequeDetails.amount;
-                    // Optionally, update bank name if available
-                    if (selectedChequeDetails.bank) {
-                        document.getElementById('id_bank').value = selectedChequeDetails.bank.id;
-                    } else {
-                        document.getElementById('id_bank').value = '';
-                    }
-                } else {
+                  } else {
                     console.error('Selected cheque number details not found in fetched data.');
+                  }
+                } catch (error) {
+                  console.error('Error parsing response:', error);
                 }
-            } else {
+              } else {
                 console.error('Error fetching cheque details:', xhr.statusText);
-            }
-        };
-        xhr.onerror = function() {
-            console.error('Request failed');
-        };
-        xhr.send();
+              }
+            };
+            xhr.onerror = function() {
+              console.error('Request failed');
+            };
+            xhr.send();
+          }
+        });
+      });
     });
-
-
-  });
-});
-
-</script>
-
-
+    </script>
+    
     
 <script>
    

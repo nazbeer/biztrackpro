@@ -34,13 +34,19 @@
                       </div>
                       <div id="chequeDetails" class="d-none">
                     
-                      <div class="form-group">
-                        <label for="id_cheque_no">Cheque Number</label>
-                        <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2 form-control select2" data-tags="true" data-placeholder="Select Cheque Number" data-allow-clear="true" tabindex="504">
+                        <div class="form-group">
+                          <label for="id_cheque_no">Cheque Number</label>
+                          <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2" data-tags="true" data-placeholder="Select Cheque Number" data-allow-clear="true" tabindex="504">
                             <option value="">-- Select Cheque Number --</option>
+                            <option value="other">Other</option>
                             <!-- Options will be dynamically populated via JavaScript -->
-                        </select>
-                    </div>
+                          </select>
+                        </div>
+                        
+                        <div class="form-group" id="cheque_no_input_container" style="display: none;">
+                          <label for="id_cheque_no_input">Enter Cheque Number</label>
+                          <input type="text" id="id_cheque_no_input" name="cheque_no" class="form-control" tabindex="504">
+                        </div>
                     
                       </div>
                       <div class="form-group">

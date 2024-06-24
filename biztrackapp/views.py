@@ -3199,63 +3199,54 @@ def edit_bank(request, pk):
             print(f"Error saving bank details: {str(e)}")
     return render(request, 'edit_bank.html', {'bank': bank})
 
-
 def fetch_cheque_numbers(request, did):
-        print('did-----------------',did)
     # try:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
-        
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
         cheque_details = []
         today = datetime.now().date()
         
-        # Define models to fetch cheque details
-        models = [
-            BankSales,
-            CreditCollection,
-            MiscellaneousIncome,
-            Purchase,
-            SupplierPayments,
-            Expense,
-        ]
+        models = [BankSales, CreditCollection, MiscellaneousIncome, Purchase, SupplierPayments, Expense, Withdrawal]
         
         for model in models:
             queryset = model.objects.filter(business_profile=business_profile.id, daily_summary_id=did, created_on=today)
             for obj in queryset:
-                # Check if the model has cheque_no, cheque_date, and amount fields
-                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount'):
+                # Check if the model has cheque_no and cheque_date fields
+                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date'):
+                    bank_name = None
                     if hasattr(obj, 'bank') and obj.bank:
-                        bank_name = obj.bank.name
+                        bank_name = obj.bank.id
                     elif hasattr(obj, 'allbank') and obj.allbank:
-                        bank_name = obj.allbank
-                    else:
-                        bank_name = ''
+                        bank_name = obj.allbank.id
                     
-                    # Convert obj.bank and obj.allbank to dictionaries if they exist
+                    amount = None
+                    if isinstance(obj, Purchase):
+                        amount = obj.invoice_amount or 0
+                    elif isinstance(obj, (BankSales, CreditCollection, SupplierPayments, MiscellaneousIncome, Expense, Withdrawal)):
+                        amount = obj.amount or 0
                     bank_dict = {}
                     if hasattr(obj, 'bank') and obj.bank:
                         bank_dict['id'] = obj.bank.id
-                        bank_dict['name'] = obj.bank.name
+                        # bank_dict['name'] = obj.bank
                         # Add other fields as needed
                     if hasattr(obj, 'allbank') and obj.allbank:
                         bank_dict['id'] = obj.allbank.id
-                        bank_dict['name'] = obj.allbank
+                        # bank_dict['name'] = obj.allbank
                     #     # Add other fields as needed
                     
                     cheque_details.append({
                         'cheque_no': obj.cheque_no,
                         'bank': bank_dict,
                         'cheque_date': obj.cheque_date,
-                        'amount': obj.amount,
+                        'amount': amount,
                     })
             print(cheque_details)
         return JsonResponse(cheque_details, safe=False)
     
     # except Exception as e:
     #     # Log the exception for debugging purposes
-    #     # print(f"Error fetching cheque details: {str(e)}")
-        
+    #     print(f"Error fetching cheque details: {str(e)}")
     #     # Return a JSON response with an error message and status code 500 (Internal Server Error)
     #     return JsonResponse({'error': 'Error fetching cheque details'}, status=500)

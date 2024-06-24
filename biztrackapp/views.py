@@ -3224,24 +3224,24 @@ def fetch_cheque_numbers(request, did):
             queryset = model.objects.filter(business_profile=business_profile.id, daily_summary_id=did, created_on=today)
             for obj in queryset:
                 # Check if the model has cheque_no, cheque_date, and amount fields
-                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount'):
-                    if hasattr(obj, 'bank') and hasattr(obj.bank, 'bank'):
-                        bank_name = obj.bank.bank
-                    elif hasattr(obj, 'allbank') and hasattr(obj.allbank, 'name'):
-                        bank_name = obj.allbank.name
-                    else:
-                        bank_name = ''
+                if hasattr(obj, 'cheque_no') and hasattr(obj, 'cheque_date') and hasattr(obj, 'amount') and hasattr(obj, 'bank') and hasattr(obj, 'allbank'):
+                    # if hasattr(obj, 'bank') and obj.bank:
+                    #     bank_name = obj.bank.name
+                    # elif hasattr(obj, 'allbank') and obj.allbank:
+                    #     bank_name = obj.allbank
+                    # else:
+                    #     bank_name = ''
                     
                     # Convert obj.bank and obj.allbank to dictionaries if they exist
                     bank_dict = {}
                     if hasattr(obj, 'bank') and obj.bank:
                         bank_dict['id'] = obj.bank.id
-                        # bank_dict['name'] = obj.bank
+                        bank_dict['name'] = obj.bank.name
                         # Add other fields as needed
                     if hasattr(obj, 'allbank') and obj.allbank:
                         bank_dict['id'] = obj.allbank.id
-                        # bank_dict['name'] = obj.allbank.name
-                        # Add other fields as needed
+                        bank_dict['name'] = obj.allbank
+                    #     # Add other fields as needed
                     
                     cheque_details.append({
                         'cheque_no': obj.cheque_no,
@@ -3249,7 +3249,7 @@ def fetch_cheque_numbers(request, did):
                         'cheque_date': obj.cheque_date,
                         'amount': obj.amount,
                     })
-            print(obj.bank)
+            print(cheque_details)
         return JsonResponse(cheque_details, safe=False)
     
     # except Exception as e:

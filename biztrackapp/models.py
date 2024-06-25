@@ -28,7 +28,9 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=255)
     country_code = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=20)
-    is_admin = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    is_employee = models.BooleanField(default=False)
+
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
@@ -86,6 +88,7 @@ class Partners(models.Model):
         return f"Partner for {self.shop.name} - {self.user.username}"
     
 class Employee(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True)
     employee_id = models.CharField(max_length=10, unique=True)
     # business_profile = models.ForeignKey(BusinessProfile,on_delete=models.CASCADE)
     business_profile = models.CharField(max_length=255, null=True)
@@ -103,7 +106,7 @@ class Employee(models.Model):
     transportation_allowance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     joining_date = models.DateField()
     job_role = models.CharField(max_length=50)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -121,7 +124,7 @@ class BusinessTiming(models.Model):
 class ExpenseType(models.Model):
     name = models.CharField(max_length=255)
     business_profile = models.CharField(max_length=255, null=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -130,7 +133,7 @@ class ExpenseType(models.Model):
 class ReceiptType(models.Model):
     name = models.CharField(max_length=255)
     business_profile = models.CharField(max_length=255, null=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_on = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -203,7 +206,7 @@ class Bank(models.Model):
     account_number = models.CharField(max_length=50)
     opening_balance = models.DecimalField(max_digits=10, decimal_places=2)
     business_profile = models.CharField(max_length=255, null=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_on = models.DateField(auto_now_add=True, null=True)
     update_on = models.DateTimeField(auto_now=True, null=True)
 
@@ -220,7 +223,7 @@ class TransactionMode(models.Model):
     ]
     name = models.CharField(max_length=255,choices=CHOICES)
     business_profile = models.CharField(max_length=255, null=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     created_on = models.DateField(auto_now_add=True, null=True)
 
     def __str__(self):

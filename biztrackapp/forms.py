@@ -6,15 +6,23 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('email','country_code','phone_number','is_admin')
+        fields = ('email','country_code','phone_number','is_admin','is_employee')
 
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
         # fields = ('email',)
-        fields = ('email','country_code','phone_number','is_admin')
+        fields = ('email','country_code','phone_number','is_admin','is_employee')
 
+class ShopAdminForm(forms.ModelForm):
+    class Meta:
+        model = ShopAdmin
+        fields = ['shop', 'user']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = User.objects.filter(is_admin=True)
 
 class BusinessProfileForm(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
@@ -105,9 +113,35 @@ class ModeofTransactionForm(forms.ModelForm):
 
 
 class EmployeeForm(forms.ModelForm):
+    country_code = forms.CharField()
+    phone_number = forms.CharField()
+    email = forms.EmailField()
+    password = forms.CharField()
     class Meta:
         model = Employee
-        fields ='__all__'
+        fields =[
+            'employee_id',
+            'first_name',
+            'last_name',
+            'email',
+            'business_profile',
+            'business_profile_id',
+            'nationality',
+            'mobile_no',
+            'passport_no',
+            'passport_expiration_date',
+            'emirates_id',
+            'id_expiration_date',
+            'basic_pay',
+            'house_allowance',
+            'transportation_allowance',
+            'joining_date',
+            'job_role',
+            'email',
+            'country_code' ,
+            'phone_number' ,
+            'password'
+        ]
 
 class DailySummaryForm(forms.ModelForm):
     class Meta:

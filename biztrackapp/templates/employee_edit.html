@@ -48,7 +48,7 @@
       </div>
       <div class="form-group">
         <label for="mobile_no">Mobile No:</label>
-        <input type="text" id="mobile_no" name="mobile_no" value="{{ form.mobile_no.value }}" class="form-control">
+        <input type="text" id="mobile_no" name="mobile_no" value="{{ form.mobile_no.value }}" class="form-control" readonly>
       </div>
       <div class="form-group">
         <label for="passport_no">Passport No:</label>
@@ -58,12 +58,12 @@
         <label for="passport_expiration_date">Passport Expiration Date:</label>
         <input type="date" id="passport_expiration_date" name="passport_expiration_date" value="{{ form.passport_expiration_date.value|date:'Y-m-d' }}" class="form-control" >
       </div>
-      {% comment %} <div class="form-group">
+     <!-- <div class="form-group">
         <label for="username">Username:</label>
         
         <input type="text" id="username" name="username" class="form-control"  required>
         <div id="usernameAvailability" class="text-success"></div>
-    </div> {% endcomment %}
+    </div>  -->
     </div>
     <div class="col-md-6">
       <div class="form-group">
@@ -102,11 +102,11 @@
     </div>
     
      
-    {% comment %} <div class="form-group mt-2">
+    <!-- <div class="form-group mt-2">
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" class="form-control"  required>
       
-  </div> {% endcomment %}
+  </div>  -->
     </div>
   </div>
       <button type="submit" class="btn btn-primary">Update</button>

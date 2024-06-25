@@ -22,6 +22,8 @@ from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
+from django.contrib.auth.hashers import make_password
+
 
 import xhtml2pdf as pisa
 
@@ -61,6 +63,42 @@ def success_view(request):
     return render(request, 'success.html')
 
 
+def get_object_or_none(model, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        return None
+    
+def get_employee(request, user):
+    return get_object_or_none(Employee, user=user)
+
+def get_business_profile(request, id):
+    return get_object_or_none(BusinessProfile, pk=id)
+    
+def get_shop_admin(request,user):
+    employee = get_employee(request, user=user)
+    if employee:
+        business_profile = get_business_profile(request, id=employee.business_profile_id)
+        if business_profile:
+            shop = get_object_or_none(Shop, name=business_profile.name)
+            if shop:
+                shop_admin = get_object_or_none(ShopAdmin, shop=shop)
+                if shop_admin:
+                    return shop_admin
+                else:
+                    messages.error(request, "No shop admin associated with the current user.")
+                    return redirect('home')
+            else:
+                messages.error(request, "No shop associated with the current user.")
+                return redirect('home')
+        else:
+            messages.error(request, "No business profile associated with the current user.")
+            return redirect('home')
+    else:
+        messages.error(request, "No employee associated with the current user.")
+        return redirect('home')
+    
+
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'home.html'
@@ -70,11 +108,15 @@ class HomeView(LoginRequiredMixin, TemplateView):
         
         if self.request.user.is_authenticated:
             try:
-                shop_admin = ShopAdmin.objects.get(user=self.request.user)
-                context['shop'] = shop_admin.shop
-                context['user'] = shop_admin.user
-
-
+                if self.request.user.is_admin:
+                    shop_admin = ShopAdmin.objects.get(user=self.request.user)
+                    context['shop'] = shop_admin.shop
+                    context['user'] = shop_admin.user
+                else:
+                    shop_admin = get_shop_admin(self.request,user=self.request.user)
+                    context['shop'] = shop_admin.shop
+                    context['user'] = shop_admin.user                        
+                    
             except ShopAdmin.DoesNotExist:
                 # Render the template with a message
                 context['error_message'] = "No shop associated with the current user."
@@ -136,11 +178,20 @@ def create_business_profile(request):
     if request.user.is_authenticated:
         # Fetch the shop details associated with the logged-in user
         try:
-            shop_admin = ShopAdmin.objects.get(user=request.user)
+            if request.user.is_admin:
+                shop_admin = ShopAdmin.objects.get(user=request.user)
+                context['shop_details'] = shop_admin.shop
+                context['license_number'] = shop_admin.shop.license_number
+            else:
+                shop_admin = get_shop_admin(request,user=request.user)
+                context['shop_details'] = shop_admin.shop
+                context['license_number'] = shop_admin.shop.license_number
+                
+            # shop_admin = ShopAdmin.objects.get(user=request.user)
+            # # #print(shop_name)
+            # context['shop_details'] = shop_admin.shop
+            # context['license_number'] = shop_admin.shop.license_number
             shop_name = shop_admin.shop.name
-            # #print(shop_name)
-            context['shop_details'] = shop_admin.shop
-            context['license_number'] = shop_admin.shop.license_number
 
             # Check if a business profile already exists with the same name as shop name
             if BusinessProfile.objects.filter(name=shop_name).exists():
@@ -156,17 +207,34 @@ def business_profile_list(request):
     context = {}
     if request.user.is_authenticated:
         try:
+            if request.user.is_admin:
             # Fetch the shop details associated with the logged-in user
-            shop_admin = ShopAdmin.objects.get(user=request.user)
-            # shop_name = shop_admin.shop.name
-            shop = shop_admin.shop
+                shop_admin = ShopAdmin.objects.get(user=request.user)
+                # shop_name = shop_admin.shop.name
+                shop = shop_admin.shop
+                # Filter Business Profiles based on the logged-in user's shop name
+                profiles = BusinessProfile.objects.filter(name=shop.name)
+                context['profiles'] = profiles
+                context['shop_details'] = shop_admin.shop
+                context['license_number'] = shop_admin.shop.license_number
+            else:
+                shop_admin = get_shop_admin(request,user=request.user)
+                shop = shop_admin.shop
+                profiles = BusinessProfile.objects.filter(name=shop.name)
+                context['profiles'] = profiles
+                context['shop_details'] = shop_admin.shop
+                context['license_number'] = shop_admin.shop.license_number
 
-            
-            # Filter Business Profiles based on the logged-in user's shop name
-            profiles = BusinessProfile.objects.filter(name=shop.name)
-            context['profiles'] = profiles
-            context['shop_details'] = shop_admin.shop
-            context['license_number'] = shop_admin.shop.license_number
+
+            # Fetch the shop details associated with the logged-in user
+            # shop_admin = ShopAdmin.objects.get(user=request.user)
+            # # shop_name = shop_admin.shop.name
+            # shop = shop_admin.shop
+            # # Filter Business Profiles based on the logged-in user's shop name
+            # profiles = BusinessProfile.objects.filter(name=shop.name)
+            # context['profiles'] = profiles
+            # context['shop_details'] = shop_admin.shop
+            # context['license_number'] = shop_admin.shop.license_number
         except ShopAdmin.DoesNotExist:
             context['profiles'] = None
             context['shop_details'] = None
@@ -201,7 +269,12 @@ def delete_business_profile(request, pk):
 from django.contrib.auth.mixins import LoginRequiredMixin
 class PartnerListView(LoginRequiredMixin, View):
     def get(self, request):
-        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        if self.request.user.is_admin:
+            shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+            shop = shop_admin.shop
+
         if shop:
             partners = Partners.objects.filter(shop=shop)
         else:
@@ -215,7 +288,12 @@ class PartnerCreateView(LoginRequiredMixin, View):
         return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
 
     def post(self, request):
-        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        if self.request.user.is_admin:
+            shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+            shop = shop_admin.shop
+        # shop = Shop.objects.filter(shopadmin__user=request.user).first()
         form = PartnerForm(request.POST, initial={'shop': shop})
         if form.is_valid():
             partner = form.save(commit=False)
@@ -223,8 +301,14 @@ class PartnerCreateView(LoginRequiredMixin, View):
             partner.save()
             return redirect(reverse('partner_list'))
         return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
+    
 def create_supplier(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+        shop = shop_admin.shop
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     
     # Get the shop associated with the shop admin
     shop = shop_admin.shop.name
@@ -246,7 +330,12 @@ def create_supplier(request):
     return render(request, 'create_supplier.html', {'form': form, 'business_profile': business_profile.id})
 
 def create_customer(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+        shop = shop_admin.shop
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     # Get the shop associated with the shop admin
     shop = shop_admin.shop
     # Get the business profile associated with the shop
@@ -265,7 +354,10 @@ def create_customer(request):
 
 def customer_list(request):
     try:
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = ShopAdmin.objects.get(user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         business = BusinessProfile.objects.get(license_number=shop.license_number)
     except ShopAdmin.DoesNotExist:
@@ -279,7 +371,10 @@ def customer_list(request):
 
 def supplier_list(request):
     try:
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = ShopAdmin.objects.get(user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         business = BusinessProfile.objects.get(license_number=shop.license_number)
     except ShopAdmin.DoesNotExist:
@@ -293,8 +388,10 @@ def supplier_list(request):
 
 def create_expense_type(request):
     try:
-        # Get the current shop admin
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = ShopAdmin.objects.get(user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
@@ -317,8 +414,11 @@ class ExpenseTypeListView(ListView):
     model = ExpenseType
     template_name = 'expense_type_list.html'
     def get_queryset(self):
-        shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
-    
+        if self.request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        else:
+            shop_admin = get_shop_admin(self.request,user=self.request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
         # Get the shop associated with the shop admin
         shop = shop_admin.shop
         
@@ -341,8 +441,11 @@ class ExpenseTypeDeleteView(DeleteView):
 
 def create_receipt_type(request):
     try:
-        # Get the current shop admin
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = ShopAdmin.objects.get(user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        # shop_admin = ShopAdmin.objects.get(user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
@@ -365,7 +468,12 @@ def create_receipt_type(request):
 
 def receipt_type_list(request):
     # Retrieve the current user's shop admin instance
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    # Get the associated shop
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -387,7 +495,11 @@ class ReceiptTypeUpdateView(UpdateView):
 def create_bank(request):
     try:
         # Get the current shop admin
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        # shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
@@ -418,7 +530,11 @@ class BankListView(ListView):
     template_name = 'bank_list.html'
     
     def get_queryset(self):
-        shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        if self.request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        else:
+            shop_admin = get_shop_admin(self.request,user=self.request.user)
     
         # Get the shop associated with the shop admin
         shop = shop_admin.shop
@@ -435,7 +551,11 @@ def create_mode_of_transaction(request):
     choices = TransactionMode.CHOICES  # Accessing the choices from the model
     try:
         # Get the current shop admin
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        # shop_admin = ShopAdmin.objects.get(user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
@@ -465,7 +585,11 @@ class ModeOfTransaction(ListView):
     template_name = 'mode_transaction_list.html'
     
     def get_queryset(self):
-        shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        if self.request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=self.request.user)
+        else:
+            shop_admin = get_shop_admin(self.request,user=self.request.user)
     
         # Get the shop associated with the shop admin
         shop = shop_admin.shop
@@ -487,7 +611,11 @@ def create_employee(request):
     error_occurred = False  
     try:
         # Get the current shop admin
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        # shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         # Get the associated shop
         shop = shop_admin.shop
         # Get the business profile associated with the shop
@@ -498,7 +626,11 @@ def create_employee(request):
 
     # Fetch the shop details associated with the logged-in user
     try:
-        shop_admin = ShopAdmin.objects.get(user=request.user)
+        # shop_admin = ShopAdmin.objects.get(user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
     except ShopAdmin.DoesNotExist:
         shop = None
@@ -524,8 +656,29 @@ def create_employee(request):
                 messages.error(request, "Max User Registration limit is reached.")
             else:
                 try:
+                    first_name = form.cleaned_data['first_name']
+                    last_name = form.cleaned_data['last_name']
+                    email = form.cleaned_data['email']
+                    country_code = form.cleaned_data['country_code']
+                    phone_number = form.cleaned_data['phone_number']
+                    password = form.cleaned_data['password']
+                    hashed_password = make_password(password)
+
+                    username  =  phone_number
+                    user = User.objects.create(
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        username=username,
+                        password=hashed_password,
+                        country_code=country_code,
+                        phone_number=phone_number,
+                        is_employee = True
+                    )
+                    user.save()
                     employee = form.save(commit=False)
-                    # employee.business_profile_id = request.POST.get('business_profile_id')  # Set business_profile_id from POST data
+                    employee.user = user
+                    employee.mobile_no = country_code + phone_number
                     employee.save()
                     return redirect('employee_list') 
                 except Exception as e:
@@ -554,7 +707,11 @@ def create_employee(request):
 
 def employee_list(request):
     # Get the shop admin user
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     
     # Get the shop associated with the shop admin
     shop = shop_admin.shop
@@ -600,7 +757,11 @@ def employee_edit(request, pk):
 
 def daily_summary_list(request):
     today = date.today()
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -635,7 +796,11 @@ def create_business_timing(request):
             return redirect('business_timing_list')
     else:
         form = BusinessTimingForm()
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -644,7 +809,11 @@ def create_business_timing(request):
 
 def business_timing_list(request):
     # Get the ShopAdmin instance for the current user
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     
     # Retrieve the BusinessProfile instance associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop_admin.shop.name)
@@ -658,7 +827,11 @@ def business_timing_list(request):
 
 def edit_business_timing(request, id):
     business_timing = get_object_or_404(BusinessTiming, id=id)
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     
     # Retrieve the BusinessProfile instance associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop_admin.shop.name)
@@ -715,8 +888,13 @@ def save_after_submit(request):
     except TransactionMode.DoesNotExist:
         pass
 
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
+
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     daily_summary = get_object_or_404(DailySummary, daily_summary_id=id, business_profile=business_profile.id)
@@ -995,7 +1173,11 @@ def create_daily_summary(request):
     today = date.today()
     yesterday = datetime.now() - timedelta(days=1)
     yesterday_date = yesterday.date()
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -1380,7 +1562,12 @@ def create_bank_sale(request):
             
 def list_bank_sales(request):
     # id = request.GET.get('id')
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1417,7 +1604,11 @@ def create_credit_collection(request):
 
 
 def list_credit_collection(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1449,7 +1640,11 @@ def create_misc_income(request):
 
 
 def list_msc_income(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1487,7 +1682,11 @@ def create_purchase(request):
 
 
 def list_purchases(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1523,7 +1722,12 @@ def create_supplier_payment(request):
 
 
 def list_supplier_payment(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1554,7 +1758,12 @@ def create_bank_deposit(request):
 
 
 def list_bank_deposit(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
     shop = shop_admin.shop
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -1584,7 +1793,12 @@ def create_expense(request):
 
 
 def list_expense(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
     
     # Retrieve the business profile associated with the shop
@@ -1632,7 +1846,12 @@ def create_withdrawal(request):
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
 
 def list_withdrawal(request):
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
     shop = shop_admin.shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     withdrawals = Withdrawal.objects.filter(business_profile=business_profile.id)
@@ -1642,7 +1861,12 @@ def list_withdrawal(request):
 def get_daily_summary_data(request,id):
     # id = request.GET.get('id')
     today = date.today()
-    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+
     shop = shop_admin.shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     cheque_transaction_mode = None
@@ -1763,7 +1987,11 @@ class MscIncomeReportView(View):
 
 class SupplierPaymentReportView(View):
     def get(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         suppliers = Supplier.objects.filter(business_profile=business_profile.id)
@@ -1773,7 +2001,12 @@ class SupplierPaymentReportView(View):
 
 class CustomerPaymentReportView(View):
     def get(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         customers = Customer.objects.filter(business_profile=business_profile.id)
@@ -1783,7 +2016,11 @@ class CustomerPaymentReportView(View):
 
 class BankStatementView(View):
     def get(self, request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2059,7 +2296,12 @@ class DailyCollectionReportAPIView(APIView):
         start_date = request.GET.get('start_date')
         #print('start date1', start_date)
         end_date = request.GET.get('end_date')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2134,7 +2376,12 @@ class DailyCollectionReportPDFView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2211,7 +2458,12 @@ class SalesReportAPIView(APIView):
     def get(self, request, *args, **kwargs):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2272,7 +2524,12 @@ class PurchaseReportAPIView(APIView):
     def get(self, request, *args, **kwargs):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2331,7 +2588,12 @@ class MscIncomeReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2373,7 +2635,12 @@ class SupplierPaymentReportAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -2489,7 +2756,12 @@ class SupplierPaymentReportPDFAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -2589,7 +2861,12 @@ class CustomerPaymentReportAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -2706,7 +2983,12 @@ class CustomerPaymentReportPDFAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -2804,7 +3086,12 @@ class BankStatementAPIView(APIView):
         end_date = request.GET.get('end_date')
         bank_id = request.GET.get('bank')
 
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -2946,7 +3233,12 @@ class BankStatementPDFView(APIView):
         end_date = request.GET.get('end_date')
         bank_id = request.GET.get('bank')
 
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
@@ -3089,7 +3381,12 @@ class BankStatementPDFView(APIView):
 class PassDSDailySummaryAPIView(APIView):
     def post(self, request):
         daily_summary_id = request.data.get('daily_summary_id')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         if daily_summary_id is not None:
@@ -3110,7 +3407,11 @@ class PassDSDailySummaryAPIView(APIView):
 class PassDSDailySummaryAPIView(APIView):
     def post(self, request):
         daily_summary_id = request.data.get('daily_summary_id')
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         today = datetime.now().date()
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -3141,7 +3442,12 @@ class PassDSDailySummaryAPIView(APIView):
 
 class CheckDailySummaryExists(APIView):
     def get(self,request):
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
         shop = shop_admin.shop
         businessprofile = get_object_or_404(BusinessProfile, name=shop.name)
         daily_summary_instance = DailySummary.objects.filter(business_profile = businessprofile.id,date = datetime.now().date())
@@ -3201,7 +3507,12 @@ def edit_bank(request, pk):
 
 def fetch_cheque_numbers(request, did):
     # try:
-        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         

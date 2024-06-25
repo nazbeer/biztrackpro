@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm,ShopAdminForm
 from .models import *
 
 
@@ -37,9 +37,13 @@ admin.site.register(User, CustomUserAdmin)
 class NewShopAdmin(admin.ModelAdmin):
     list_display = ['name','license_number', 'num_users','vat_remainder', 'employee_transaction_window', 'license_expiration_reminder', 'employee_visa_expiration_reminder', 'employee_passport_expiration_reminder', 'created_on']
 
-@admin.register(ShopAdmin)
+# @admin.register(ShopAdmin)
+# class ShopAdminAdmin(admin.ModelAdmin):
+#     list_display = ['shop', 'user']
 class ShopAdminAdmin(admin.ModelAdmin):
+    form = ShopAdminForm
     list_display = ['shop', 'user']
+admin.site.register(ShopAdmin, ShopAdminAdmin)
 
 class BusinessProfileAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'license_number', 'license_expiration', 'shop_phone_number', 'vat_percentage', 'vat_number', 'created_on')

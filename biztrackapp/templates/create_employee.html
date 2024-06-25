@@ -77,47 +77,43 @@
     </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    <label for="job_role">Mobile Number:</label>
-                    <input  type="tel" id="mobile_no" 
-                    placeholder="971xxxxxxxxx" name="mobile_no"  oninput="validatePhoneNumber(this)" maxlength="12" required>
-                    
-                </div>
 
                 <div class="form-group">
                     <label for="first_name">First Name:</label>
                     {{ form.first_name }}
                 </div>
                 
-            <div class="form-group">
-                    <label for="nationality">Nationality:</label>
-                    {{ form.nationality }}
-
-                    {% comment %} <select id="nationality" name="nationality" class="form-control">
-                        {% for nationality in nationalities %}
-                            <option value="{{ nationality }}">{{ nationality }}</option>
-                        {% endfor %}
-                    </select> {% endcomment %}
-                </div>
-               
-                <div class="form-group">
-                    <label for="emirates_id">Emirates ID:</label>
-                    <input type="number" id="emirates_id" name="emirates_id" required min="100000000000000" max="999999999999999" inputmode="numeric">
-                </div>
-                
-            </div>
-            <div class="col-md-6">
                 <div class="form-group">
                     <label for="passport_no">Passport No:</label>
                     {{ form.passport_no }}
                 </div>
+                
+                <div class="form-group">
+                    <label for="emirates_id">Emirates ID:</label>
+                    <input type="number" id="emirates_id" name="emirates_id" required min="100000000000000" max="999999999999999" inputmode="numeric" >
+                </div>
+
+                <!-- <div class="form-group">
+                    <label for="job_role">Mobile Number:</label>
+                    <input  type="tel" id="mobile_no" 
+                    placeholder="971xxxxxxxxx" name="mobile_no"  oninput="validatePhoneNumber(this)" maxlength="12" required>
+                </div> -->
+
+                
+              
+               
+               
+                
+            </div>
+            <div class="col-md-6">
+                
                 <div class="form-group">
                     <label for="last_name">Last Name:</label>
                     {{ form.last_name }}
                 </div>
                 <div class="form-group">
                     <label for="passport_expiration_date">Passport Expiration Date:</label>
-                    <input type="date" id="passport_expiration_date" name="passport_expiration_date" value="{{ form.passport_expiration_date.value }}" class="form-control">
+                    <input type="date" id="passport_expiration_date" name="passport_expiration_date" value="{{ form.passport_expiration_date.value }}" >
                 </div>
                 <div class="form-group">
                     <label for="id_expiration_date">ID Expiration Date:</label>
@@ -135,57 +131,68 @@
                     <label for="house_allowance">House Allowance:</label>
                     {{ form.house_allowance }}
                 </div>
+                <div class="form-group">
+                    <label for="joining_date">Joining Date:</label>
+                    <input type="date" id="joining_date" value="{{ form.joining_date.value }}"  name="joining_date" class="form-control">
+                </div>
+
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="transportation_allowance">Transportation Allowance:</label>
                     {{ form.transportation_allowance }}
                 </div>
+
                   <div class="form-group">
                     <label for="commission_percentage">Job Role:</label>
-                    
                     <input type="text" id="job_role" name="job_role" value="Staff" readonly>
                 </div>
-                {% comment %} <div class="form-group">
-                    <label for="commission_percentage">Commission Percentage:</label>
-                    {{ form.commission_percentage }}
-                </div> {% endcomment %}
+                
+                   <div class="form-group">
+                    <label for="nationality">Nationality:</label>
+                    {{ form.nationality }}
+                </div>
             </div>
         </div>
+
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="joining_date">Joining Date:</label>
-                    <input type="date" id="joining_date" value="{{ form.joining_date.value }}"  name="joining_date" class="form-control">
+                    <label for="country_code">Country Code:</label>
+                    <input type="text" id="country_code" name="country_code" class="form-control" value="971"  required readonly>
                 </div>
             </div>
-            {% comment %} <div class="col-md-6">
+            <div class="col-md-6">
                 <div class="form-group">
-                    <label for="job_role">Job Role:</label>
-                    <select id="job_role" name="job_role" class="form-control">
-                        <option value="">Select Job Role</option>
-                        {% for role in roles %}
-                            <option value="{{ role.id }}">{{ role.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="phone_number">Phone No:</label>
+                    <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="05xxxxxxxx" maxlength="10" required >
+                    <div id="usernameAvailability" class="text-success"></div>
+
                 </div>
-            </div> {% endcomment %}
+            </div>
+        </div>
+
+        <!-- <div class="form-group">
+            <label for="phone_number">Username:</label>
+            <div id="usernameAvailability" class="text-success"></div>
+        </div> -->
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" class="form-control"  required>
+        </div>
+        <!-- <div class="form-group">
+            <label for="country_code">Country Code:</label>
+            <input type="text" id="country_code" name="country_code" class="form-control"  required>
+        </div> -->
+       <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password" class="form-control"  required>
             
         </div>
-        {% comment %} <div class="form-group">
-            <label for="username">Username:</label>
-           
-            {{ form.username }}
-            <div id="usernameAvailability" class="text-success"></div>
-        </div> {% endcomment %}
-        {% comment %} <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" class="form-control"  required>
-            
-        </div> {% endcomment %}
-        {% comment %} <div class="form-group">
+       <div class="form-group">
             <input type="hidden" id="is_employee" name="is_employee"  value="true" checked>
-        </div> {% endcomment %}
+        </div>
         <button type="submit" class="btn btn-primary" {% if error_occurred or num_users_created >= max_users_allowed %}disabled{% endif %}>Submit</button>
     </form>
 
@@ -249,16 +256,16 @@
 
 
     function checkUsernameAvailability() {
-        var username = document.getElementById('id_username').value;
+        var username = document.getElementById('phone_number').value;
         if (username.trim() !== '') {
             // Make an AJAX request to check username availability
             fetch('/check-username-availability/?username=' + username)
                 .then(response => response.json())
                 .then(data => {
                     if (data.available) {
-                        document.getElementById('usernameAvailability').textContent = 'Username is available';
+                        document.getElementById('usernameAvailability').textContent = 'Mobile Number is available';
                     } else {
-                        document.getElementById('usernameAvailability').textContent = 'Username already exists';
+                        document.getElementById('usernameAvailability').textContent = 'Mobile Number is not available';
                     }
                 });
         }

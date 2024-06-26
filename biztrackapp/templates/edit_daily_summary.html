@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Daily Summary{% endblock %}
+{% block title %}Update Daily Summary{% endblock %}
 
 {% block content %}
 
@@ -10,6 +10,9 @@
         box-sizing: border-box;
         max-height: 50px !important;
         overflow-y: auto;
+    }
+    thead>tr>th{
+        background-color: dimgray !important;
     }
 </style>
 <!-- jQuery -->
@@ -198,7 +201,7 @@
 
         // Format today's date as 'YYYY-MM-DD'
         const formattedToday = today.toISOString().split('T')[0];
-
+        // $('#modal_date').val() = formattedToday;
         // Get start and end times from the server in 'g:i A' format
         const startTimeValue = "{{ start_time|default_if_none:''|date:'g:i A' }}";
         const endTimeValue = "{{ end_time|default_if_none:''|date:'g:i A' }}";
@@ -252,9 +255,41 @@
     });
 </script>
 <script>
+ 
+
     $(document).ready(function() {
+        $('#confirmModal').on('show.bs.modal', function(event) {
+            const today = new Date();
+            const formattedToday = today.toISOString().split('T')[0];
+
+            // Set the current date in the #modal_date <td> element
+            $('#modal_date').text(formattedToday);
+            $('#date_span').text(formattedToday);
+            // const button = $(event.relatedTarget); 
+            // console.log(button);
+            // const summaryData = button.data('summary');
+            // const dailySummary = JSON.parse(summaryData); 
+
+        
+            // $('#modal_date').val(dailySummary.date);
+            // $('#modal_opening_balance').val(dailySummary.opening_balance);
+            // $('#modal_cash_sale').val(dailySummary.cash_sale);
+            // $('#modal_credit_sale').val(dailySummary.credit_sale);
+            // $('#modal_card_sale').val(dailySummary.card_sale);
+            // $('#modal_sales').val(dailySummary.sales);
+            // $('#modal_credit_collection').val(dailySummary.credit_collection);
+            // $('#modal_miscellaneous_income').val(dailySummary.miscellaneous_income);
+            // $('#modal_purchase').val(dailySummary.purchase);
+            // $('#modal_supplier_payment').val(dailySummary.supplier_payment);
+            // $('#modal_expense').val(dailySummary.expense);
+            // $('#modal_withdrawal').val(dailySummary.withdrawal);
+            // $('#modal_closing_balance').val(dailySummary.closing_balance);
+            // $('#modal_status').val(dailySummary.status);
+            // $('#modal_daily_summary_id').val(dailySummary.id);
+        });
+
         function toggleChequeDetails() {
-            const modal = $('.modal.show'); // Get the currently shown modal
+            const modal = $('.modal.show'); 
             const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
             const chequeDetails = modal.find('#chequeDetails');
             const chequeDetails1 = modal.find('#chequeDetails1');
@@ -351,6 +386,8 @@
         setDailySummaryId('supplierPaymentModal', 'modal_daily_summary_id6');
         setDailySummaryId('expenseModal', 'modal_daily_summary_id7');
         setDailySummaryId('withdrawalModal', 'modal_daily_summary_idw');
+        setDailySummaryId('confirmModal', 'modal_daily_summary_idc');
+        
     });
     
     </script>
@@ -364,6 +401,7 @@
             .then(data => {
                 console.log('pp',data.closing_balance)
             document.getElementById('id_closing_balance').innerHTML = `Closing Balance: ${data.closing_balance}`;
+            document.getElementById('modal_closing_balance').innerHTML = `${data.closing_balance}`;
 
             })
             .catch(error => console.error('Error:', error));
@@ -420,7 +458,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="id_date">Opening Balance <small class="text-muted">(cash on hand)</small>:</label>
+                                <label for="id_date">Opening Balance</label>
                                 <input type="number" name="opening_balance" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
                             </div>
                         </div>
@@ -1092,12 +1130,12 @@
         </div>
         <div class="card-footer mb-0">
             <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
-                {% comment %} <input type="hidden" name="closing_balance" value="0"> {% endcomment %}
+              
                 <input type="hidden" name="status" id="status" value="ongoing">
-                {% comment %} <input type="button" onclick="saveFunction()"  class="btn btn-warning" value="Save">
-                <input type="button"  class="btn btn-primary" value="Submit"> {% endcomment %}
+             
+
         
-             <button type="button" class="btn btn-primary" id="submit-btn" onclick="submitFunction()">Submit</button>
+             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">Confirm &amp; Submit</button>
                 <button type="button" class="btn btn-secondary" id="save-btn" onclick="saveFunction()">Save</button>
             </div>
         </div>
@@ -1113,6 +1151,7 @@
 {% include 'modals/expense_modal.html' %}
 {% include 'modals/bank_deposit_modal.html' %}
 {% include 'modals/withdrawal_modal.html' %}
+{% include 'modals/confirm_modal.html' %}
 
 
 

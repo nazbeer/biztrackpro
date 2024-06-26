@@ -1,0 +1,70 @@
+<!-- Confirm Daily Summary Modal -->
+<div class="modal fade" id="confirmModal" tabindex="900" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-primary">
+                <h5 class="modal-title text-white" id="confirmModalLabel">Confirm Daily Summary</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body bg-white">
+                {% csrf_token %}
+                <div id="confirm-form-errors" class="alert alert-danger d-none"></div>
+                
+                <table class="table table-bordered"  style="text-align: right;">
+                    <thead style="background-color: dimgrey !important;">
+                        <tr style="background-color: dimgrey !important;">
+                            <th  style="text-align: center; background-color: dimgrey !important;">Date</th>
+                            <th style="background-color: dimgrey !important;">Op. Bal.</th>
+                            <!-- <th>Cash Sale</th>
+                            <th>Credit Sale</th>
+                            <th>Card Sale</th>
+                            <th>Cheque Sale</th> -->
+                            <th style="background-color: dimgrey !important;">Bank Sales</th>
+                            <th style="background-color: dimgrey !important;">Credit Col.</th>
+                            <th style="background-color: dimgrey !important;">Msc. Income</th>
+                            <th style="background-color: dimgrey !important;">Purchase</th>
+                            <th style="background-color: dimgrey !important;">Sup. Payment</th>
+                            <th style="background-color: dimgrey !important;">Expense</th>
+                            <th style="background-color: dimgrey !important;">Withdrawal</th>
+                            <th style="background-color: dimgrey !important;">Bank Dep.</th>
+                            <th style="background-color: dimgrey !important;">Cl. Bal.</th>
+                            <!-- <th  style="text-align: center;background-color: dimgrey !important;">Status</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                           
+                            <input type="hidden" name="business_profile" value="{{ business_profile }}">
+                            <input type="hidden" id="modal_daily_summary_idc" name="daily_summary_id">
+                            <td id="modal_date" style="text-align: center;" >{{ date }}</td>
+                            <td id="modal_opening_balance" style="text-align: right;">{{ cash_on_hand|floatformat:2 }}</td>
+                            <!-- <td id="modal_cash_sale">{{ bank_sale_total_cash_sale }}</td>
+                            <td id="modal_credit_sale">{{ bank_sale_total_credit_sale }}</td>
+                            <td id="modal_card_sale">{{ bank_sale_total_card_sale }}</td>
+                            <td id="modal_cheque_sale">{{ bank_sale_total_cheque_sale }}</td> -->
+                            <td id="modal_sales" style="text-align: right;">{{ total_bank_sale_amount|floatformat:2 }}</td>
+                            <td id="modal_credit_collection" style="text-align: right;">{{ total_credit_sale_amount|floatformat:2 }}</td>
+                            <td id="modal_miscellaneous_income" style="text-align: right;">{{ total_mis_income_amount|floatformat:2 }}</td>
+                            <td id="modal_purchase" style="text-align: right;">{{ total_purchase_amount|floatformat:2 }}</td>
+                            <td id="modal_supplier_payment" style="text-align: right;">{{ total_supplier_payment_amount|floatformat:2 }}</td>
+                            <td id="modal_expense" style="text-align: right;">{{ total_expense_amount|floatformat:2 }}</td>
+                            <td id="modal_withdrawal" style="text-align: right;">{{ total_withdrawal_amount|floatformat:2 }}</td>
+                            <td id="modal_bank_deposit" style="text-align: right;">{{ bank_deposit_amount|floatformat:2 }}</td>
+                            <td id="modal_closing_balance" style="text-align: right;"></td>
+                            <!-- <td id="modal_status" style="text-align: center;">Ongoing</td> -->
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-center text-dark font-weight-600">Would you like to proceed with submitting the data for the Daily Summary of <span id="date_span"></span> ?</p>
+            </div>
+            <div class="modal-footer justify-content-center align-items-center">
+                <input type="hidden" name="status" id="status" value="ongoing">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submit-btn" onclick="submitFunction()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

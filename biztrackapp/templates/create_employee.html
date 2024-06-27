@@ -148,9 +148,14 @@
                     <input type="text" id="job_role" name="job_role" value="Staff" readonly>
                 </div>
                 
-                   <div class="form-group">
+                  
+                <div class="form-group">
                     <label for="nationality">Nationality:</label>
-                    {{ form.nationality }}
+                    <select id="nationality" name="nationality" class="form-control">
+                        {% for nationality in nationalities %}
+                            <option value="{{ nationality }}">{{ nationality }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
         </div>

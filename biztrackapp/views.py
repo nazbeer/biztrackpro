@@ -23,7 +23,7 @@ from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
-
+from .constants import NATIONALITIES 
 
 import xhtml2pdf as pisa
 
@@ -704,6 +704,7 @@ def create_employee(request):
     'num_users_created': num_users_created,
     'max_users_allowed': max_users_allowed,
     'business_profile_id': shop.id,
+    'nationalities': NATIONALITIES, 
     }
 
     return render(request, 'create_employee.html', context)

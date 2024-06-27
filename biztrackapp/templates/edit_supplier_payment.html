@@ -94,15 +94,15 @@
       setRequired(chequeNoDetails, true);
 
     } else if( modeOfTransaction === "bank transfer" || modeOfTransaction === "card") {
-      chequeDetails.style.display = "block";
+      chequeDetails.style.display = "none";
       chequeNoDetails.style.display = "none";
       bankDetails.style.display = "block";
 
-      setRequired(chequeDetails, true);
+      setRequired(chequeDetails, false);
       setRequired(bankDetails, true);
       setRequired(chequeNoDetails, false);
 
-    //   document.getElementById("id_cheque_date").value = "";
+      document.getElementById("id_cheque_date").value = "";
       document.getElementById("id_cheque_no").value = "";
     }
     else{

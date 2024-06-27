@@ -18,7 +18,10 @@
       <h5 class="mb-0">Bank List</h5>
       <div>
         <a href="{% url 'create_bank' %}" class="btn btn-primary float-right">Create Bank</a>
+      <!-- <a href="{% url 'create_all_banks' %}" class="btn btn-primary float-right mr-3">Customer Bank</a> -->
+      {% if not all_banks_exist %}
       <a href="{% url 'create_all_banks' %}" class="btn btn-primary float-right mr-3">Customer Bank</a>
+  {% endif %}
       </div>
   </div>
     <div class="card-body">

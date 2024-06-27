@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
+# from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
@@ -544,6 +544,11 @@ class BankListView(ListView):
     
         # Return the queryset of Bank objects filtered by business profile and sorted by created_on date in descending order
         return Bank.objects.filter(business_profile=business_profile.id).order_by('-created_on')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['all_banks_exist'] = AllBank.objects.exists()
+        return context
 
 
 

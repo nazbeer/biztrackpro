@@ -147,7 +147,7 @@ urlpatterns = [
 
     # path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
     #API Views
-    path('api/expense-report/', ExpenseReportAPIView.as_view(), name='expense_report'),
+    path('api/expense-report/', ExpenseReportAPIView.as_view(), name='expense_report_api'),
     path('api/daily-collection-report/', DailyCollectionReportAPIView.as_view(), name='daily_collection_report_api'),
     path('api/sales-report/', SalesReportAPIView.as_view(), name='sales_report'),
     path('api/purchase-report/', PurchaseReportAPIView.as_view(), name='purchase_report'),
@@ -157,6 +157,7 @@ urlpatterns = [
     path('api/customer-payment-report/', CustomerPaymentReportAPIView.as_view(), name='customer_payment_report'),
 
     #pdfapi
+     path('api/expense-report-pdf/', ExpenseReportPDFView.as_view(), name='expense_report_pdf'),
     path('api/bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
     path('api/supplier-payment-report-pdf/', SupplierPaymentReportPDFAPIView.as_view(), name='supplier-payment-report-pdf'),

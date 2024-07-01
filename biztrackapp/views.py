@@ -304,14 +304,11 @@ class PartnerCreateView(LoginRequiredMixin, View):
     
 def create_supplier(request):
     if request.user.is_admin:
-        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
         shop_admin = get_shop_admin(request,user=request.user)
-        shop = shop_admin.shop
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    
-    # Get the shop associated with the shop admin
-    shop = shop_admin.shop.name
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop
     
     # Get the business profile associated with the shop
     # business_profile = get_object_or_404(BusinessProfile, name=shop.name)
@@ -331,14 +328,11 @@ def create_supplier(request):
 
 def create_customer(request):
     if request.user.is_admin:
-        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
         shop_admin = get_shop_admin(request,user=request.user)
-        shop = shop_admin.shop
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-    # Get the shop associated with the shop admin
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     shop = shop_admin.shop
-    # Get the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     if request.method == 'POST':
         form = CustomerForm(request.POST)

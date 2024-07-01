@@ -142,11 +142,12 @@ urlpatterns = [
     path('supplier-payment-report/', SupplierPaymentReportView.as_view(), name='supplier_payment_report'),
     path('customer-payment-report/', CustomerPaymentReportView.as_view(), name='customer_payment_report'),
     path('bank-statement/', BankStatementView.as_view(), name='bank_statement'),
+    path('expense-report/', ExpenseReportView.as_view(), name='expense_report'),
 
 
     # path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
     #API Views
-
+    path('api/expense-report/', ExpenseReportAPIView.as_view(), name='expense_report'),
     path('api/daily-collection-report/', DailyCollectionReportAPIView.as_view(), name='daily_collection_report_api'),
     path('api/sales-report/', SalesReportAPIView.as_view(), name='sales_report'),
     path('api/purchase-report/', PurchaseReportAPIView.as_view(), name='purchase_report'),

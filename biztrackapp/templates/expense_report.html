@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Expense Report{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Expense Report</h4>
+        </div>
+        <div class="card-body">
+            <form id="expense-report-form" class="mb-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </form>
+            <div id="expense-report-results" class="mt-4" style="display: none;">
+                <div class="text-center">
+                    <h5 class="text-dark">Report Results</h5>
+                    <p>Date: <span id="report-date-range"></span></p>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th  style="background-color: #8a8a8a; text-align:center;">Date</th>
+                            <th  style="background-color: #8a8a8a; text-align:center;"> Type</th>
+                            <th  style="background-color: #8a8a8a; text-align:center;">Amount</th>
+                            <th  style="background-color: #8a8a8a; text-align:center;">Remark</th>
+                            <th  style="background-color: #8a8a8a; text-align:center;">Mode of Transaction</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody id="expense-report-body"></tbody>
+                    <tfoot id="expense-report-footer"></tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('expense-report-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+
+        fetch(`/api/expense-report/?start_date=${startDate}&end_date=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('expense-report-results').style.display = 'block';
+            const reportBody = document.getElementById('expense-report-body');
+            const reportFooter = document.getElementById('expense-report-footer');
+            const reportDateRange = document.getElementById('report-date-range');
+            reportBody.innerHTML = data.details.map(detail => `
+                <tr>
+                     <td>${new Date(detail.date).toLocaleDateString()}</td>
+                    <td>${detail.expense_type}</td>
+                    <td>${detail.amount.toFixed(2)}</td>
+                    <td>${detail.invoice_no}</td>
+                    <td>${detail.mode_of_transaction}</td>
+                   
+                </tr>
+            `).join('');
+
+            const totalAmount = data.details.reduce((acc, detail) => acc + parseFloat(detail.amount), 0).toFixed(2);
+            reportFooter.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:right;"><strong>Total:</strong></td>
+                    <td>${totalAmount}</td>
+                </tr>
+            `;
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+</script>
+{% endblock %}

@@ -23,7 +23,7 @@ from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
-from .constants import NATIONALITIES 
+
 
 import xhtml2pdf as pisa
 
@@ -544,11 +544,6 @@ class BankListView(ListView):
     
         # Return the queryset of Bank objects filtered by business profile and sorted by created_on date in descending order
         return Bank.objects.filter(business_profile=business_profile.id).order_by('-created_on')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['all_banks_exist'] = AllBank.objects.exists()
-        return context
 
 
 
@@ -704,7 +699,6 @@ def create_employee(request):
     'num_users_created': num_users_created,
     'max_users_allowed': max_users_allowed,
     'business_profile_id': shop.id,
-    'nationalities': NATIONALITIES, 
     }
 
     return render(request, 'create_employee.html', context)
@@ -2032,6 +2026,20 @@ class BankStatementView(View):
         
         banks = Bank.objects.filter(business_profile=business_profile.id)
         return render(request, 'bank_statement.html', {'banks': banks})
+
+
+class ExpenseReportView(View):
+    def get(self, request):
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        
+        expenses = Expense.objects.filter(business_profile=business_profile.id)
+        return render(request, 'expense_report.html', {'expenses': expenses})
 
 
 def edit_bank_sale(request, pk):
@@ -3383,11 +3391,11 @@ class BankStatementPDFView(APIView):
         response['Content-Disposition'] = f'attachment; filename="Bank_Statement_{start_date}_to_{end_date}.pdf"'
         return response
 
+class ExpenseReportAPIView(APIView):
+    def get(self, request):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
 
-class PassDSDailySummaryAPIView(APIView):
-    def post(self, request):
-        daily_summary_id = request.data.get('daily_summary_id')
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
@@ -3395,18 +3403,71 @@ class PassDSDailySummaryAPIView(APIView):
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        if daily_summary_id is not None:
-            try:
-                # Create or update DailySummary instance
-                daily_summary, created = DailySummary.objects.create(
-                    defaults={'daily_summary_id': daily_summary_id},
-                    business_profile=business_profile.id,
-                )
-                return Response({'message': 'Daily summary ID saved successfully'}, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        
+        if not (start_date and end_date):
+            return Response({'error': 'Invalid parameters'}, status=400)
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        expenses = Expense.objects.filter(created_on__range=(start_date, end_date), business_profile=business_profile.id)
+       
+        expense_data = [{
+            'expense_type': expense.expense_type.name,  # Assuming ExpenseType has a 'name' field
+            'amount': float(expense.amount),
+            'invoice_no': expense.invoice_no,
+            'mode_of_transaction': expense.mode_of_transaction.name,  # Assuming TransactionMode has a 'name' field
+            'date': expense.created_on.isoformat(),
+        } for expense in expenses]
+        print(expense_data)
+        return Response({'details': expense_data}, status=status.HTTP_200_OK)
+
+class ExpenseReportPDFView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            return Response({'error': 'daily_summary_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+            shop_admin = get_shop_admin(request,user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        # if start_date and end_date:
+        expenses = Expense.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
+        # else:
+        #     expenses = Expense.objects.all()
+        html_string = render_to_string('expense_report.html', {'expenses': expenses})
+        pdf = HTML(string=html_string).write_pdf()
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="expense_report.pdf"'
+        return response
+    
+# class PassDSDailySummaryAPIView(APIView):
+#     def post(self, request):
+#         daily_summary_id = request.data.get('daily_summary_id')
+#         # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#         if request.user.is_admin:
+#             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+#         else:
+#             shop_admin = get_shop_admin(request,user=request.user)
+
+#         shop = shop_admin.shop
+#         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+#         if daily_summary_id is not None:
+#             try:
+#                 # Create or update DailySummary instance
+#                 daily_summary, created = DailySummary.objects.create(
+#                     defaults={'daily_summary_id': daily_summary_id},
+#                     business_profile=business_profile.id,
+#                 )
+#                 return Response({'message': 'Daily summary ID saved successfully'}, status=status.HTTP_201_CREATED)
+#             except Exception as e:
+#                 return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         else:
+#             return Response({'error': 'daily_summary_id parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

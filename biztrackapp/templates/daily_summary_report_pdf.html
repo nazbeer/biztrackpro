@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Summary Report</title>
+    <style>
+         @page {
+            size: A4 landscape; /* A4 page size with landscape orientation */
+            margin: 1cm; /* Adjust margins as needed */
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+        }
+        h1, h2 { 
+            text-align: center; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 12px !important;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            border: 1px solid #ddd;
+            font-size: 12px !important;
+        }
+        th {
+            background-color: #8a8a8a; 
+            color: #fff;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.05); /* Light stripe for odd rows */
+        }
+        tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.075); /* Slightly darker stripe for even rows */
+        }
+    </style>
+</head>
+<body>
+    <h2>Daily Summary Report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Opening Bal.</th>
+                <th>Cash Sale</th>
+                <th>Credit Sale</th>
+                <th>Card Sale</th>
+                <th>Sales</th>
+                <th>Credit Col.</th>
+                <th>Msc. Income</th>
+                <th>Purchase</th>
+                <th>Sup. Payment</th>
+                <th>Expense</th>
+                <th>Withdrawal</th>
+                <th>Bank Deposit</th>
+                <th>Closing Bal.</th>
+             
+            </tr>
+        </thead>
+        <tbody>
+            {% for summary in summaries %}
+            <tr>
+                <td>{{ summary.date|date:"d-m-Y" }}</td>
+                <td>{{ summary.opening_balance }}</td>
+                <td>{{ summary.cash_sale }}</td>
+                <td>{{ summary.credit_sale }}</td>
+                <td>{{ summary.card_sale }}</td>
+                <td>{{ summary.sales }}</td>
+                <td>{{ summary.credit_collection }}</td>
+                <td>{{ summary.miscellaneous_income }}</td>
+                <td>{{ summary.purchase }}</td>
+                <td>{{ summary.supplier_payment }}</td>
+                <td>{{ summary.expense }}</td>
+                <td>{{ summary.withdrawal }}</td>
+                <td>{{ summary.bank_deposit }}</td>
+                <td>{{ summary.closing_balance }}</td>
+             
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Daily Summary Report{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Daily Summary Report</h4>
+        </div>
+        <div class="card-body">
+            <form id="summary-report-form" class="form-inline mb-4">
+                <div class="row  d-flex justify-content-between align-items-center">
+                    <div class="col-md-4">
+                        <div class="form-group mr-2">
+                            <label for="start_date" class="mr-2">Start Date</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mr-2">
+                            <label for="end_date" class="mr-2">End Date</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group mr-2 mt-2">
+                            <button type="submit" id="gen" class="btn btn-primary">Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div id="report-results" class="mt-4 d-none">
+                <div class="text-center">
+                    <h5 class="text-dark">Report Results</h5>
+                    <p>Date: <span id="report-date-range"></span></p>
+                </div>
+                <table class="table table-bordered table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th style="background-color: #8a8a8a; text-align:center;">Date</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Opening Balance</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Cash Sale</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Credit Sale</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Card Sale</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Sales</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Credit Col.</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Msc Income</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Purchase</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Supplier Payment</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Expense</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Withdrawal</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Bank Deposit</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Closing Balance</th>
+                            <!-- <th style="background-color: #8a8a8a; text-align:center;">Status</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Created On</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Updated On</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="report-body"></tbody>
+                </table>
+                <button id="download-pdf" class="btn btn-success mt-2">Download PDF</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('summary-report-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    fetch(`/api/daily-summary-report/?start_date=${startDate}&end_date=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('data:', data); // Debugging line to see what data is returned
+            document.getElementById('report-results').classList.remove('d-none'); // Ensuring this ID exists in your HTML
+            const reportBody = document.getElementById('report-body');
+            const reportDateRange = document.getElementById('report-date-range');
+
+            reportDateRange.textContent = `${startDate} to ${endDate}`;
+            reportBody.innerHTML = data.map(detail => {
+                return `
+                    <tr>
+                        <td>${new Date(detail.date).toLocaleDateString('en-UK', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                        })}</td>
+                        <td style="text-align:right;">${detail.opening_balance}</td>
+                        <td style="text-align:right;">${detail.cash_sale}</td>
+                        <td style="text-align:right;">${detail.credit_sale}</td>
+                        <td style="text-align:right;">${detail.card_sale}</td>
+                        <td style="text-align:right;">${detail.sales}</td>
+                        <td style="text-align:right;">${detail.credit_collection}</td>
+                        <td style="text-align:right;">${detail.miscellaneous_income}</td>
+                        <td style="text-align:right;">${detail.purchase}</td>
+                        <td style="text-align:right;">${detail.supplier_payment}</td>
+                        <td style="text-align:right;">${detail.expense}</td>
+                        <td style="text-align:right;">${detail.withdrawal}</td>
+                        <td style="text-align:right;">${detail.bank_deposit}</td>
+                        <td style="text-align:right;">${detail.closing_balance}</td>
+                       
+                    </tr>
+                `;
+            }).join('');
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+});
+
+document.getElementById('download-pdf').addEventListener('click', function() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    window.location.href = `/api/daily-summary-pdf/?start_date=${startDate}&end_date=${endDate}`;
+});
+</script>
+{% endblock %}

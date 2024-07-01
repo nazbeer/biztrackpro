@@ -2033,6 +2033,12 @@ class ExpenseReportView(View):
 
 
 
+class DailySummaryReportView(View):
+    def get(self, request):
+        return render(request, 'daily_summary_report.html')
+
+
+
 
 def edit_bank_sale(request, pk):
     bank_sale = get_object_or_404(BankSales, pk=pk)
@@ -3419,7 +3425,7 @@ class ExpenseReportAPIView(APIView):
        
         return Response({'detail': expense_data})
         # return Response({'details': expense_data}, safe=False, status=200)
-        
+
 class ExpenseReportPDFView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -3455,6 +3461,83 @@ class ExpenseReportPDFView(APIView):
         return response
     
 
+class DailySummaryReportAPIView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request, user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        if not start_date or not end_date:
+            return Response({'error': 'Both start date and end date are required.'}, status=400)
+
+        summaries = DailySummary.objects.filter(
+            date__range=[start_date, end_date],
+            business_profile=business_profile.id
+        ).order_by('date')
+
+        result = [{
+            'date': summary.date.isoformat(),
+            'opening_balance': str(summary.opening_balance),
+            'daily_summary_id': summary.daily_summary_id,
+            'cash_sale': str(summary.cash_sale),
+            'credit_sale': str(summary.credit_sale),
+            'card_sale': str(summary.card_sale),
+            'sales': str(summary.sales),
+            'credit_collection': str(summary.credit_collection),
+            'miscellaneous_income': str(summary.miscellaneous_income),
+            'purchase': str(summary.purchase),
+            'supplier_payment': str(summary.supplier_payment),
+            'expense': str(summary.expense),
+            'withdrawal': str(summary.withdrawal),
+            'bank_deposit': str(summary.bank_deposit),
+            'closing_balance': str(summary.closing_balance),
+            'status': summary.status,
+            'created_on': summary.created_on.isoformat(),
+            'updated_on': summary.updated_on.isoformat()
+        } for summary in summaries]
+
+        return Response(result)
+    
+class DailySummaryPDFView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request, user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        summaries = DailySummary.objects.filter(
+            date__range=[start_date, end_date],
+            business_profile=business_profile.id
+        ).order_by('date')
+
+        context = {
+            'summaries': summaries,
+            'start_date': start_date,
+            'end_date': end_date,
+            'business': business_profile.name,
+
+        }
+
+        html_string = render_to_string('daily_summary_report_pdf.html', context)
+        pdf = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="daily_summary_report.pdf"'
+        return response
+    
 class PassDSDailySummaryAPIView(APIView):
     def post(self, request):
         daily_summary_id = request.data.get('daily_summary_id')

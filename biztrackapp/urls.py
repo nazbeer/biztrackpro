@@ -143,6 +143,12 @@ urlpatterns = [
     path('customer-payment-report/', CustomerPaymentReportView.as_view(), name='customer_payment_report'),
     path('bank-statement/', BankStatementView.as_view(), name='bank_statement'),
     path('expense-report/', ExpenseReportView.as_view(), name='expense_report'),
+ 
+    path('daily-summary-report/', DailySummaryReportView.as_view(), name='daily_summary_report'),
+
+    path('api/daily-summary-report/', DailySummaryReportAPIView.as_view(), name='daily_summary_report_api'),
+    path('api/daily-summary-pdf/', DailySummaryPDFView.as_view(), name='daily_summary_pdf'),
+
 
 
     # path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),

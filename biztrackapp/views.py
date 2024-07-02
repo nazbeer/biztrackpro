@@ -274,9 +274,9 @@ class PartnerListView(LoginRequiredMixin, View):
         else:
             shop_admin = get_shop_admin(request,user=request.user)
             shop = shop_admin.shop
-
+            profiles = BusinessProfile.objects.filter(name=shop.name)
         if shop:
-            partners = Partners.objects.filter(shop=shop)
+            partners = Partners.objects.filter(business_profile=profiles)
         else:
             partners = Partners.objects.none()
         return render(request, 'partner_list.html', {'partners': partners})
@@ -293,6 +293,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
         else:
             shop_admin = get_shop_admin(request,user=request.user)
             shop = shop_admin.shop
+            profiles = BusinessProfile.objects.filter(name=shop.name)
         # shop = Shop.objects.filter(shopadmin__user=request.user).first()
         form = PartnerForm(request.POST, initial={'shop': shop})
         if form.is_valid():

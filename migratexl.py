@@ -1,43 +1,65 @@
 import os
 import django
-import pandas as pd
+import csv
+from datetime import datetime, date
 import random
 import string
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'biztrackpro.settings')
 django.setup()
 
-from biztrackapp.models import DailySummary
+from biztrackapp.models import DailySummary, Expense, ExpenseType, TransactionMode, Bank
 
-file_path = 'Migration file latest.xlsx'
-df = pd.read_excel(file_path)
+def generate_random_summary_id():
+    return "DS_" + ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
-def generate_random_id():
-    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
-    return f"DS_{random_string}"
+# Create a mapping of date to daily_summary_id
+date_to_summary_id = {ds.date: ds.daily_summary_id for ds in DailySummary.objects.filter(business_profile=2)}
 
-for index, row in df.iterrows():
-    daily_summary = DailySummary(
-        date=row['date'],
-        opening_balance=row.get('opening_balance', None),
-        daily_summary_id=generate_random_id(),
-        cash_sale=row.get('cash_sale', None),
-        credit_sale=row.get('credit_sale', None),
-        card_sale=row.get('card_sale', None),
-        sales=row.get('sales', None),
-        credit_collection=row.get('credit_collection', None),
-        miscellaneous_income=row.get('miscellaneous_income', None),
-        purchase=row.get('purchase', None),
-        supplier_payment=row.get('supplier_payment', None),
-        expense=row.get('expense', None),
-        withdrawal=row.get('withdrawal', None),
-        bank_deposit=row.get('bank_deposit', None),
-        closing_balance=row.get('closing_balance', None),
-        business_profile='2', 
-        status=row['status'],
-        created_on=row.get('created_on', None),
-        updated_on=row.get('updated_on', None)
-    )
-    daily_summary.save()
+# Clear existing Expense entries
+Expense.objects.filter(business_profile=2).delete()
 
-print("Data uploaded successfully.")
+# Reset the auto-increment id counter for SQLite
+from django.db import connection
+with connection.cursor() as cursor:
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='biztrackapp_expense';")
+
+# Load the data from the Expense CSV file
+expense_file_path = 'expense1.csv'  # Path to the uploaded CSV file
+
+# Print headers to debug
+with open(expense_file_path, mode='r') as file:
+    csv_reader = csv.DictReader(file)
+    headers = csv_reader.fieldnames
+    print(headers)
+
+# Load Expense data
+expenses = []
+with open(expense_file_path, mode='r') as file:
+    csv_reader = csv.DictReader(file)
+    for row in csv_reader:
+        expense_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
+        daily_summary_id = date_to_summary_id.get(expense_date)
+
+        if daily_summary_id:
+            expense = Expense(
+                expense_type=ExpenseType.objects.get(id=row["expense_type"]),
+                amount=row["amount"],
+                daily_summary_id=daily_summary_id,
+                cheque_no=None,  # Ensure cheque_no is set to None for all entries
+                invoice_no=row["invoice_no"],
+                mode_of_transaction=TransactionMode.objects.get(name='cash', business_profile=2),  # Filter by business_profile
+                cheque_date=expense_date,
+                bank=Bank.objects.get(id=1),
+                business_profile=2,
+                created_on=expense_date,  # Override auto_now_add
+                updated_on=date.today()
+            )
+            expenses.append(expense)
+
+# Bulk create the Expense entries
+Expense.objects.bulk_create(expenses)
+
+# Manually set the created_on field using a direct update
+for expense in expenses:
+    Expense.objects.filter(pk=expense.pk).update(created_on=expense.created_on)

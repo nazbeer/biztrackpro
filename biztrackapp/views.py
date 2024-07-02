@@ -274,9 +274,9 @@ class PartnerListView(LoginRequiredMixin, View):
         else:
             shop_admin = get_shop_admin(request,user=request.user)
             shop = shop_admin.shop
-            profiles = BusinessProfile.objects.filter(name=shop.name)
+
         if shop:
-            partners = Partners.objects.filter(business_profile=profiles)
+            partners = Partners.objects.filter(shop=shop)
         else:
             partners = Partners.objects.none()
         return render(request, 'partner_list.html', {'partners': partners})
@@ -293,7 +293,6 @@ class PartnerCreateView(LoginRequiredMixin, View):
         else:
             shop_admin = get_shop_admin(request,user=request.user)
             shop = shop_admin.shop
-            profiles = BusinessProfile.objects.filter(name=shop.name)
         # shop = Shop.objects.filter(shopadmin__user=request.user).first()
         form = PartnerForm(request.POST, initial={'shop': shop})
         if form.is_valid():
@@ -862,26 +861,27 @@ def save_after_submit(request):
     credit_transaction_mode = None
     card_transaction_mode = None
 
-    try:
-        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    except TransactionMode.DoesNotExist:
-        pass
-    try:
-        card_transaction_mode = TransactionMode.objects.get(name="card")
-    except TransactionMode.DoesNotExist:
-        pass
+
+    # try:
+    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    # except TransactionMode.DoesNotExist:
+    #     pass
+    # try:
+    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    # except TransactionMode.DoesNotExist:
+    #     pass
+    # try:
+    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
+    # except TransactionMode.DoesNotExist:
+    #     pass
+    # try:
+    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    # except TransactionMode.DoesNotExist:
+    #     pass
+    # try:
+    #     card_transaction_mode = TransactionMode.objects.get(name="card")
+    # except TransactionMode.DoesNotExist:
+    #     pass
 
     # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     if request.user.is_admin:
@@ -893,6 +893,29 @@ def save_after_submit(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     daily_summary = get_object_or_404(DailySummary, daily_summary_id=id, business_profile=business_profile.id)
+
+    business_profile_id = business_profile.id
+    try:
+        cheque_transaction_mode = TransactionMode.objects.filter(name="cheque",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.filter(name="bank transfer",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+
 
     if request.method == 'POST':
         form = DailySummaryForm(request.POST, instance=daily_summary)
@@ -1182,27 +1205,51 @@ def create_daily_summary(request):
     credit_transaction_mode = None
     card_transaction_mode = None
 
+    business_profile_id = business_profile.id
+
+    try:
+        cheque_transaction_mode = TransactionMode.objects.filter(name="cheque",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.filter(name="bank transfer",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+
+
     
-    try:
-        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        card_transaction_mode = TransactionMode.objects.get(name="card")
-    except TransactionMode.DoesNotExist:
-        pass 
+    # try:
+    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     card_transaction_mode = TransactionMode.objects.get(name="card")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
     if BusinessTiming.objects.filter(business_profile=business_profile.id).exists():
         business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     else:
@@ -1869,28 +1916,51 @@ def get_daily_summary_data(request,id):
     bank_transaction_mode = None
     credit_transaction_mode = None
     card_transaction_mode = None
+    
+    business_profile_id = business_profile.id
+    try:
+        cheque_transaction_mode = TransactionMode.objects.filter(name="cheque",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.filter(name="bank transfer",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+
 
     
-    try:
-        cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    except TransactionMode.DoesNotExist:
-        pass 
-    try:
-        card_transaction_mode = TransactionMode.objects.get(name="card")
-    except TransactionMode.DoesNotExist:
-        pass 
+    # try:
+    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
+    # try:
+    #     card_transaction_mode = TransactionMode.objects.get(name="card")
+    # except TransactionMode.DoesNotExist:
+    #     pass 
 
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
     # purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)

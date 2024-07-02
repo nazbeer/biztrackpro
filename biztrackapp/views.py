@@ -283,9 +283,15 @@ class PartnerListView(LoginRequiredMixin, View):
 
 class PartnerCreateView(LoginRequiredMixin, View):
     def get(self, request):
-        shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        if self.request.user.is_admin:
+            shop = Shop.objects.filter(shopadmin__user=request.user).first()
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+            shop = shop_admin.shop
         form = PartnerForm(initial={'shop': shop})
-        return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
+        profiles = BusinessProfile.objects.filter(name=shop.name)
+        users = User.objects.filter(shopadmin__shop=shop)
+        return render(request, 'partner_form.html', {'form': form,'shop':shop.id,'business_profile':profiles,'users':users})
 
     def post(self, request):
         if self.request.user.is_admin:
@@ -293,6 +299,9 @@ class PartnerCreateView(LoginRequiredMixin, View):
         else:
             shop_admin = get_shop_admin(request,user=request.user)
             shop = shop_admin.shop
+
+        profiles = BusinessProfile.objects.filter(name=shop.name)
+        users = User.objects.filter(shopadmin__shop=shop)
         # shop = Shop.objects.filter(shopadmin__user=request.user).first()
         form = PartnerForm(request.POST, initial={'shop': shop})
         if form.is_valid():
@@ -300,7 +309,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
             partner.shop = shop
             partner.save()
             return redirect(reverse('partner_list'))
-        return render(request, 'partner_form.html', {'form': form,'shop':shop.id})
+        return render(request, 'partner_form.html', {'form': form,'shop':shop.id,'business_profile':profiles})
     
 def create_supplier(request):
     if request.user.is_admin:
@@ -3760,3 +3769,28 @@ def fetch_cheque_numbers(request, did):
     #     print(f"Error fetching cheque details: {str(e)}")
     #     # Return a JSON response with an error message and status code 500 (Internal Server Error)
     #     return JsonResponse({'error': 'Error fetching cheque details'}, status=500)
+
+class CustomTokenObtainView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomTokenObtainSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            # refresh = RefreshToken.for_user(user)
+            # request.session['refresh_token'] = str(refresh)
+            # request.session['access_token'] = str(refresh.access_token)
+            # request.session['user'] = UserSerializer(user).data
+            return Response({
+                # 'refresh': str(refresh),
+                # 'access': str(refresh.access_token),
+                'user': UserSerializer(user).data,
+                'message': 'Authentication successful'
+            })
+        else:
+            return Response({"error": "Authentication failed"}, status=status.HTTP_401_UNAUTHORIZED)

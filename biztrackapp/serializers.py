@@ -15,3 +15,13 @@ class BankStatementReportFilterSerializer(serializers.Serializer):
     end_date = serializers.DateField(required=True)
     bank = serializers.PrimaryKeyRelatedField(queryset=AllBank.objects.all())
     
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number', 'country_code','phone_number','is_admin','is_employee']
+   
+
+class CustomTokenObtainSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)

@@ -23,7 +23,7 @@
                 <div class="form-group col-md-4">
                     <label for="user">User</label>
                     <select id="user" name="user" class="form-control">
-                        {% for user in form.user.field.queryset %}
+                        {% for user in users %}
                             <option value="{{ user.id }}" {% if user.id == form.user.value %}selected{% endif %}>{{ user.username }}  {{user.country_code}}{{user.phone_number}}</option>
                         {% endfor %}
                     </select>
@@ -31,8 +31,8 @@
                 <div class="form-group col-md-4">
                     <label for="business_profile">Business Profile</label>
                     <select id="business_profile" name="business_profile" class="form-control">
-                        {% for business_profile in form.business_profile.field.queryset %}
-                            <option value="{{ business_profile.id }}" {% if business_profile.id == form.business_profile.value %}selected{% endif %}>{{ business_profile.name }}</option>
+                        {% for profile in business_profile %}
+                            <option value="{{ profile.id }}" {% if profile.id == form.business_profile.value %}selected{% endif %}>{{ profile.name }}</option>
                         {% endfor %}
                     </select>
                 </div>

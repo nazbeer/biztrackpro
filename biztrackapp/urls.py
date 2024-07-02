@@ -172,6 +172,8 @@ urlpatterns = [
     #extras
     path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
     path('api/daily_summary_exists/', CheckDailySummaryExists.as_view(), name='daily_summary_exists'),
+    path('api/login/', CustomTokenObtainView.as_view(),name = 'api_login'),
+
 ]
 # handler404 = 'custom_404_view'
 if settings.DEBUG:

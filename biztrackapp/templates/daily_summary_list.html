@@ -23,53 +23,38 @@
     <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
-          <thead >
+          <thead>
             <tr style="border-radius: 15rem;">
-              <th scope="col" class="text-center">#</th>
-              <th scope="col">Date</th>
-              <!-- <th scope="col" class="d-none">ID</th> -->
-              
-              <th scope="col">Op. Bal</th>
-              <!-- <th scope="col">Cash Sale</th>
-              <th scope="col">Credit Sale</th>
-              <th scope="col">Card Sale</th> -->
-              <th scope="col">Sales</th>
-              <th scope="col">Credit Colln.</th>
-              <th scope="col">Msc. Inc.</th>
-              <th scope="col">Withdrawal</th>
-              <th scope="col">Purchase</th>
-              <th scope="col">Sup. Pay.</th>
-              <th scope="col">Expense</th>
-              <th scope="col">Bank Dep.</th>
-              <th scope="col">Cl. Bal.</th>
-              <th scope="col">Status</th>
-              <th scope="col">Created On</th>
-              <th scope="col">Updated On</th>
-              <th scope="col">Actions</th>
+              <th  class="text-center">#</th> 
+              <th >Date</th>
+              <th >Op. Bal</th>
+              <th >Sales</th>
+              <th >Credit Colln.</th>
+              <th >Msc. Inc.</th>
+              <th >Withdrawal</th>
+              <th >Purchase</th>
+              <th >Sup. Pay.</th>
+              <th >Expense</th>
+              <th >Bank Dep.</th>
+              <th >Cl. Bal.</th>
+              <th >Status</th>
+              <th >Created On</th>
+              <th >Updated On</th>
+              <th >Actions</th>
             </tr>
           </thead>
           <tbody>
             {% for summary in daily_summaries %}
               <tr>
-                <td scope="row" class="text-left">
-                  {% if summary.date == today  and summary.status == 'ongoing'  %}
-                  <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" class="ath" target="_blank"> {{ summary.id }}</a>
-                {% else %}
-                  {{ summary.id }}
-                {% endif %}</td>
-                <td>{{ summary.date|date:"d-m-y" }}</td>
-                <!-- <td class="d-none"> 
-                  {% if summary.date == today  and summary.status == 'ongoing'  %}
-                    <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" target="_blank"> {{ summary.daily_summary_id }}</a>
+                <td class="text-center">{{ forloop.counter }}</td>
+                <td>
+                  {% if summary.date == today and summary.status == 'ongoing' %}
+                  <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" class="ath" target="_blank">  {{ summary.date|date:"d-m-y" }}</a>
                   {% else %}
-                    {{ summary.daily_summary_id }}
+                  {{ summary.date|date:"d-m-y" }}
                   {% endif %}
-                </td> -->
-                
+                </td>
                 <td>{{ summary.opening_balance }}</td>
-                <!-- <td>{{ summary.cash_sale }}</td>
-                <td>{{ summary.credit_sale }}</td>
-                <td>{{ summary.card_sale }}</td> -->
                 <td>{{ summary.sales }}</td>
                 <td>{{ summary.credit_collection }}</td>
                 <td>{{ summary.miscellaneous_income }}</td>
@@ -79,20 +64,15 @@
                 <td>{{ summary.expense }}</td>
                 <td><span class="text-right">{{ summary.bank_deposit }}</span></td>
                 <td><span class="text-right">{{ summary.closing_balance }}</span></td>
-                <td><span  class="text-capitalize text-right">{{ summary.status }}</span></td>
-                <td><span class="text-right pl-2"> {{ summary.created_on }}</span></td>
-                <td><span class="text-right pl-2"> {{ summary.updated_on }}</span></td>
+                <td><span class="text-capitalize text-right">{{ summary.status }}</span></td>
+                <td><span class="text-right pl-2">{{ summary.created_on }}</span></td>
+                <td><span class="text-right pl-2">{{ summary.updated_on }}</span></td>
                 <td>
-                  {% if summary.date == today  and summary.status == 'ongoing'  %}
+                  {% if summary.date == today and summary.status == 'ongoing' %}
                     <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" target="_blank" class="btn btn-primary btn-sm">Edit</a>
                   {% else %}
                     <button class="btn btn-primary btn-sm" disabled>Edit</button>
                   {% endif %}
-                  <!-- Uncomment the delete form if needed -->
-                  <!-- <form action="{% url 'delete_daily_summary' summary.id %}" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                  </form> -->
                 </td>  
               </tr>
             {% endfor %}
@@ -103,41 +83,31 @@
   </div>
 </div>
 
-<!-- 
-  document.getElementById('daily_summary_id').addEventListener('click', function(e) {
-    e.preventDefault();
-    const id = 'DS_' + Math.random().toString(36).substr(2, 10);
-    const url = "{% url 'create_daily_summary' %}?id=" + id;
-    window.location.href = url;
-  }); -->
 <script>
-
   document.getElementById('daily_summary_id').addEventListener('click', function(e) {
     e.preventDefault();
     fetch(`/api/daily_summary_exists/`)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data.exists);
-          const dailySummaryLink = document.getElementById("daily_summary_id");
-          if (data.exists === true) {
-            message.style.display = "block";
-            message.innerHTML = "Daily summary already submitted";
-          } else {
-            const id = 'DS_' + Math.random().toString(36).substr(2, 10);
-            const url = "{% url 'create_daily_summary' %}?id=" + id;
-            window.location.href = url;
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+      .then(response => response.json())
+      .then(data => {
+        const dailySummaryLink = document.getElementById("daily_summary_id");
+        if (data.exists === true) {
+          message.style.display = "block";
+          message.innerHTML = "Daily summary already submitted";
+        } else {
+          const id = 'DS_' + Math.random().toString(36).substr(2, 10);
+          const url = "{% url 'create_daily_summary' %}?id=" + id;
+          window.location.href = url;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   });
-
 
   new DataTable('#dailysummary', {
     responsive: true,
     dom: 'lBfrtip',
-     order: [[1, 'asc']], 
+    order: [[0, 'desc']],
     buttons: [
       {
         text: 'Print',

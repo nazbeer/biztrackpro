@@ -23,6 +23,7 @@ from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
+from .constants import NATIONALITIES 
 
 
 import xhtml2pdf as pisa
@@ -702,6 +703,7 @@ def create_employee(request):
     'num_users_created': num_users_created,
     'max_users_allowed': max_users_allowed,
     'business_profile_id': shop.id,
+    'nationalities': NATIONALITIES, 
     }
 
     return render(request, 'create_employee.html', context)
@@ -989,14 +991,14 @@ def save_after_submit(request):
             return redirect('daily_summary_list')
     else:
         form = DailySummaryForm(instance=daily_summary)
-        bank_sale_form = BankSaleForm()
-        credit_collection_form = CreditCollectionForm()
-        msc_income_form = MiscellaneousIncomeForm()
-        purchase_form = PurchaseForm()
-        supplier_payments_form = SupplierPaymentForm()
-        bank_deposit_form = BankDepositsForm()
-        expense_form = ExpenseForm()
-        withdrawal_form = WithdrawalForm()
+        bank_sale_form = BankSaleForm(initial={}, business_profile=business_profile.id)
+        credit_collection_form = CreditCollectionForm(initial={}, business_profile=business_profile.id)
+        msc_income_form = MiscellaneousIncomeForm(initial={}, business_profile=business_profile.id)
+        purchase_form = PurchaseForm(initial={}, business_profile=business_profile.id)
+        supplier_payments_form = SupplierPaymentForm(initial={}, business_profile=business_profile.id)
+        bank_deposit_form = BankDepositsForm(initial={}, business_profile=business_profile.id)
+        expense_form = ExpenseForm(initial={}, business_profile=business_profile.id)
+        withdrawal_form = WithdrawalForm(initial={}, business_profile=business_profile.id)
 
     # try:
     #     # previous_daily_summary = DailySummary.objects.get(date=yesterday_date, business_profile=business_profile.id)
@@ -1363,14 +1365,14 @@ def create_daily_summary(request):
             # return redirect('daily_summary_list')
     else:
         form = DailySummaryForm()
-        bank_sale_form = BankSaleForm()
-        credit_collection_form = CreditCollectionForm()
-        msc_income_form = MiscellaneousIncomeForm()
-        purchase_form = PurchaseForm()
-        supplier_payments_form = SupplierPaymentForm()
-        bank_deposit_form = BankDepositsForm()
-        expense_form = ExpenseForm()
-        withdrawal_form = WithdrawalForm()
+        bank_sale_form = BankSaleForm(initial={}, business_profile=business_profile.id)
+        credit_collection_form = CreditCollectionForm(initial={}, business_profile=business_profile.id)
+        msc_income_form = MiscellaneousIncomeForm(initial={}, business_profile=business_profile.id)
+        purchase_form = PurchaseForm(initial={}, business_profile=business_profile.id)
+        supplier_payments_form = SupplierPaymentForm(initial={}, business_profile=business_profile.id)
+        bank_deposit_form = BankDepositsForm(initial={}, business_profile=business_profile.id)
+        expense_form = ExpenseForm(initial={}, business_profile=business_profile.id)
+        withdrawal_form = WithdrawalForm(initial={}, business_profile=business_profile.id)
 
     # try:
     #     # Get the latest DailySummary by sorting by date in descending order and taking the first one
@@ -2118,7 +2120,7 @@ def edit_bank_sale(request, pk):
     bank_sale = get_object_or_404(BankSales, pk=pk)
     daily_summary_id = bank_sale.daily_summary_id
     if request.method == 'POST':
-        form = BankSaleForm(request.POST, request.FILES, instance=bank_sale)    
+        form = BankSaleForm(request.POST, request.FILES, instance=bank_sale,initial={},business_profile = bank_sale.business_profile)    
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2129,14 +2131,16 @@ def edit_bank_sale(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
     else:
-        form = BankSaleForm(instance=bank_sale)
+        # form = BankSaleForm(instance=bank_sale)
+        form = BankSaleForm(instance=bank_sale,initial={},business_profile = bank_sale.business_profile)
+
     return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
 
 def edit_credit_collection(request, pk):
     credit_instance = get_object_or_404(CreditCollection, pk=pk)
     daily_summary_id = credit_instance.daily_summary_id
     if request.method == 'POST':
-        form = CreditCollectionForm(request.POST, request.FILES, instance=credit_instance)    
+        form = CreditCollectionForm(request.POST, request.FILES, instance=credit_instance ,initial={},business_profile = credit_instance.business_profile)    
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2147,7 +2151,7 @@ def edit_credit_collection(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#2')
     else:
-        form = CreditCollectionForm(instance=credit_instance)
+        form = CreditCollectionForm(instance=credit_instance,initial={},business_profile = credit_instance.business_profile)
     return render(request, 'edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
 
 
@@ -2155,7 +2159,7 @@ def edit_miscellaneous_income(request, pk):
     misc_instance = get_object_or_404(MiscellaneousIncome, pk=pk)
     daily_summary_id = misc_instance.daily_summary_id
     if request.method == 'POST':
-        form = MiscellaneousIncomeForm(request.POST, request.FILES, instance=misc_instance)    
+        form = MiscellaneousIncomeForm(request.POST, request.FILES, instance=misc_instance,initial={},business_profile = misc_instance.business_profile)    
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2166,7 +2170,7 @@ def edit_miscellaneous_income(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
     else:
-        form = MiscellaneousIncomeForm(instance=misc_instance)
+        form = MiscellaneousIncomeForm(instance=misc_instance,initial={},business_profile = misc_instance.business_profile)
     return render(request, 'edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
 
 def edit_withdrawal(request, pk):
@@ -3660,7 +3664,7 @@ class CheckDailySummaryExists(APIView):
         businessprofile = get_object_or_404(BusinessProfile, name=shop.name)
         daily_summary_instance = DailySummary.objects.filter(business_profile = businessprofile.id,date = datetime.now().date())
         if daily_summary_instance:
-            return Response({'exists': False}) 
+            return Response({'exists': True}) 
             # return Response({'exists': True})  uncomment this return statement and Remove the above return statement after complete the testing
         else:
             return Response({'exists': False})

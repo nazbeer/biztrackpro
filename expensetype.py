@@ -27,7 +27,7 @@ expense_types = [
     "INAUGRATION PROGRAM",
     "GAS",
     "PARKING",
-    "PEST CONTROL",
+    "PEST CONTROL", 
     "ROOM RENT",
     "TRAVEL EXP",
     "OPENING ADJUSTMENT"

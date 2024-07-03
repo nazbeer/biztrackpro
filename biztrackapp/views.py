@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.loader import render_to_string
-# from weasyprint import HTML, CSS
+from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
@@ -774,11 +774,16 @@ def daily_summary_list(request):
     else:
         shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
-    
+
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    last_daily_summary = (
+        DailySummary.objects
+        .filter(date__lt=today, status='ongoing', business_profile=business_profile.id)
+        .order_by('-date').first()
+    )   
     daily_summaries = DailySummary.objects.filter(business_profile=business_profile.id)
-    return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries,'today':today})
+    return render(request, 'daily_summary_list.html', {'daily_summaries': daily_summaries,'today':today,'last_daily_summary':last_daily_summary})
 
 def edit_daily_summary(request, id):
     daily_summaries = get_object_or_404(DailySummary, id=id)

@@ -58,8 +58,10 @@ class WithdrawalForm(forms.ModelForm):
         fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile','cheque_date','cheque_no']
 
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit','bank transfer','card'])
+        self.fields['bank'].queryset = Bank.objects.filter(business_profile=business_profile)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile).exclude(name__in=['credit','bank transfer','card'])
         
 class SupplierForm(forms.ModelForm):
     class Meta:
@@ -156,14 +158,24 @@ class BankSaleForm(forms.ModelForm):
         model = BankSales
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status=True)
+        self.fields['customer'].queryset = Customer.objects.filter(business_profile=business_profile, status=True)
+
+
 class CreditCollectionForm(forms.ModelForm):
     class Meta:
         model = CreditCollection
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['payment_mode'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+        self.fields['payment_mode'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status=True).exclude(name__in=['credit'])
+        self.fields['customer'].queryset = Customer.objects.filter(business_profile=business_profile, status=True)
+
 
 class MiscellaneousIncomeForm(forms.ModelForm):
     class Meta:
@@ -171,21 +183,33 @@ class MiscellaneousIncomeForm(forms.ModelForm):
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status=True).exclude(name__in=['credit'])
+        self.fields['receipt_type'].queryset = ReceiptType.objects.filter(business_profile=business_profile,status=True)
 
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
+        super().__init__(*args, **kwargs)
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status = True)
+        self.fields['supplier'].queryset = Supplier.objects.filter(business_profile=business_profile, status = True)
+
+
 class SupplierPaymentForm(forms.ModelForm):
     class Meta:
         model = SupplierPayments
         fields = '__all__'
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status = True).exclude(name__in=['credit'])
+        self.fields['bank'].queryset = Bank.objects.filter(business_profile=business_profile,status = True)
+        self.fields['supplier'].queryset = Supplier.objects.filter(business_profile=business_profile, status = True)
 
 
 class BankDepositsForm(forms.ModelForm):
@@ -193,15 +217,27 @@ class BankDepositsForm(forms.ModelForm):
         model = BankDeposits
         fields = '__all__'
 
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status = True).exclude(name__in=['credit'])
+        self.fields['bank_deposit_bank'].queryset = Bank.objects.filter(business_profile=business_profile,status = True)
+
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
         fields = '__all__'
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
     def __init__(self, *args, **kwargs):
+        business_profile = kwargs.pop('business_profile', None)
         super().__init__(*args, **kwargs)
-        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.exclude(name__in=['credit'])
+        self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status = True).exclude(name__in=['credit'])
+        self.fields['expense_type'].queryset = ExpenseType.objects.filter(business_profile=business_profile,status = True)

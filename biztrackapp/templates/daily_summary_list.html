@@ -15,6 +15,7 @@
   }
 </style>
 <div class="container">
+  <p id="message" class="alert alert-info mt-3 d-none"></p>
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Daily Summary List</h5>
@@ -93,6 +94,7 @@
         if (data.exists === true) {
           message.style.display = "block";
           message.innerHTML = "Daily summary already submitted";
+          message.classList.remove('d-none');
         } else {
           const id = 'DS_' + Math.random().toString(36).substr(2, 10);
           const url = "{% url 'create_daily_summary' %}?id=" + id;

@@ -407,6 +407,8 @@ def create_expense_type(request):
     if request.method == 'POST':
         form = ExpenseTypeForm(request.POST)
         if form.is_valid():
+            expense_type = form.save(commit=False)
+            expense_type.status = True
             form.save()
             return redirect('expense_type_list')
     else:
@@ -462,6 +464,7 @@ def create_receipt_type(request):
         form = ReceiptTypeForm(request.POST)
         if form.is_valid():
             receipt_type= form.save(commit=False)
+            receipt_type.status = True
             receipt_type.save()
             return redirect('receipt_type_list')  
     else:
@@ -517,6 +520,7 @@ def create_bank(request):
         if form.is_valid():
             bank = form.save(commit=False)
             bank.business_profile = business_profile.id  # Link to the business profile
+            bank.status = True
             bank.save()
             return redirect('bank_list')  
     else:
@@ -571,6 +575,8 @@ def create_mode_of_transaction(request):
     if request.method == 'POST':
         form = ModeofTransactionForm(request.POST)
         if form.is_valid():
+            mode_of_transaction = form.save(commit=False)
+            mode_of_transaction.status = True
             form.save()
             return redirect('mode_of_transaction_list')  
     else:
@@ -1587,7 +1593,13 @@ def create_daily_summary(request):
 
 def create_bank_sale(request):
     if request.method == 'POST':
-        form = BankSaleForm(request.POST)
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        form = BankSaleForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
         if form.is_valid():
             form = form.save(commit=False)
@@ -1630,8 +1642,15 @@ def list_bank_sales(request):
     return render(request, 'create_daily_summary.html', {'bank_sales': bank_sales})
 
 def create_credit_collection(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     if request.method == 'POST':
-        form = CreditCollectionForm(request.POST)
+        form = CreditCollectionForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1671,8 +1690,15 @@ def list_credit_collection(request):
     return render(request, 'create_daily_summary.html', {'credit_collections': credit_collections})
 
 def create_misc_income(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     if request.method == 'POST':
-        form = MiscellaneousIncomeForm(request.POST)
+        form = MiscellaneousIncomeForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1707,8 +1733,15 @@ def list_msc_income(request):
     return render(request, 'create_daily_summary.html', {'msc_income': msc_income})
 
 def create_purchase(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     if request.method == 'POST':
-        form = PurchaseForm(request.POST)
+        form = PurchaseForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1748,8 +1781,14 @@ def list_purchases(request):
     return render(request, 'create_daily_summary.html', {'purchases': purchases})
 
 def create_supplier_payment(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     if request.method == 'POST':
-        form = SupplierPaymentForm(request.POST)
+        form = SupplierPaymentForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1790,8 +1829,15 @@ def list_supplier_payment(request):
 
 
 def create_bank_deposit(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     if request.method == 'POST':
-        form = BankDepositsForm(request.POST)
+        form = BankDepositsForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1825,8 +1871,15 @@ def list_bank_deposit(request):
     return render(request, 'create_daily_summary.html', {'bank_deposit': bank_deposit})
 
 def create_expense(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     if request.method == 'POST':
-        form = ExpenseForm(request.POST)
+        form = ExpenseForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -1881,8 +1934,14 @@ def delete_daily_summary(request, id):
 
 
 def create_withdrawal(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     if request.method == 'POST':
-        form = WithdrawalForm(request.POST)
+        form = WithdrawalForm(request.POST,initial={},business_profile=business_profile.id)
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
@@ -2177,7 +2236,7 @@ def edit_withdrawal(request, pk):
     withdrawal_instance = get_object_or_404(Withdrawal, pk=pk)
     daily_summary_id = withdrawal_instance.daily_summary_id
     if request.method == 'POST':
-        form = WithdrawalForm(request.POST, request.FILES, instance=withdrawal_instance)    
+        form = WithdrawalForm(request.POST, request.FILES, instance=withdrawal_instance,initial={},business_profile = withdrawal_instance.business_profile)    
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2188,14 +2247,14 @@ def edit_withdrawal(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
     else:
-        form = WithdrawalForm(instance=withdrawal_instance)
+        form = WithdrawalForm(instance=withdrawal_instance,initial={},business_profile = withdrawal_instance.business_profile)
     return render(request, 'edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
 
 def edit_purchase(request, pk):
     purchase_instance = get_object_or_404(Purchase, pk=pk)
     daily_summary_id = purchase_instance.daily_summary_id
     if request.method == 'POST':
-        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance)
+        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance,inital={},business_profile = purchase_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2206,7 +2265,7 @@ def edit_purchase(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
     else:
-        form = PurchaseForm(instance=purchase_instance)
+        form = PurchaseForm(instance=purchase_instance,inital={},business_profile = purchase_instance.business_profile)
     return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
 
 
@@ -2214,7 +2273,7 @@ def edit_supplier_payment(request, pk):
     supplier_instance = get_object_or_404(SupplierPayments, pk=pk)
     daily_summary_id = supplier_instance.daily_summary_id
     if request.method == 'POST':
-        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance)
+        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance,inital={},business_profile = supplier_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2225,14 +2284,14 @@ def edit_supplier_payment(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
     else:
-        form = SupplierPaymentForm(instance=supplier_instance)
+        form = SupplierPaymentForm(instance=supplier_instance,inital={},business_profile = supplier_instance.business_profile)
     return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
 
 def edit_expense(request, pk):
     expense_instance = get_object_or_404(Expense, pk=pk)
     daily_summary_id = expense_instance.daily_summary_id
     if request.method == 'POST':
-        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance)
+        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance,inital={},business_profile = expense_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2243,14 +2302,14 @@ def edit_expense(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
     else:
-        form = ExpenseForm(instance=expense_instance)
+        form = ExpenseForm(instance=expense_instance,inital={},business_profile = expense_instance.business_profile)
     return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
 
 def edit_bank_deposit(request, pk):
     bank_deposit = get_object_or_404(BankDeposits, pk=pk)
     daily_summary_id = bank_deposit.daily_summary_id
     if request.method == 'POST':
-        form = BankDepositsForm(request.POST, request.FILES, instance=bank_deposit)
+        form = BankDepositsForm(request.POST, request.FILES, instance=bank_deposit ,initial={},business_profile = bank_deposit.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2261,7 +2320,7 @@ def edit_bank_deposit(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
     else:
-        form = BankDepositsForm(instance=bank_deposit)
+        form = BankDepositsForm(instance=bank_deposit,initial={},business_profile = bank_deposit.business_profile)
     return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
 
 
@@ -3643,6 +3702,18 @@ class PassDSDailySummaryAPIView(APIView):
                     status = "ongoing",
                     date = today,
                     opening_balance = last_daily_summary_data,
+                    closing_balance = last_daily_summary_data,
+                    cash_sale = 0.00,
+                    credit_sale = 0.00,
+                    card_sale = 0.00,
+                    sales = 0.00,
+                    credit_collection = 0.00,
+                    miscellaneous_income = 0.00,
+                    purchase = 0.00,
+                    supplier_payment = 0.00,
+                    expense = 0.00,
+                    withdrawal = 0.00,
+                    bank_deposit = 0.00,
                     
                 )
                 return Response({'message': 'Daily summary ID saved successfully'}, status=status.HTTP_201_CREATED)

@@ -324,6 +324,7 @@
                     chequeDetails2.find('input, select, textarea').prop('required', false);
                     bank_detail1.find('input, select, textarea').prop('required', false);
                     date_detail1.find('input, select, textarea').prop('required', false);
+                   
     
                 }
                 else if(selectedMode === 'bank transfer'){
@@ -435,6 +436,22 @@
         display: none;
     }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+
+const hashValue = window.location.hash.substring(1);
+const element = document.getElementById(hashValue);
+        if (element) {
+            element.focus();
+            element.style.scrollMarginTop = '100px';
+        } else {
+            console.error(`your error`);
+        }
+    }
+);
+
+</script>
+
 <div class="container ">
     <div class="card  ">
         <div class="card-header">
@@ -465,7 +482,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card" id="1">
+            <div class="card" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Sale</h5>
                 </div>
@@ -499,7 +516,7 @@
                                 <input type="hidden" name="sales" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="addButton" data-toggle="modal" data-target="#bankSaleModal" tabindex="1">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="1" data-toggle="modal" data-target="#bankSaleModal" tabindex="1">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -543,7 +560,7 @@
                 </div>
                 </div>
             </div>
-            <div class="card  mt-4"  id="2">
+            <div class="card  mt-4" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Credit Collection</h5>
                 </div>
@@ -574,7 +591,7 @@
                             <input type="hidden" name="credit_collection" value="{{total_credit_sale_amount}}"  required class="form-control bg-light" id="id_credit_collection_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal" tabindex="2" >Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="2" data-toggle="modal" data-target="#creditCollectionModal" tabindex="2" >Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -626,7 +643,7 @@
 
 
 
-            <div class="card  mt-4" id="3">
+            <div class="card  mt-4" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Miscellaneous Income</h5>
                 </div>
@@ -657,7 +674,7 @@
                             <input type="hidden" name="miscellaneous_income" value="{{total_mis_income_amount}}" required class="form-control bg-light" id="id_msc_income_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal" tabindex="3">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="3" data-toggle="modal" data-target="#miscIncomeModal" tabindex="3">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -705,7 +722,7 @@
             </div>
 
 
-            <div class="card mt-4" id="4">
+            <div class="card mt-4" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Withdrawal</h5>
                 </div>
@@ -736,7 +753,7 @@
                             <input type="hidden" name="withdrawal" value="{{total_withdrawal_amount}}" required class="form-control bg-light" id="id_withdrawal_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal" tabindex="4">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="4"  data-toggle="modal" data-target="#withdrawalModal" tabindex="4">Add </button>
                         </div>
                         
                     </div>
@@ -783,7 +800,7 @@
 
 
 
-            <div class="card  mt-4" id="5">
+            <div class="card  mt-4" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Purchases</h5>
                 </div>
@@ -819,7 +836,7 @@
                             <input type="hidden" name="purchase" value="{{total_purchase_amount}}" required class="form-control bg-light" id="id_purchases_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal" tabindex="5">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="5" data-toggle="modal" data-target="#purchaseModal" tabindex="5">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -872,7 +889,7 @@
             </div>
 
 
-            <div class="card  mt-4" id="6">
+            <div class="card  mt-4">
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Supplier Payment</h5>
                 </div>
@@ -904,7 +921,7 @@
                             <input type="hidden" name="supplier_payment" value="{{total_supplier_payment_amount}}" required class="form-control bg-light" id="id_supplier_payment_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal" tabindex="6">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="6" data-toggle="modal" data-target="#supplierPaymentModal" tabindex="6">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -953,7 +970,7 @@
 
 
 
-            <div class="card  mt-4" id="7">
+            <div class="card  mt-4" >
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Expenses</h5>
                 </div>
@@ -985,7 +1002,7 @@
                             <input type="hidden" name="expense" value="{{total_expense_amount}}" required class="form-control bg-light" id="id_expense_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal" tabindex="7">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="7" data-toggle="modal" data-target="#expenseModal" tabindex="7">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -1039,7 +1056,7 @@
                 <div class="card-header text-white">
                     <h5 class="text-left mb-0">Bank Deposit</h5>
                 </div>
-                <div class="card-body bg-white  br-5" id="8">
+                <div class="card-body bg-white  br-5" >
                     
                     <div class="row ">
                         <div class="col-md-3">
@@ -1067,7 +1084,7 @@
                             <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#bankDepositModal" tabindex="8">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="8"  data-toggle="modal" data-target="#bankDepositModal" tabindex="8">Add </button>
                         </div>
                         
                     </div>

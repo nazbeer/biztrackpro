@@ -25,6 +25,7 @@ from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
 from .constants import NATIONALITIES 
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db import IntegrityError
 
 import xhtml2pdf as pisa
 
@@ -761,15 +762,75 @@ def employee_list(request):
 
 
 def employee_edit(request, pk):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request, user=request.user)  # Ensure get_shop_admin is implemented correctly
+
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
     employee = get_object_or_404(Employee, pk=pk)
     if request.method == 'POST':
         form = EmployeeForm(request.POST, instance=employee)
         if form.is_valid():
-            form.save()
-            return redirect('employee_list')
+            try:
+                first_name = form.cleaned_data['first_name']
+                last_name = form.cleaned_data['last_name']
+                email = form.cleaned_data['email']
+                country_code = form.cleaned_data['country_code']
+                phone_number = form.cleaned_data['phone_number']
+                password = form.cleaned_data['password'] if form.cleaned_data['password'] else None  # Handle optional password field
+
+                username = phone_number  # You might want to generate a unique username if phone number is not unique
+                hashed_password = make_password(password) if password else employee.user.password  # Update password only if it's provided
+
+                # Update or create user instance
+                user = employee.user
+                user.username = username
+                user.first_name = first_name
+                user.last_name = last_name
+                user.email = email
+                user.country_code = country_code
+                user.phone_number = phone_number
+                if password:
+                    user.password = hashed_password
+                user.is_employee = True
+                user.save()
+
+                # Save the Employee instance
+                employee = form.save(commit=False)
+                employee.user = user
+                employee.mobile_no = country_code + phone_number
+                employee.save()
+                
+                messages.success(request, "Employee details updated successfully.")
+                return redirect('employee_list')
+            except IntegrityError as e:
+                if 'UNIQUE constraint failed: biztrackapp_user.username' in str(e):
+                    form.add_error('phone_number', 'A user with this phone number already exists. Please use a different phone number.')
+                elif 'UNIQUE constraint failed: biztrackapp_user.email' in str(e):
+                    form.add_error('email', 'A user with this email already exists. Please use a different email address.')
+                elif 'UNIQUE constraint failed: biztrackapp_employee.passport_no' in str(e):
+                    form.add_error('passport_no', 'A user with this passport number already exists. Please use a different passport number.')
+                elif 'UNIQUE constraint failed: biztrackapp_employee.emirates_id' in str(e):
+                    form.add_error('emirates_id', 'A user with this Emirates ID already exists. Please use a different Emirates ID.')
+                else:
+                    messages.error(request, "An error occurred while saving the form.")
     else:
-        form = EmployeeForm(instance=employee)
-    return render(request, 'employee_edit.html', {'form': form})
+        form = EmployeeForm(instance=employee, initial={
+            'email': employee.user.email,
+            'country_code': employee.user.country_code,
+            'phone_number': employee.user.phone_number,
+        })
+
+    return render(request, 'employee_edit.html', {
+        'form': form,
+        'employee': employee,
+        'nationalities': NATIONALITIES,  # Ensure NATIONALITIES is defined in your views or import it
+        'business_profiles': [business_profile],  # Pass as a list for consistency in templates
+        'business_profile_id': shop.id,
+    })
 
 
 def daily_summary_list(request):

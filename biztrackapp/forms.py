@@ -142,7 +142,8 @@ class EmployeeForm(forms.ModelForm):
             'email',
             'country_code' ,
             'phone_number' ,
-            'password'
+            'password',
+            'status'
         ]
 
 class DailySummaryForm(forms.ModelForm):

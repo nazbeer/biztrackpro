@@ -130,6 +130,7 @@
       {% endfor %}
     </select>
 
+
     <!-- <div class="form-group">
       <label for="phone_number">Phone No:</label>
       <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="05xxxxxxxx" maxlength="10" required >
@@ -156,7 +157,16 @@
             <label for="phone_number">Phone No:</label>
             <input type="text" id="phone_number" name="phone_number" class="form-control"value="{{ employee.user.phone_number }}" maxlength="10" required >
             <div id="usernameAvailability" class="text-success"></div>
+
         </div>
+        <div class="form-group">
+          <label for="id_status" class="mt-0">Status:</label>
+          <select id="id_status" name="status" class="form-control mb-3">
+              <option value="True" {% if employee.status %}selected{% endif %}>Active</option>
+              <option value="False" {% if not employee.status %}selected{% endif %}>Inactive</option>
+          </select>
+      
+      </div>
     </div>
 </div>
     

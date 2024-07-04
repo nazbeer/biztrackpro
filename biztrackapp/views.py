@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
+# from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
@@ -780,10 +780,9 @@ def employee_edit(request, pk):
                 email = form.cleaned_data['email']
                 country_code = form.cleaned_data['country_code']
                 phone_number = form.cleaned_data['phone_number']
-                password = form.cleaned_data['password'] if form.cleaned_data['password'] else None  # Handle optional password field
-
+                status = form.cleaned_data['status']
                 username = phone_number  # You might want to generate a unique username if phone number is not unique
-                hashed_password = make_password(password) if password else employee.user.password  # Update password only if it's provided
+                # hashed_password = make_password(password) if password else employee.user.password  # Update password only if it's provided
 
                 # Update or create user instance
                 user = employee.user
@@ -793,8 +792,7 @@ def employee_edit(request, pk):
                 user.email = email
                 user.country_code = country_code
                 user.phone_number = phone_number
-                if password:
-                    user.password = hashed_password
+                user.is_active = status
                 user.is_employee = True
                 user.save()
 

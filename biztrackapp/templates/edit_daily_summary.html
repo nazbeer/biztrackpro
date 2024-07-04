@@ -180,7 +180,7 @@
       });
     });
     </script>
-    
+
     
 <script>
    
@@ -473,23 +473,23 @@
                     <div class="row ">
                         <div class="col-md-2">
                             <label>Cash </label>
-                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale" tabindex="1" value="{{ bank_sale_total_cash_sale }}" readonly> 
+                            <input type="number" name="cash_sale" required class="form-control bg-light" id="id_cash_sale"  value="{{ bank_sale_total_cash_sale }}" readonly> 
                         </div>
                         <div class="col-md-2">
                             <label>Credit </label>
-                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale" tabindex="2" value="{{ bank_sale_total_credit_sale }}" readonly> 
+                            <input type="number" name="credit_sale" required class="form-control bg-light" id="id_credit_sale"  value="{{ bank_sale_total_credit_sale }}" readonly> 
                         </div>
                         <div class="col-md-2">
                             <label>Card </label>
-                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale" tabindex="3" value="{{ bank_sale_total_card_sale }}" readonly> 
+                            <input type="number" name="card_sale" required class="form-control bg-light" id="id_card_sale"  value="{{ bank_sale_total_card_sale }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque</label>
-                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale" tabindex="4" value="{{ bank_sale_total_cheque_sale }}" readonly> 
+                            <input type="number" name="cheque_sale" required class="form-control bg-light" id="id_cheque_sale"  value="{{ bank_sale_total_cheque_sale }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank</label>
-                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale" tabindex="5" value="{{ bank_sale_total_bank_sale }}" readonly> 
+                            <input type="number" name="bank_sale" required class="form-control bg-light" id="id_bank_sale"  value="{{ bank_sale_total_bank_sale }}" readonly> 
                         </div>
                     </div>
                     <div class="row mb-3 mt-2">
@@ -499,7 +499,7 @@
                                 <input type="hidden" name="sales" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#bankSaleModal">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="addButton" data-toggle="modal" data-target="#bankSaleModal" tabindex="1">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -551,19 +551,19 @@
                     <div class="row ">
                         <div class="col-md-3">
                             <label>Cash</label>
-                            <input type="number" name="cash_collection" required class="form-control bg-light" id="id_cash_collection" tabindex="1" value="{{ credit_sale_total_cash_sale }}" readonly> 
+                            <input type="number" name="cash_collection" required class="form-control bg-light" id="id_cash_collection"  value="{{ credit_sale_total_cash_sale }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_collection" required class="form-control bg-light" id="id_bank_collection" tabindex="2" value="{{ credit_sale_total_bank_sale }}" readonly> 
+                            <input type="number" name="bank_collection" required class="form-control bg-light" id="id_bank_collection"  value="{{ credit_sale_total_bank_sale }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_collection" required class="form-control bg-light" id="id_card_collection" tabindex="3" value="{{ credit_sale_total_card_sale }}" readonly> 
+                            <input type="number" name="card_collection" required class="form-control bg-light" id="id_card_collection"  value="{{ credit_sale_total_card_sale }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque</label>
-                            <input type="number" name="cheque_collection" required class="form-control bg-light" id="id_cheque_collection" tabindex="4" value="{{ credit_sale_total_cheque_sale }}" readonly> 
+                            <input type="number" name="cheque_collection" required class="form-control bg-light" id="id_cheque_collection"  value="{{ credit_sale_total_cheque_sale }}" readonly> 
                         </div>
                     </div>
                     
@@ -574,7 +574,7 @@
                             <input type="hidden" name="credit_collection" value="{{total_credit_sale_amount}}"  required class="form-control bg-light" id="id_credit_collection_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#creditCollectionModal" tabindex="2" >Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -634,19 +634,19 @@
                     <div class="row ">
                         <div class="col-md-3">
                             <label>Cash </label>
-                            <input type="number" name="cash_msc_income" required class="form-control bg-light" id="id_cash_msc_income" tabindex="1" value="{{ mis_income_total_cash }}" readonly> 
+                            <input type="number" name="cash_msc_income" required class="form-control bg-light" id="id_cash_msc_income"  value="{{ mis_income_total_cash }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_msc_income" required class="form-control bg-light" id="id_bank_msc_income" tabindex="2" value="{{ mis_income_total_bank }}" readonly> 
+                            <input type="number" name="bank_msc_income" required class="form-control bg-light" id="id_bank_msc_income"  value="{{ mis_income_total_bank }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_msc_income" required class="form-control bg-light" id="id_card_msc_income" tabindex="3" value="{{ mis_income_total_card }}" readonly> 
+                            <input type="number" name="card_msc_income" required class="form-control bg-light" id="id_card_msc_income"  value="{{ mis_income_total_card }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_msc_income" required class="form-control bg-light" id="id_cheque_msc_income" tabindex="4" value="{{ mis_income_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_msc_income" required class="form-control bg-light" id="id_cheque_msc_income"  value="{{ mis_income_total_cheque }}" readonly> 
                         </div>
                     </div>
                     
@@ -657,7 +657,7 @@
                             <input type="hidden" name="miscellaneous_income" value="{{total_mis_income_amount}}" required class="form-control bg-light" id="id_msc_income_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#miscIncomeModal" tabindex="3">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -713,19 +713,19 @@
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label>Cash </label>
-                            <input type="number" name="cash_withdrawal" required class="form-control bg-light" id="id_cash_withdrawal" tabindex="1" value="{{ withdrawal_total_cash }}" readonly> 
+                            <input type="number" name="cash_withdrawal" required class="form-control bg-light" id="id_cash_withdrawal"  value="{{ withdrawal_total_cash }}" readonly> 
                         </div>
                         {% comment %} <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_withdrawal" required class="form-control bg-light" id="id_bank_withdrawal" tabindex="2" value="{{ withdrawal_total_bank }}" readonly> 
+                            <input type="number" name="bank_withdrawal" required class="form-control bg-light" id="id_bank_withdrawal"  value="{{ withdrawal_total_bank }}" readonly> 
                         </div> {% endcomment %}
                         {% comment %} <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_withdrawal" required class="form-control bg-light" id="id_card_withdrawal" tabindex="3" value="{{ withdrawal_total_card }}" readonly> 
+                            <input type="number" name="card_withdrawal" required class="form-control bg-light" id="id_card_withdrawal"  value="{{ withdrawal_total_card }}" readonly> 
                         </div> {% endcomment %}
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal" tabindex="4" value="{{ withdrawal_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal"  value="{{ withdrawal_total_cheque }}" readonly> 
                         </div>
                     </div>
                     
@@ -736,7 +736,7 @@
                             <input type="hidden" name="withdrawal" value="{{total_withdrawal_amount}}" required class="form-control bg-light" id="id_withdrawal_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal">Add </button>
+                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#withdrawalModal" tabindex="4">Add </button>
                         </div>
                         
                     </div>
@@ -791,23 +791,23 @@
                     <div class="row ">
                         <div class="col-md-2">
                             <label>Cash </label>
-                            <input type="number" name="cash_purchase" required class="form-control bg-light" id="id_cash_purchase" tabindex="1" value="{{ purchase_total_cash }}" readonly> 
+                            <input type="number" name="cash_purchase" required class="form-control bg-light" id="id_cash_purchase"  value="{{ purchase_total_cash }}" readonly> 
                         </div>
                         <div class="col-md-2">
                             <label>Bank </label>
-                            <input type="number" name="bank_purchase" required class="form-control bg-light" id="id_bank_purchase" tabindex="2" value="{{ purchase_total_bank }}" readonly> 
+                            <input type="number" name="bank_purchase" required class="form-control bg-light" id="id_bank_purchase"  value="{{ purchase_total_bank }}" readonly> 
                         </div>
                         <div class="col-md-2">
                             <label>Card </label>
-                            <input type="number" name="card_purchase" required class="form-control bg-light" id="id_card_purchase" tabindex="3" value="{{ purchase_total_card }}" readonly> 
+                            <input type="number" name="card_purchase" required class="form-control bg-light" id="id_card_purchase"  value="{{ purchase_total_card }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_purchase" required class="form-control bg-light" id="id_cheque_purchase" tabindex="4" value="{{ purchase_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_purchase" required class="form-control bg-light" id="id_cheque_purchase"  value="{{ purchase_total_cheque }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Credit </label>
-                            <input type="number" name="credit_purchase" required class="form-control bg-light" id="id_credit_purchase" tabindex="5" value="{{ purchase_total_credit }}" readonly> 
+                            <input type="number" name="credit_purchase" required class="form-control bg-light" id="id_credit_purchase"  value="{{ purchase_total_credit }}" readonly> 
                         </div>
                     </div>
                     
@@ -819,7 +819,7 @@
                             <input type="hidden" name="purchase" value="{{total_purchase_amount}}" required class="form-control bg-light" id="id_purchases_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#purchaseModal" tabindex="5">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -880,19 +880,19 @@
                     <div class="row ">
                         <div class="col-md-3">
                             <label>Cash</label>
-                            <input type="number" name="cash_supplier_payment" required class="form-control bg-light" id="id_cash_supplier_payment" tabindex="1" value="{{ supplier_payment_total_cash }}" readonly> 
+                            <input type="number" name="cash_supplier_payment" required class="form-control bg-light" id="id_cash_supplier_payment"  value="{{ supplier_payment_total_cash }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank</label>
-                            <input type="number" name="bank_supplier_payment" required class="form-control bg-light" id="id_bank_supplier_payment" tabindex="2" value="{{ supplier_payment_total_bank }}" readonly> 
+                            <input type="number" name="bank_supplier_payment" required class="form-control bg-light" id="id_bank_supplier_payment"  value="{{ supplier_payment_total_bank }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_supplier_payment" required class="form-control bg-light" id="id_card_supplier_payment" tabindex="3" value="{{ supplier_payment_total_card }}" readonly> 
+                            <input type="number" name="card_supplier_payment" required class="form-control bg-light" id="id_card_supplier_payment"  value="{{ supplier_payment_total_card }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_supplier_payment" required class="form-control bg-light" id="id_cheque_supplier_payment" tabindex="4" value="{{ supplier_payment_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_supplier_payment" required class="form-control bg-light" id="id_cheque_supplier_payment"  value="{{ supplier_payment_total_cheque }}" readonly> 
                         </div>
                     </div>
 
@@ -904,7 +904,7 @@
                             <input type="hidden" name="supplier_payment" value="{{total_supplier_payment_amount}}" required class="form-control bg-light" id="id_supplier_payment_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#supplierPaymentModal" tabindex="6">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -962,19 +962,19 @@
                     <div class="row ">
                         <div class="col-md-3">
                             <label>Cash </label>
-                            <input type="number" name="cash_expense" required class="form-control bg-light" id="id_cash_expense" tabindex="1" value="{{ expense_total_cash }}" readonly> 
+                            <input type="number" name="cash_expense" required class="form-control bg-light" id="id_cash_expense"  value="{{ expense_total_cash }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_expense" required class="form-control bg-light" id="id_bank_expense" tabindex="2" value="{{ expense_total_bank }}" readonly> 
+                            <input type="number" name="bank_expense" required class="form-control bg-light" id="id_bank_expense"  value="{{ expense_total_bank }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_expense" required class="form-control bg-light" id="id_card_expense" tabindex="3" value="{{ expense_total_card }}" readonly> 
+                            <input type="number" name="card_expense" required class="form-control bg-light" id="id_card_expense"  value="{{ expense_total_card }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_expense" required class="form-control bg-light" id="id_cheque_expense" tabindex="4" value="{{ expense_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_expense" required class="form-control bg-light" id="id_cheque_expense"  value="{{ expense_total_cheque }}" readonly> 
                         </div>
                     </div>
                     
@@ -985,7 +985,7 @@
                             <input type="hidden" name="expense" value="{{total_expense_amount}}" required class="form-control bg-light" id="id_expense_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#expenseModal" tabindex="7">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -1044,19 +1044,19 @@
                     <div class="row ">
                         <div class="col-md-3">
                             <label>Cash </label>
-                            <input type="number" name="cash_bank_deposit" required class="form-control bg-light" id="id_cash_bank_deposit" tabindex="1" value="{{ bank_deposit_total_cash }}" readonly> 
+                            <input type="number" name="cash_bank_deposit" required class="form-control bg-light" id="id_cash_bank_deposit"  value="{{ bank_deposit_total_cash }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Bank </label>
-                            <input type="number" name="bank_bank_deposit" required class="form-control bg-light" id="id_bank_bank_deposit" tabindex="2" value="{{ bank_deposit_total_bank }}" readonly> 
+                            <input type="number" name="bank_bank_deposit" required class="form-control bg-light" id="id_bank_bank_deposit"  value="{{ bank_deposit_total_bank }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Card </label>
-                            <input type="number" name="card_bank_deposit" required class="form-control bg-light" id="id_card_bank_deposit" tabindex="3" value="{{ bank_deposit_total_card }}" readonly> 
+                            <input type="number" name="card_bank_deposit" required class="form-control bg-light" id="id_card_bank_deposit"  value="{{ bank_deposit_total_card }}" readonly> 
                         </div>
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_bank_deposit" required class="form-control bg-light" id="id_cheque_bank_deposit" tabindex="4" value="{{ bank_deposit_total_cheque }}" readonly> 
+                            <input type="number" name="cheque_bank_deposit" required class="form-control bg-light" id="id_cheque_bank_deposit"  value="{{ bank_deposit_total_cheque }}" readonly> 
                         </div>
                     </div>
                     
@@ -1067,7 +1067,7 @@
                             <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#bankDepositModal">Add </button>
+                            <button type="button" class="btn btn-primary mt-3"  data-toggle="modal" data-target="#bankDepositModal" tabindex="8">Add </button>
                         </div>
                         
                     </div>
@@ -1135,8 +1135,8 @@
              
 
         
-             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">Confirm &amp; Submit</button>
-                <button type="button" class="btn btn-secondary" id="save-btn" onclick="saveFunction()">Save</button>
+             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal" tabindex="9">Confirm &amp; Submit</button>
+                <button type="button" class="btn btn-secondary" id="save-btn" onclick="saveFunction()" tabindex="10">Save</button>
             </div>
         </div>
     </form>

@@ -25,7 +25,8 @@
             <option value="false" {% if not form.status.value %} selected {% endif %}>Inactive</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="submit" class="btn btn-success text-white">Update</button>
+        <a href="{% url 'receipt_type_list' %}" class="btn btn-secondary text-white">Cancel</a>
       </form>
 
 

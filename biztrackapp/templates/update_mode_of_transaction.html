@@ -26,7 +26,8 @@
       <option value="true" {% if form.status.value %} selected {% endif %}>Active</option>
       <option value="false" {% if not form.status.value %} selected {% endif %}>Inactive</option>
 </select>
-</div><button type="submit" class="btn btn-primary">Update</button>
+</div><button type="submit" class="btn btn-success text-white">Update</button>
+<a href="{% url 'mode_of_transaction_list' %}" class="btn btn-secondary text-white">Cancel</a>
   </form>
 
 </div>

@@ -3356,11 +3356,13 @@ class BankStatementAPIView(APIView):
             creditcol = transaction.get('creditcol', 0)
             supplierpayment = transaction.get('supplierpayment', 0)
 
-            balance += ( withdrawal + banksale + creditcol + mscincome) - (deposit + purchase + expense + supplierpayment)
+            balance += deposit + banksale + creditcol + mscincome
+            balance -= withdrawal + purchase + expense + supplierpayment
 
+            
             statement_details.append({
                 'date': formatted_date,
-                'description': transaction['description'],
+                'description':   transaction['description'] ,
                 'withdrawal': withdrawal + purchase + expense + supplierpayment,
                 'deposit': deposit + banksale + creditcol + mscincome,
                 'balance': balance
@@ -3481,13 +3483,13 @@ class BankStatementPDFView(APIView):
         total_withdrawals = 0
 
         # Add opening balance entry
-        statement_details.append({
-            'date': start_date.strftime('%d %b %Y'),
-            'description': 'Opening Balance',
-            'withdrawal': 0,
-            'deposit': 0,
-            'balance': opening_balance
-        })
+        # statement_details.append({
+        #     'date': start_date.strftime('%d %b %Y'),
+        #     'description': 'Opening Balance',
+        #     'withdrawal': 0,
+        #     'deposit': 0,
+        #     'balance': opening_balance
+        # })
 
 
         for transaction in all_transactions:
@@ -3503,15 +3505,27 @@ class BankStatementPDFView(APIView):
             supplierpayment = transaction.get('supplierpayment', 0)
 
             # Update balance
-            balance += ( withdrawal + banksale + creditcol + mscincome) - (deposit + purchase + expense + supplierpayment)
+            # balance += ( withdrawal + banksale + creditcol + mscincome) - (deposit + purchase + expense + supplierpayment)
 
+            # statement_details.append({
+            #     'date': formatted_date,
+            #     'description': transaction['description'],
+            #     'withdrawal': withdrawal + purchase + expense + supplierpayment,
+            #     'deposit': deposit + banksale + creditcol + mscincome,
+            #     'balance': balance
+            # })
+            balance += deposit + banksale + creditcol + mscincome
+            balance -= withdrawal + purchase + expense + supplierpayment
+
+            
             statement_details.append({
                 'date': formatted_date,
-                'description': transaction['description'],
+                'description': transaction['description'] ,
                 'withdrawal': withdrawal + purchase + expense + supplierpayment,
                 'deposit': deposit + banksale + creditcol + mscincome,
                 'balance': balance
             })
+
 
             total_deposits += deposit + banksale + creditcol + mscincome
             total_withdrawals += withdrawal + purchase + expense + supplierpayment

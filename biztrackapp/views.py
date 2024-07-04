@@ -24,7 +24,7 @@ import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
 from .constants import NATIONALITIES 
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 import xhtml2pdf as pisa
 
@@ -292,7 +292,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
         form = PartnerForm(initial={'shop': shop})
         profiles = BusinessProfile.objects.filter(name=shop.name)
         users = User.objects.filter(shopadmin__shop=shop)
-        return render(request, 'partner_form.html', {'form': form,'shop':shop.id,'business_profile':profiles,'users':users})
+        return render(request, 'partner_form.html', {'form': form,'shop':shop,'business_profile':profiles,'users':users})
 
     def post(self, request):
         if self.request.user.is_admin:
@@ -310,7 +310,7 @@ class PartnerCreateView(LoginRequiredMixin, View):
             partner.shop = shop
             partner.save()
             return redirect(reverse('partner_list'))
-        return render(request, 'partner_form.html', {'form': form,'shop':shop.id,'business_profile':profiles})
+        return render(request, 'partner_form.html', {'form': form,'shop':shop,'business_profile':profiles,'users':users})
     
 def create_supplier(request):
     if request.user.is_admin:
@@ -552,6 +552,12 @@ class BankListView(ListView):
     
         # Return the queryset of Bank objects filtered by business profile and sorted by created_on date in descending order
         return Bank.objects.filter(business_profile=business_profile.id).order_by('-created_on')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_banks_exist = AllBank.objects.exists()        
+        context['all_banks_exist'] = all_banks_exist
+        return context
 
 
 
@@ -774,7 +780,7 @@ def daily_summary_list(request):
     else:
         shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
-
+    
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     last_daily_summary = (
@@ -2613,7 +2619,7 @@ class SalesReportAPIView(APIView):
         start_date = request.query_params.get('start_date')
         end_date = request.query_params.get('end_date')
         # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
-        if request.user.is_admin:
+        if request.user.is_admin or request.user.is_employee:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
             shop_admin = get_shop_admin(request,user=request.user)
@@ -3862,13 +3868,13 @@ class CustomTokenObtainView(APIView):
 
         if user is not None:
             login(request, user)
-            # refresh = RefreshToken.for_user(user)
-            # request.session['refresh_token'] = str(refresh)
-            # request.session['access_token'] = str(refresh.access_token)
-            # request.session['user'] = UserSerializer(user).data
+            refresh = RefreshToken.for_user(user)
+            request.session['refresh_token'] = str(refresh)
+            request.session['access_token'] = str(refresh.access_token)
+            request.session['user'] = UserSerializer(user).data
             return Response({
-                # 'refresh': str(refresh),
-                # 'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
                 'user': UserSerializer(user).data,
                 'message': 'Authentication successful'
             })

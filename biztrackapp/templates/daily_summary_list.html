@@ -13,8 +13,36 @@
   td, th, .ath{
       font-size: 13px !important;
   }
+  .preloader-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .preloader {
+    border: 12px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 12px solid #3498db;
+    width: 70px;
+    height: 70px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
-<div class="container">
+
+<div class="preloader-wrapper" id="preloader-wrapper">
+  <div class="preloader"></div>
+</div>
+
+<div class="container" id="content-container" style="display:none;">
   <p id="message" class="alert alert-info mt-3 d-none"></p>
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -26,22 +54,22 @@
         <table class="table table-bordered table-striped nowrap" style="width: 100%;" id="dailysummary">
           <thead>
             <tr style="border-radius: 15rem;">
-              <th  class="text-center">#</th> 
-              <th >Date</th>
-              <th >Op. Bal</th>
-              <th >Sales</th>
-              <th >Credit Colln.</th>
-              <th >Msc. Inc.</th>
-              <th >Withdrawal</th>
-              <th >Purchase</th>
-              <th >Sup. Pay.</th>
-              <th >Expense</th>
-              <th >Bank Dep.</th>
-              <th >Cl. Bal.</th>
-              <th >Status</th>
-              <th >Created On</th>
-              <th >Updated On</th>
-              <th >Actions</th>
+              <th class="text-center">#</th> 
+              <th>Date</th>
+              <th>Op. Bal</th>
+              <th>Sales</th>
+              <th>Credit Colln.</th>
+              <th>Msc. Inc.</th>
+              <th>Withdrawal</th>
+              <th>Purchase</th>
+              <th>Sup. Pay.</th>
+              <th>Expense</th>
+              <th>Bank Dep.</th>
+              <th>Cl. Bal.</th>
+              <th>Status</th>
+              <th>Created On</th>
+              <th>Updated On</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -106,27 +134,37 @@
       });
   });
 
-  new DataTable('#dailysummary', {
-    responsive: true,
-    dom: 'lBfrtip',
-    order: [[0, 'desc']],
-    buttons: [
-      {
-        text: 'Print',
-        extend: 'print',
-        exportOptions: {
-          stripHtml: false,
-          columns: [0, 1, 2, 3, 4]
-        }
-      },
-      {
-        text: 'Export PDF',
-        extend: 'pdf',
-        exportOptions: {
-          stripHtml: true,
+  document.addEventListener('DOMContentLoaded', function() {
+    const preloaderWrapper = document.getElementById('preloader-wrapper');
+    const contentContainer = document.getElementById('content-container');
+    
+    // Hide preloader and show content once DataTable is initialized
+    const dataTable = new DataTable('#dailysummary', {
+      responsive: true,
+      dom: 'lBfrtip',
+      order: [[0, 'desc']],
+      buttons: [
+        {
+          text: 'Print',
+          extend: 'print',
+          exportOptions: {
+            stripHtml: false,
+            columns: [0, 1, 2, 3, 4]
+          }
         },
+        {
+          text: 'Export PDF',
+          extend: 'pdf',
+          exportOptions: {
+            stripHtml: true,
+          },
+        }
+      ],
+      initComplete: function() {
+        preloaderWrapper.style.display = 'none';
+        contentContainer.style.display = 'block';
       }
-    ],
+    });
   });
 </script>
 {% endblock %}

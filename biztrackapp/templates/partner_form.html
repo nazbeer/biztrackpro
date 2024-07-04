@@ -11,14 +11,11 @@
         
             {% csrf_token %}
             <div class="form-row">
-                <input type="hidden" name="shop" value="{{ shop }}"/>
+                <input type="hidden" name="shop" value="{{ shop.id }}"/>
                     <div class="form-group col-md-4">
                     <label for="shop">Shop</label>
-                    <select id="shop" name="shop" class="form-control" disabled>
-                        {% for shop in form.shop.field.queryset %}
-                            <option value="{{ shop.id }}" {% if shop.id == form.shop.value %}selected{% endif %}>{{ shop.name }} - {{ shop.license_number}}</option>
-                        {% endfor %}
-                    </select>
+                <input type="text" id="shop_name" name="shop_name" class="form-control" value="{{ shop.name }}" readonly>
+                  
                 </div>
                 <div class="form-group col-md-4">
                     <label for="user">User</label>

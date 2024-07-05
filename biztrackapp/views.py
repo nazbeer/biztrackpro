@@ -2324,7 +2324,7 @@ def edit_purchase(request, pk):
     purchase_instance = get_object_or_404(Purchase, pk=pk)
     daily_summary_id = purchase_instance.daily_summary_id
     if request.method == 'POST':
-        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance,inital={},business_profile = purchase_instance.business_profile)
+        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance,initial={},business_profile = purchase_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2335,7 +2335,7 @@ def edit_purchase(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
     else:
-        form = PurchaseForm(instance=purchase_instance,inital={},business_profile = purchase_instance.business_profile)
+        form = PurchaseForm(instance=purchase_instance,initial={},business_profile = purchase_instance.business_profile)
     return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
 
 
@@ -2343,7 +2343,7 @@ def edit_supplier_payment(request, pk):
     supplier_instance = get_object_or_404(SupplierPayments, pk=pk)
     daily_summary_id = supplier_instance.daily_summary_id
     if request.method == 'POST':
-        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance,inital={},business_profile = supplier_instance.business_profile)
+        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance,initial={},business_profile = supplier_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2354,14 +2354,14 @@ def edit_supplier_payment(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
     else:
-        form = SupplierPaymentForm(instance=supplier_instance,inital={},business_profile = supplier_instance.business_profile)
+        form = SupplierPaymentForm(instance=supplier_instance,initial={},business_profile = supplier_instance.business_profile)
     return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
 
 def edit_expense(request, pk):
     expense_instance = get_object_or_404(Expense, pk=pk)
     daily_summary_id = expense_instance.daily_summary_id
     if request.method == 'POST':
-        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance,inital={},business_profile = expense_instance.business_profile)
+        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance,initial={},business_profile = expense_instance.business_profile)
         if form.is_valid():
             form.save()
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
@@ -2372,7 +2372,7 @@ def edit_expense(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
     else:
-        form = ExpenseForm(instance=expense_instance,inital={},business_profile = expense_instance.business_profile)
+        form = ExpenseForm(instance=expense_instance,initial={},business_profile = expense_instance.business_profile)
     return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
 
 def edit_bank_deposit(request, pk):

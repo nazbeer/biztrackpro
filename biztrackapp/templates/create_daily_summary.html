@@ -233,7 +233,7 @@ $(document).ready(function() {
                 chequeDetails.find('input, select, textarea').prop('required', true);
                 chequeDetails2.find('input, select, textarea').prop('required', true);
                 bank_detail1.find('input, select, textarea').prop('required', true);
-                date_detail1.find('input, select, textarea').prop('required', false);
+                date_detail1.find('input, select, textarea').prop('required', false).val('');
 
             } else if(selectedMode ==='cash'|| selectedMode === 'credit') {
                 chequeDetails.addClass('d-none');
@@ -242,11 +242,11 @@ $(document).ready(function() {
                 bank_detail1.addClass('d-none');
                 date_detail1.addClass('d-none');
 
-                chequeDetails.find('input, select, textarea').prop('required', false);
-                chequeDetails1.find('input, select, textarea').prop('required', false);
-                chequeDetails2.find('input, select, textarea').prop('required', false);
-                bank_detail1.find('input, select, textarea').prop('required', false);
-                date_detail1.find('input, select, textarea').prop('required', false);
+                chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails2.find('input, select, textarea').prop('required', false).val('');
+                bank_detail1.find('input, select, textarea').prop('required', false).val('');
+                date_detail1.find('input, select, textarea').prop('required', false).val('');
 
             }
             else if(selectedMode === 'bank transfer'){
@@ -254,13 +254,13 @@ $(document).ready(function() {
                 chequeDetails1.addClass('d-none');
                 chequeDetails2.addClass('d-none');
                 bank_detail1.removeClass('d-none');
-                date_detail1.removeClass('d-none');
+                date_detail1.addClass('d-none');
 
-                chequeDetails.find('input, select, textarea').prop('required', false);
-                chequeDetails1.find('input, select, textarea').prop('required', false);
-                chequeDetails2.find('input, select, textarea').prop('required', false);
+                chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails2.find('input, select, textarea').prop('required', false).val('');
                 bank_detail1.find('input, select, textarea').prop('required', true);
-                date_detail1.find('input, select, textarea').prop('required', true);
+                date_detail1.find('input, select, textarea').prop('required', false).val('');
             }
             else  {
                 chequeDetails.addClass('d-none');
@@ -269,11 +269,11 @@ $(document).ready(function() {
                 bank_detail1.removeClass('d-none');
                 date_detail1.addClass('d-none');
 
-                chequeDetails.find('input, select, textarea').prop('required', false);
-                chequeDetails1.find('input, select, textarea').prop('required', false);
-                chequeDetails2.find('input, select, textarea').prop('required', false);
+                chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                chequeDetails2.find('input, select, textarea').prop('required', false).val('');
                 bank_detail1.find('input, select, textarea').prop('required', true);
-                date_detail1.find('input, select, textarea').prop('required', false);
+                date_detail1.find('input, select, textarea').prop('required', false).val('');
             }
         }
     }

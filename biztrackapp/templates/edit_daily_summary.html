@@ -241,9 +241,12 @@
         const formattedTomorrow = endTime.toISOString().split('T')[0];
 
         // Set date input value and limits
-        dateInput.value = formattedToday;
-        dateInput.min = formattedToday;
-        dateInput.max = formattedTomorrow;
+        // dateInput.value = formattedToday;
+        // dateInput.min = formattedToday;
+        // dateInput.max = formattedTomorrow;
+        dateInput.value = dateInput.value;
+        dateInput.min = dateInput.value;
+        dateInput.max = dateInput.value;
 
         // Set the start and end times in the hidden inputs
         const startTimeInput = document.getElementById('start_time');
@@ -466,7 +469,7 @@ const element = document.getElementById(hashValue);
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date">Date:</label>
-                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">   
+                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1" value="{{ daily_summary.date|date:'Y-m-d' }}">
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
                                 <input type="hidden" id="start_time" value="{{ start_time|default_if_none:''|date:'g:i A' }}">
@@ -475,7 +478,7 @@ const element = document.getElementById(hashValue);
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="id_date">Opening Balance</label>
+                                <label for="id_cash_on_hand">Opening Balance</label>
                                 <input type="number" name="opening_balance" value="{{cash_on_hand}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
                             </div>
                         </div>

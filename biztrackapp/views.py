@@ -1172,6 +1172,7 @@ def save_after_submit(request):
     # else:
     closing_balance = bankdata or 0
     return render(request, 'edit_daily_summary.html', {
+        'daily_summary': daily_summary,
         'business_profile': business_profile.id,
         'today': today,
 
@@ -1562,11 +1563,25 @@ def create_daily_summary(request):
     #                 (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
     #             )
     # else:
+    lastest_dailysummary_date = DailySummary.objects.filter(business_profile = business_profile.id).exists()
+
+    if lastest_dailysummary_date:
+        old_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-date').first()
+        old_daily_summary_date = old_daily_summary.date + timedelta(days=1)
+        print(old_daily_summary_date,'----------------------------------------')
+    else:
+        old_daily_summary_date = datetime.now().date()
+    
+    today_date = datetime.now().date()
+
+
     closing_balance = bankdata or 0
 
     return render(request, 'create_daily_summary.html',
         {
-            
+            'old_daily_summary_date':old_daily_summary_date.strftime('%Y-%m-%d'),
+            'today_date':today_date.strftime('%Y-%m-%d'),
+
             'business_profile': business_profile.id,
             'today':today,
 
@@ -3762,7 +3777,7 @@ class DailySummaryPDFView(APIView):
 class PassDSDailySummaryAPIView(APIView):
     def post(self, request):
         daily_summary_id = request.data.get('daily_summary_id')
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        date = request.data.get('select_date')
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
@@ -3784,7 +3799,7 @@ class PassDSDailySummaryAPIView(APIView):
                     daily_summary_id = daily_summary_id,
                     business_profile=business_profile.id,
                     status = "ongoing",
-                    date = today,
+                    date = date,
                     opening_balance = last_daily_summary_data,
                     closing_balance = last_daily_summary_data,
                     cash_sale = 0.00,

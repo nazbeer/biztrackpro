@@ -49,17 +49,17 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="id_invoice_no">Invoice Number</label>
-                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="201" required>
-                            </div>
-                            <div class="form-group">
                                 <label for="id_mode_of_transaction">Payment Mode</label>
-                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="203" required>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="201" required>
                                     <option value="">-- Payment Mode --</option>
                                     {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
                                         <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
                                     {% endfor %}
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_invoice_no">Remark</label>
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="203" required>
                             </div>
                             
                             <div id="chequeDetails" class="d-none">

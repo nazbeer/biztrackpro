@@ -35,6 +35,10 @@
           </div>
           <div class="col-md-6">
             <div class="form-group">
+              <label for="id_opening_outstanding">Opening Outstanding</label>
+              <input type="number" id="id_opening_outstanding" name="opening_outstanding" class="form-control" tabindex="043" readonly value="{{ credit_instance.opening_outstanding }}">
+            </div>
+            <div class="form-group">
               <label for="id_payment_mode">Mode of Transaction</label>
               <select id="id_payment_mode" name="payment_mode" class="form-control text-capitalize" tabindex="011" required>
                 <option>-- Mode of Transaction --</option>

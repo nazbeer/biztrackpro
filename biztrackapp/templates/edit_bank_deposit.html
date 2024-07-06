@@ -34,7 +34,7 @@
               </div>
 
             <div class="form-group" id="bank_details">
-              <label for="id_bank">Bank</label>
+              <label for="id_bank">Received Bank</label>
               <select id="id_bank" name="bank" class="form-control text-capitalize" tabindex="077">
                 {% for bank in form.bank.field.queryset %}
                 <option value="{{ bank.id }}" {% if bank.id == bank_deposit.bank.id %} selected {% endif %}>{{ bank.name }}</option>

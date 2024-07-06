@@ -3833,11 +3833,30 @@ class CheckDailySummaryExists(APIView):
         shop = shop_admin.shop
         businessprofile = get_object_or_404(BusinessProfile, name=shop.name)
         daily_summary_instance = DailySummary.objects.filter(business_profile = businessprofile.id,date = datetime.now().date())
-        if daily_summary_instance:
-            return Response({'exists': True}) 
-            # return Response({'exists': True})  uncomment this return statement and Remove the above return statement after complete the testing
-        else:
-            return Response({'exists': False})
+        # if daily_summary_instance:
+        #     return Response({'exists': True}) 
+        #     # return Response({'exists': True})  uncomment this return statement and Remove the above return statement after complete the testing
+        # else:
+        #     return Response({'exists': False})
+        last_daily_summary = DailySummary.objects.filter(
+            business_profile=businessprofile.id
+        ).exclude(date=datetime.now().date()).order_by('-date').first()
+
+        daily_summary_instance = DailySummary.objects.filter(business_profile = businessprofile.id,date = datetime.now().date())
+
+        # if not last_daily_summary:
+        #     if daily_summary_instance:
+        #         return Response({'exists': True, 'message': 'You are already submitting  daily summary'})
+        #     else:
+        #         return Response({'exists': False, 'message': 'Create your first daily summary'})
+
+        if last_daily_summary and last_daily_summary.status == "ongoing":
+            return Response({'exists': True,'message':'Please complete the ongoing daily summary'})
+        elif last_daily_summary and last_daily_summary.status == "completed":
+            if daily_summary_instance:
+                return Response({'exists': True,'message':'You are already submitting  daily summary'}) 
+            else:
+                return Response({'exists': False,'message':'Create new daily summary'})
 
 
 def edit_customer(request,pk):

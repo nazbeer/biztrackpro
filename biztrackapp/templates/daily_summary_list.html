@@ -116,14 +116,30 @@
   document.getElementById('daily_summary_id').addEventListener('click', function(e) {
     e.preventDefault();
     fetch(`/api/daily_summary_exists/`)
+      // .then(response => response.json())
+      // .then(data => {
+      //   const dailySummaryLink = document.getElementById("daily_summary_id");
+      //   if (data.exists === true) {
+      //     message.style.display = "block";
+      //     message.innerHTML = "Daily summary already submitted";
+      //     message.classList.remove('d-none');
+      //   } else {
+      //     const id = 'DS_' + Math.random().toString(36).substr(2, 10);
+      //     const url = "{% url 'create_daily_summary' %}?id=" + id;
+      //     window.location.href = url;
+      //   }
+      // })
       .then(response => response.json())
       .then(data => {
         const dailySummaryLink = document.getElementById("daily_summary_id");
         if (data.exists === true) {
           message.style.display = "block";
-          message.innerHTML = "Daily summary already submitted";
+          message.innerHTML = data.message;
           message.classList.remove('d-none');
         } else {
+          // message.style.display = "block";
+          // message.innerHTML = data.message;
+          // message.classList.remove('d-none');
           const id = 'DS_' + Math.random().toString(36).substr(2, 10);
           const url = "{% url 'create_daily_summary' %}?id=" + id;
           window.location.href = url;

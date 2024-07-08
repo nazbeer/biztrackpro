@@ -844,7 +844,7 @@ def daily_summary_list(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     last_daily_summary = (
         DailySummary.objects
-        .filter(date__lt=today, status='ongoing', business_profile=business_profile.id)
+        .filter(business_profile=business_profile.id)
         .order_by('-date').first()
     )   
     daily_summaries = DailySummary.objects.filter(business_profile=business_profile.id)

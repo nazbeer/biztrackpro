@@ -3720,6 +3720,9 @@ class DailySummaryReportAPIView(APIView):
 
         result = [{
             'date': summary.date.isoformat(),
+            'start_date':start_date,
+            'end_date':end_date,
+            'business':business_profile.name,
             'opening_balance': str(summary.opening_balance),
             'daily_summary_id': summary.daily_summary_id,
             'cash_sale': str(summary.cash_sale),

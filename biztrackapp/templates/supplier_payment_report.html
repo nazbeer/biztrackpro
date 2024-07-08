@@ -3,44 +3,63 @@
 {% block title %}Supplier Report{% endblock %}
 
 {% block content %}
+<style>
+    .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 5px;
+    align-items: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.button-group {
+    grid-column: span 3; 
+    text-align: right;
+}
+@media (max-width: 767px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* Single column layout for mobile */
+    }
+    .button-group {
+        grid-column: span 1; /* Ensure button group spans single column */
+        text-align: center; /* Center the button on mobile */
+    }
+}
+
+</style>
 <div class="container">
     <div class="card">
         <div class="card-header">
             <h5 class="text-white mb-0">Supplier Report</h5>
         </div>
         <div class="card-body">
-            <form id="report-form" class="form-inline">
-                <div class="row d-flex justify-content-between align-items-center">
-                    <div class="col-md-3">
-                        <div class="form-group mr-2">
-                            <label for="supplier_id" class="mr-2">Supplier</label><br/>
-                            <select id="supplier_id" name="supplier_id" class="form-control" required>
-                                <option value="">Select Supplier</option>
-                                {% for supplier in suppliers %}
-                                    <option value="{{ supplier.id }}">{{ supplier.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group mr-2">
-                            <label for="start_date" class="mr-2">Start Date</label>
-                            <input type="date" id="start_date" name="start_date" class="form-control" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group mr-2">
-                            <label for="end_date" class="mr-2">End Date</label>
-                            <input type="date" id="end_date" name="end_date" class="form-control" required>
-                        </div>
-                    </div>
+            <form id="report-form" class="form-grid">
+                <div class="form-group">
+                    <label for="supplier_id">Supplier</label>
+                    <select id="supplier_id" name="supplier_id" class="form-control" required>
+                        <option value="">Select Supplier</option>
+                        {% for supplier in suppliers %}
+                            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="row mt-2 ml-2">
-                    <div class="col-md-12 text-right">
-                        <button type="submit" class="btn btn-primary">Generate Report</button>
-                    </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                </div>
+                <div class="form-group button-group my-0">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
                 </div>
             </form>
+            
             <div id="report-results" class="mt-4 d-none">
                 <div class="text-center">
                     <h5 class="text-dark">Report Results</h5>

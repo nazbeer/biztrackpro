@@ -12,24 +12,25 @@
     <div class="card-body">
       
       <div class="table-responsive">
-        <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+        <table  id="modeTable" class="table table-bordered table-striped nowrap"  style="width: 100%;">
     <thead>
       <tr>
         <th scope="col">#</th>
         <th scope="col">Type Name</th>
         <th scope="col">Status</th>
         <th scope="col">Created On</th>
-
+        
         <th scope="col">Actions</th>  <!-- New column for actions -->
       </tr>
     </thead>
     <tbody>
       {% for transaction in object_list %}
         <tr>
-          <th scope="row">{{ forloop.counter }}</th>
-          <td>{{ transaction.name }}</td>
+          <td >{{ forloop.counter }}</td>
+          <td class="text-capitalize">{{ transaction.name }}</td>
           <td>{{ transaction.status }}</td>
           <td>{{ transaction.created_on }}</td>
+          
           <td>
             <a href="{% url 'edit_mode_of_transaction' transaction.id %}" class="btn btn-primary btn-sm">Edit</a>
               {% csrf_token %}
@@ -44,5 +45,32 @@
 </div>
 </div>
 </div>
+<script>
+  $(document).ready(function() {
+    
+const dataTable = new DataTable('#modeTable', {
+responsive: true,
+dom: 'lfrtip',
+order: [[0, 'asc']],
+//   buttons: [
+//     {
+//       text: 'Print',
+//       extend: 'print',
+//       exportOptions: {
+//         stripHtml: false,
+//         columns: [0, 1, 2, 3, 4]
+//       }
+//     },
+//     {
+//       text: 'Export PDF',
+//       extend: 'pdf',
+//       exportOptions: {
+//         stripHtml: true,
+//       },
+//     }
+//   ],
 
+});
+  });
+</script>
 {% endblock %}

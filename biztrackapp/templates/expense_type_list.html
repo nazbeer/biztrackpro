@@ -12,7 +12,7 @@
     <div class="card-body">
       
       <div class="table-responsive">
-        <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+        <table id="exTable" class="table table-bordered table-striped nowrap"  style="width: 100%;">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -25,7 +25,7 @@
     <tbody>
       {% for expense_type in object_list %}
         <tr>
-          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ forloop.counter }}</td>
           <td>{{ expense_type.name }}</td>
           <td>{{ expense_type.status }}</td>
           <td>{{ expense_type.created_on }}</td>
@@ -45,4 +45,32 @@
 </div>
 </div>
 
+<script>
+  $(document).ready(function() {
+    
+const dataTable = new DataTable('#exTable', {
+responsive: true,
+dom: 'lfrtip',
+order: [[0, 'asc']],
+//   buttons: [
+//     {
+//       text: 'Print',
+//       extend: 'print',
+//       exportOptions: {
+//         stripHtml: false,
+//         columns: [0, 1, 2, 3, 4]
+//       }
+//     },
+//     {
+//       text: 'Export PDF',
+//       extend: 'pdf',
+//       exportOptions: {
+//         stripHtml: true,
+//       },
+//     }
+//   ],
+
+});
+  });
+</script>
 {% endblock %}

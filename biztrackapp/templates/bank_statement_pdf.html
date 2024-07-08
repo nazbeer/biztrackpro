@@ -10,7 +10,10 @@
         }
         body { 
             font-family: Arial, sans-serif; 
-         
+         font-size:12px !important;
+        }
+        h4{
+            font-size:14px !important;
         }
         h1, h2 { 
             text-align: center; 
@@ -42,13 +45,11 @@
 </head>
 <body>
     <h2>Bank Statement</h2>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h4 style="margin-bottom: 0;">Company Name:</h4>
         <h4 style="text-align: left; margin-bottom: 0;">{{business}}</h4>
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h4>Date Range:</h4>
-        <h4 style="text-align: left;">{{ start_date }} to {{ end_date }}</h4>
+        <h4  style="margin-bottom: 0;">Date Range:</h4>
+        <h4 style="text-align: left;margin-bottom:0;">{{ start_date }} to {{ end_date }}</h4>
     </div>
     <table class="table">
         <thead>

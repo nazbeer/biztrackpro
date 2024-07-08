@@ -12,7 +12,7 @@
   </div>  
     <div class="card-body">
       <div class="table-responsive">
-        <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+        <table  id="rdTable" class="table table-bordered table-striped nowrap"  style="width: 100%;">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -26,7 +26,7 @@
         <tbody>
           {% for receipt_type in object_list %}
             <tr>
-              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ forloop.counter }}</td>
               <td>{{ receipt_type.name }}</td>
               <td>{{ receipt_type.status }}</td>
               <td>{{ receipt_type.created_on }}</td>
@@ -44,4 +44,33 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(document).ready(function() {
+    
+const dataTable = new DataTable('#rdTable', {
+responsive: true,
+dom: 'lfrtip',
+order: [[0, 'asc']],
+//   buttons: [
+//     {
+//       text: 'Print',
+//       extend: 'print',
+//       exportOptions: {
+//         stripHtml: false,
+//         columns: [0, 1, 2, 3, 4]
+//       }
+//     },
+//     {
+//       text: 'Export PDF',
+//       extend: 'pdf',
+//       exportOptions: {
+//         stripHtml: true,
+//       },
+//     }
+//   ],
+
+});
+  });
+</script>
 {% endblock %}

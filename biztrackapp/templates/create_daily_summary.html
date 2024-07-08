@@ -42,48 +42,48 @@
     //     event.returnValue = message; // For modern browsers
     //     return message; // For older browsers
     // });
-    document.addEventListener('DOMContentLoaded', function() {
-        const addBtn = document.querySelector('[data-id="passDS"]');
-        const currentUrl = window.location.href;
-        const url = new URL(currentUrl);
-        const id = url.searchParams.get('id');
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     const addBtn = document.querySelector('[data-id="passDS"]');
+    //     const currentUrl = window.location.href;
+    //     const url = new URL(currentUrl);
+    //     const id = url.searchParams.get('id');
         
-        addBtn.addEventListener('click', function() {
-            const date = document.getElementById('id_date').value
-            if (id) {
-                // Send POST request to API endpoint
-                fetch('/api/passDS/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')  // Ensure you have CSRF token setup
-                    },
-                    body: JSON.stringify({
-                        daily_summary_id: id,
-                        select_date : date
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error('Failed to save daily summary ID');
-                })
-                .then(data => {
-                    // Handle success response
-                    console.log('Success:', data);
-                    // You can optionally close the modal here if needed
-                    // $('#bankSaleModal').modal('hide');
-                })
-                .catch(error => {
-                    // Handle error
-                    console.error('Error:', error);
-                });
-            } else {
-                console.error('Daily summary ID not found in URL');
-            }
-        });
-    });
+    //     addBtn.addEventListener('click', function() {
+    //         const date = document.getElementById('id_date').value
+    //         if (id) {
+    //             // Send POST request to API endpoint
+    //             fetch('/api/passDS/', {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'X-CSRFToken': getCookie('csrftoken')  // Ensure you have CSRF token setup
+    //                 },
+    //                 body: JSON.stringify({
+    //                     daily_summary_id: id,
+    //                     select_date : date
+    //                 })
+    //             })
+    //             .then(response => {
+    //                 if (response.ok) {
+    //                     return response.json();
+    //                 }
+    //                 throw new Error('Failed to save daily summary ID');
+    //             })
+    //             .then(data => {
+    //                 // Handle success response
+    //                 console.log('Success:', data);
+    //                 // You can optionally close the modal here if needed
+    //                 // $('#bankSaleModal').modal('hide');
+    //             })
+    //             .catch(error => {
+    //                 // Handle error
+    //                 console.error('Error:', error);
+    //             });
+    //         } else {
+    //             console.error('Daily summary ID not found in URL');
+    //         }
+    //     });
+    // });
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -136,12 +136,14 @@
                 
     });
     document.addEventListener('DOMContentLoaded', (event) => {
-        
         const dateInput = document.getElementById('id_date');
-        const today = new Date();
+        const lastSummaryDate = document.getElementById('last_date').value;
+        const dateError = document.getElementById('date_error');
+        const today = lastSummaryDate;
+        // console.log("Today: ", today);
 
         // Format today's date as 'YYYY-MM-DD'
-        const formattedToday = today.toISOString().split('T')[0];
+        // const formattedToday = today.toISOString().split('T')[0];
 
         // Get start and end times from the server in 'g:i A' format
         const startTimeValue = "{{ start_time|default_if_none:''|date:'g:i A' }}";
@@ -182,9 +184,38 @@
         const formattedTomorrow = endTime.toISOString().split('T')[0];
 
         // Set date input value and limits
-        dateInput.value = formattedToday;
-        dateInput.min = formattedToday;
-        dateInput.max = formattedTomorrow;
+        // dateInput.value = formattedToday;
+        // dateInput.min = formattedToday;
+        // dateInput.max = formattedTomorrow;
+
+        if (dateInput) {
+
+            dateInput.addEventListener('focus', function() {
+            dateInput.type = 'date';
+            dateInput.removeAttribute('placeholder');
+            dateInput.setAttribute("max",lastSummaryDate );
+            dateInput.setAttribute("min",lastSummaryDate );
+            });
+
+            dateInput.addEventListener('blur', function() {
+            if(dateInput.value == ""){
+                date_error.innerHTML = 'Please select a valid date';
+                dateInput.onfocus();
+            }  
+            else{
+                const dateValue = new Date(dateInput.value).toISOString().substring(0, 10);
+                if (dateValue == lastSummaryDate) {
+                    dateInput.value = dateValue;
+                    date_error.innerHTML = '';
+
+                }else {
+                    date_error.innerHTML = 'Please select a valid date';
+                    dateInput.value = "";
+                    dateInput.onfocus();
+                    }
+                }
+            })
+        }
 
         // Set the start and end times in the hidden inputs
         const startTimeInput = document.getElementById('start_time');
@@ -315,26 +346,56 @@ $(document).ready(function() {
  
 <script>
     function saveFunction() {
-        document.getElementById('status').value = 'ongoing';
-        document.getElementById("daily_summary_form").submit();
+        const date_error = document.getElementById('date_error');
+        const dateElement = document.getElementById('id_date');
+        const selectedDate = dateElement.value;
+        const lastDailySummaryDate = document.getElementById('last_date').value;
+
+        
+        if (!selectedDate || selectedDate !== lastDailySummaryDate) {
+            date_error.innerHTML = 'Please select a valid date';
+            dateElement.focus();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+        else{
+
+            document.getElementById("daily_summary_form").submit();
+            document.getElementById('status').value = 'ongoing';
+
+        }
     }
     function submitFunction() {
-        document.getElementById('status').value = 'completed';
-        document.getElementById("daily_summary_form").submit();
+
+        const date_error = document.getElementById('date_error');
+        const dateElement = document.getElementById('id_date');
+        const selectedDate = dateElement.value;
+        const lastDailySummaryDate = document.getElementById('last_date').value;
+
+        if (!selectedDate || selectedDate !== lastDailySummaryDate) {
+            date_error.innerHTML = 'Please select a valid date';
+            dateElement.focus();
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+        else{
+            document.getElementById('status').value = 'completed';
+            document.getElementById("daily_summary_form").submit();
+
+        }
     }
    
 </script>
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-    
     const hashValue = window.location.hash.substring(1);
     const element = document.getElementById(hashValue);
             if (element) {
                 element.focus();
                 element.style.scrollMarginTop = '100px';
             } else {
-                console.error(`your error`);
+                console.error('Could not find element with ID your error');
             }
         }
     );
@@ -352,21 +413,78 @@ $(document).ready(function() {
         display: none;
     }
 </style>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const lastDate = document.getElementById('last_date').value;
-        const currentDate = document.getElementById('id_date').value;
-        lastDateElement = document.getElementById('last_date');
-        dateElement = document.getElementById('id_date');
-        if (lastDateElement && dateElement) {
-            dateElement.setAttribute("max",currentDate );
-            dateElement.setAttribute("min",lastDate );
 
-        } else {
-            console.error('Missing elements: #last_date or #id_date');
+
+<script>
+    const DateIsSelected = (event) => {
+      const selectedDate = document.getElementById('id_date').value;
+      const lastDailySummaryDate = document.getElementById('last_date').value;
+      const date_error = document.getElementById('date_error');
+      const dateElement = document.getElementById('id_date');
+
+
+      if (!selectedDate) {
+          date_error.innerHTML = 'Please select a valid date';
+          dateElement.focus(); 
+          event.preventDefault();
+          event.stopImmediatePropagation();
         }
-    });
+        else if (selectedDate != lastDailySummaryDate) {
+          date_error.innerHTML = 'Please select a valid date';
+          dateElement.focus(); 
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        else {
+            if (selectedDate == lastDailySummaryDate) {
+            date_error.innerHTML = '';
+            const currentUrl = window.location.href;
+            const url = new URL(currentUrl);
+            const id = url.searchParams.get('id');
+            const date = document.getElementById('id_date').value
+                if (id) {
+                // Send POST request to API endpoint
+                fetch('/api/passDS/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')  
+                    },
+                    body: JSON.stringify({
+                        daily_summary_id: id,
+                        select_date : date
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Failed to save daily summary ID');
+                })
+                .then(data => {
+                    // Handle success response
+                    console.log('Success:', data);
+                  
+                })
+                .catch(error => {
+                    // Handle error
+                    console.error('Error:', error);
+                });
+            } else {
+                console.error('Daily summary ID not found in URL');
+            }
+        }
+        else {
+            date_error.innerHTML = 'Please select a valid date';
+            dateElement.focus(); 
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+    }
+    }
+    
 </script>
+
 
 <div class="container ">
     <div class="card  ">
@@ -380,9 +498,12 @@ $(document).ready(function() {
                 <div class="card-body bg-white br-5">
                     <div class="row ">
                         <div class="col-md-4">
+                            <p></p>
                             <div class="form-group">
-                                <label for="id_date">Date:</label>
-                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1">  
+
+                                <label for="id_date">Select Date:</label>
+                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1"> 
+                                <div id="date_error" class="text-danger"></div>
                                 <input type="hidden" name="last_date" id="last_date" value="{{ old_daily_summary_date}}">
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
@@ -433,7 +554,7 @@ $(document).ready(function() {
                                 <input type="hidden" name="sales" value="{{ total_bank_sale_amount }}"  required class="form-control bg-light" id="id_bank_sale_total" > 
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="1" data-id="passDS" data-toggle="modal"  data-target="#bankSaleModal" tabindex="1">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="1"  data-toggle="modal" onclick="DateIsSelected(event)"   data-target="#bankSaleModal" tabindex="1">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -498,7 +619,7 @@ $(document).ready(function() {
                             <input type="hidden" name="credit_collection" value="{{total_credit_sale_amount}}"  required class="form-control bg-light" id="id_credit_collection_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="2" data-toggle="modal" data-target="#creditCollectionModal" tabindex="2">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="2" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#creditCollectionModal" tabindex="2">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -569,7 +690,7 @@ $(document).ready(function() {
                             <input type="hidden" name="miscellaneous_income" value="{{total_mis_income_amount}}" required class="form-control bg-light" id="id_msc_income_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="3" data-toggle="modal" data-target="#miscIncomeModal" tabindex="3">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="3" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#miscIncomeModal" tabindex="3">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -614,17 +735,9 @@ $(document).ready(function() {
                             <label>Cash </label>
                             <input type="number" name="cash_withdrawal" required class="form-control bg-light" id="id_cash_withdrawal"  value="{{ withdrawal_total_cash }}" readonly> 
                         </div>
-                        {% comment %} <div class="col-md-3">
-                            <label>Bank </label>
-                            <input type="number" name="bank_withdrawal" required class="form-control bg-light" id="id_bank_withdrawal" lue="{{ withdrawal_total_bank }}" readonly> 
-                        </div> {% endcomment %}
-                        {% comment %} <div class="col-md-3">
-                            <label>Card </label>
-                            <input type="number" name="card_withdrawal" required class="form-control bg-light" id="id_card_withdrawal" lue="{{ withdrawal_total_card }}" readonly> 
-                        </div> {% endcomment %}
                         <div class="col-md-3">
                             <label>Cheque </label>
-                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal"  value="{{ withdrawal_total_cheque }} " readonly> 
+                            <input type="number" name="cheque_withdrawal" required class="form-control bg-light" id="id_cheque_withdrawal"  value="{{ withdrawal_total_cheque }}" readonly> 
                         </div>
                     </div>
                     
@@ -635,7 +748,7 @@ $(document).ready(function() {
                             <input type="hidden" name="withdrawal" value="{{total_withdrawal_amount}}" required class="form-control bg-light" id="id_withdrawal_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id ="4" data-toggle="modal" data-target="#withdrawalModal" tabindex="4">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id ="4" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#withdrawalModal" tabindex="4">Add </button>
                         </div>
                         
                     </div>
@@ -706,7 +819,7 @@ $(document).ready(function() {
                             <input type="hidden" name="purchase" value="{{total_purchase_amount}}" required class="form-control bg-light" id="id_purchases_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="5" data-toggle="modal" data-target="#purchaseModal" tabindex="5">Add</button>
+                            <button type="button" class="btn btn-primary mt-3" id="5" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#purchaseModal" tabindex="5">Add</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -779,7 +892,7 @@ $(document).ready(function() {
                             <input type="hidden" name="supplier_payment" value="{{total_supplier_payment_amount}}" required class="form-control bg-light" id="id_supplier_payment_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="6" data-toggle="modal" data-target="#supplierPaymentModal" tabindex="6">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="6" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#supplierPaymentModal" tabindex="6">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -848,7 +961,7 @@ $(document).ready(function() {
                             <input type="hidden" name="expense" value="{{total_expense_amount}}" required class="form-control bg-light" id="id_expense_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="7" data-toggle="modal" data-target="#expenseModal" tabindex="7">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="7" data-toggle="modal" onclick="DateIsSelected(event)" data-target="#expenseModal" tabindex="7">Add </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -918,7 +1031,7 @@ $(document).ready(function() {
                             <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount}}" required class="form-control bg-light" id="id_bank_deposit_total" > 
                         </div> 
                         <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary mt-3" id="8"  data-toggle="modal" data-target="#bankDepositModal" tabindex="8">Add </button>
+                            <button type="button" class="btn btn-primary mt-3" id="8"  data-toggle="modal" onclick="DateIsSelected(event)" data-target="#bankDepositModal" tabindex="8">Add </button>
                         </div>
                         
                     </div>

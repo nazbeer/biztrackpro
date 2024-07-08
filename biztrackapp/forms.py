@@ -56,6 +56,9 @@ class WithdrawalForm(forms.ModelForm):
     class Meta:
         model = Withdrawal
         fields = ['bank', 'withdrawal_date', 'amount', 'mode_of_transaction', 'daily_summary_id', 'business_profile','cheque_date','cheque_no']
+        amount = forms.DecimalField(
+            widget=forms.TextInput(attrs={'class': 'form-control', 'tabindex': '1503', 'required': True})
+        )
 
     def __init__(self, *args, **kwargs):
         business_profile = kwargs.pop('business_profile', None)

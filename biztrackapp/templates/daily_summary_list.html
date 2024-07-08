@@ -77,7 +77,7 @@
               <tr>
                 <td class="text-center">{{ forloop.counter }}</td>
                 <td>
-                  {% if summary.date == today and summary.status == 'ongoing' %}
+                  {% if summary.date == last_daily_summary.date %}
                   <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" class="ath" target="_blank">  {{ summary.date|date:"d-m-y" }}</a>
                   {% else %}
                   {{ summary.date|date:"d-m-y" }}

@@ -2053,7 +2053,7 @@ def list_withdrawal(request):
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     withdrawals = Withdrawal.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html', {'withdrawals': withdrawals, 'business_profile': business_profile.id})
-
+from decimal import Decimal, ROUND_HALF_UP
 
 def get_daily_summary_data(request,id):
     # id = request.GET.get('id')
@@ -2095,27 +2095,6 @@ def get_daily_summary_data(request,id):
         pass 
 
 
-    
-    # try:
-    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     card_transaction_mode = TransactionMode.objects.get(name="card")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
 
     msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
     # purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
@@ -2132,9 +2111,6 @@ def get_daily_summary_data(request,id):
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
 
 
-    # instance.daily_summary_id = id
-
-    # bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
     total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
     total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
@@ -2168,9 +2144,11 @@ def get_daily_summary_data(request,id):
     else:
         last_daily_summary = business_profile.opening_balance
         last_daily_summary_data = last_daily_summary
-    
+    closing_balance = last_daily_summary_data + net_collection - net_payment - bank_deposit_collection
 
-    closing_balance = Decimal(last_daily_summary_data) + net_collection - net_payment - bank_deposit_collection
+    # Convert closing_balance to Decimal with 2 decimal places
+    closing_balance = closing_balance.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+
     # #print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
 

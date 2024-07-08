@@ -39,7 +39,12 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="id_amount">Amount</label>
-                            <input type="number" id="id_amount" name="amount" class="form-control" required tabindex="1503">
+                            
+
+                            <input type="text" placeholder="Enter a valid amount" id="id_amount" name="amount" class="form-control" required tabindex="1503">
+                            
+
+
                         </div>
 
                         <div class="form-group col-md-6">
@@ -75,3 +80,24 @@
         </div>
     </div>
 </div>
+<!-- 
+<script>
+    // Function to validate and format the amount input
+    document.getElementById('id_amount').addEventListener('input', function() {
+        let input = this.value.trim();
+
+        // Regex pattern to match numbers with up to two decimal places
+        const regex = /^\d*(\.\d{0,2})?$/;
+
+        if (regex.test(input)) {
+            // Input is valid, update the displayed message
+            document.getElementById('validationMessage').textContent = "Typed Valid Character.";
+        } else {
+            // Input is invalid, clear the input and display error message
+            this.value = '';
+            document.getElementById('validationMessage').textContent = "Typed Invalid Character.";
+        }
+    });
+</script> -->
+
+    

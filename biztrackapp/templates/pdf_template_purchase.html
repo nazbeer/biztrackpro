@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Purchase Report</title>
+    <style>
+        @page {
+            size: A4 landscape; /* A4 page size with landscape orientation */
+            margin: 1cm; /* Adjust margins as needed */
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+        }
+        h1, h2 { 
+            text-align: center; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 12px !important;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            border: 1px solid #ddd;
+            font-size: 12px !important;
+        }
+        th {
+            background-color: #8a8a8a; 
+            color: #fff;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.05); /* Light stripe for odd rows */
+        }
+        tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.075); /* Slightly darker stripe for even rows */
+        }
+    </style>
+</head>
+<body>
+    <h2>Purchase Report</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+        <h4 style="margin-bottom: 0;">Company Name:</h4>
+        <h4 style="text-align: left; margin-bottom: 0;">{{ business }}</h4>
+   
+        <h4 style="margin-bottom: 0;">Date Range:</h4>
+        <h4 style="text-align: left; margin-bottom: 0;">{{ start_date|date:"d-m-Y" }} to {{ end_date|date:"d-m-Y" }}</h4>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Cash</th>
+                <th>Credit</th>
+                <th>Card</th>
+                <th>Bank Transfer</th>
+                <th>Cheque</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td>{{ detail.date|date:"d-m-Y" }}</td>
+                <td>{{ detail.cash|floatformat:2 }}</td>
+                <td>{{ detail.credit|floatformat:2 }}</td>
+                <td>{{ detail.card|floatformat:2 }}</td>
+                <td>{{ detail.bank_transfer|floatformat:2 }}</td>
+                <td>{{ detail.credit_card|floatformat:2 }}</td>
+                <td>{{ detail.total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th>{{ summary.total_cash|floatformat:2 }}</th>
+                <th>{{ summary.total_credit|floatformat:2 }}</th>
+                <th>{{ summary.total_card|floatformat:2 }}</th>
+                <th>{{ summary.total_bank_transfer|floatformat:2 }}</th>
+                <th>{{ summary.total_credit_card|floatformat:2 }}</th>
+                <th>{{ summary.total_amount|floatformat:2 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

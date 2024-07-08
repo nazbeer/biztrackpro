@@ -168,7 +168,9 @@ urlpatterns = [
     path('api/daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
     path('api/supplier-payment-report-pdf/', SupplierPaymentReportPDFAPIView.as_view(), name='supplier-payment-report-pdf'),
     path('api/customer-payment-report-pdf/', CustomerPaymentReportPDFAPIView.as_view(), name='customer-payment-report-pdf'),
-
+    path('api/sales-report-pdf/', SalesReportPDFView.as_view(), name='sales_report_pdf'),
+     path('api/purchase-report-pdf/', PurchaseReportPDFView.as_view(), name='purchase_report_pdf'),
+     path('api/msc-income-report-pdf/', MscIncomeReportPDFView.as_view(), name='msc_income_report_pdf'),
     #extras
     path('api/passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
     path('api/daily_summary_exists/', CheckDailySummaryExists.as_view(), name='daily_summary_exists'),

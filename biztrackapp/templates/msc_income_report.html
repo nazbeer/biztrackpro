@@ -39,14 +39,15 @@
                     <thead>
                         <tr>
                             <th style="background-color: #8a8a8a; text-align:center;">Date</th>
-                            <th style="background-color: #8a8a8a; text-align:center;">Income Type</th>
-                            <th style="background-color: #8a8a8a; text-align:center;">Mode of Transaction</th>
-                            <th style="background-color: #8a8a8a; text-align:center;">Amount</th>
+                            <th style="background-color: #8a8a8a; text-align:left;">Income Type</th>
+                            <th style="background-color: #8a8a8a; text-align:left;">Mode of Transaction</th>
+                            <th style="background-color: #8a8a8a; text-align:right;">Amount</th>
                         </tr>
                     </thead>
                     <tbody id="report-body"></tbody>
                     <tfoot id="report-footer"></tfoot>
                 </table>
+                <button id="download-pdf-cc" class="btn btn-success mt-2">Download PDF</button>
             </div>
         </div>
     </div>
@@ -78,9 +79,9 @@ document.getElementById('report-form').addEventListener('submit', function(event
                 return `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td>${detail.income_type}</td>
-                        <td>${detail.mode_of_transaction}</td>
-                        <td>${detail.amount.toFixed(2)}</td>
+                        <td style="text-align:left;">${detail.income_type}</td>
+                        <td style="text-align:left;text-transform:capitalize;">${detail.mode_of_transaction}</td>
+                        <td style="text-align:right;text-transform:capitalize;">${detail.amount.toFixed(2)}</td>
                     </tr>
                 `;
             }).join('');
@@ -88,12 +89,19 @@ document.getElementById('report-form').addEventListener('submit', function(event
             reportFooter.innerHTML = `
                 <tr>
                     <td colspan="1" style="background-color: #8a8a8a !important;color: #fff !important;"><b>Total:</b></td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;"></td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;"></td>
-                    <td style="background-color: #8a8a8a !important;color: #fff !important;">${data.summary.total_amount.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:left;"></td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:left;"></td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_amount.toFixed(2)}</td>
                 </tr>
             `;
         });
+});
+
+document.getElementById('download-pdf-cc').addEventListener('click', function() {
+  
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    window.location.href = `/api/msc-income-report-pdf/?&start_date=${startDate}&end_date=${endDate}`;
 });
 </script>
 {% endblock %}

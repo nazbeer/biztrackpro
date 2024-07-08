@@ -15,6 +15,9 @@
         h1, h2 { 
             text-align: center; 
         }
+        h4{
+            font-size:14px !important;
+        }
         .table {
             width: 100%;
             margin-bottom: 1rem;
@@ -46,47 +49,19 @@
     <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
         <h4 style="margin-bottom:0px;">Company Name:</h4>
         <h4 style="text-align: left; margin-bottom:0px;">{{business}}</h4>
+    
+        <h4 style="margin-bottom: 0px;">Date Range:</h4>
+        <h4 style="text-align: left;margin-bottom: 0px;">{{ start_date }} to {{ end_date }}</h4>
     </div>
-    <div style="display: flex;justify-content: space-between; align-items: center;" >
-        <h4>Date Range:</h4>
-        <h4 style="text-align: left;">{{ start_date }} to {{ end_date }}</h4>
-    </div>
-    <!-- <table>
-        <tr>
-            <th>Opening Balance</th>
-            <td>{{ opening_balance }}</td>
-        </tr>
-        <tr>
-            <th>Net Collections</th>
-            <td>{{ net_collections }}</td>
-        </tr>
-        <tr>
-            <th>Net Payments</th>
-            <td>{{ net_payments }}</td>
-        </tr>
-        <tr>
-            <th>Miscellaneous Income</th>
-            <td>{{ msc_income }}</td>
-        </tr>
-        <tr>
-            <th>Bank Deposits</th>
-            <td>{{ bank_deposits }}</td>
-        </tr>
-        <tr>
-            <th>Closing Balance</th>
-            <td>{{ closing_balance }}</td>
-        </tr>
-    </table> -->
-    <!-- <h2>Details</h2> -->
     <table  class="table">
         <tr>
             <th>Date</th>
-            <th style="text-align:right; ">Net Collections</th>
+            <th style="text-align:right; ">Net Coll.</th>
             <th style="text-align:right; ">Net Payments</th>
-            <th style="text-align:right; ">Miscellaneous Income</th>
+            <th style="text-align:right; ">Msc. Income</th>
             <th style="text-align:right; ">Bank Deposits</th>
-            <th style="text-align:right; ">Opening Balance</th>
-            <th style="text-align:right; ">Closing Balance</th>
+            <th style="text-align:right; ">Opening Bal.</th>
+            <th style="text-align:right; ">Closing Bal.</th>
         </tr>
         {% for detail in details %}
         <tr>

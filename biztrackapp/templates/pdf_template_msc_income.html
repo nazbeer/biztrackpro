@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Miscellaneous Income Report</title>
+    <style>
+        @page {
+            size: A4 landscape; /* A4 page size with landscape orientation */
+            margin: 1cm; /* Adjust margins as needed */
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+        }
+        h1, h2 { 
+            text-align: center; 
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            font-size: 12px !important;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            border: 1px solid #ddd;
+            font-size: 12px !important;
+        }
+        th {
+            background-color: #8a8a8a; 
+            color: #fff;
+        }
+        tbody tr:nth-child(odd) {
+            background-color: rgba(0, 0, 0, 0.05); /* Light stripe for odd rows */
+        }
+        tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.075); /* Slightly darker stripe for even rows */
+        }
+    </style>
+</head>
+<body>
+    <h2>Miscellaneous Income Report</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h4 style="margin-bottom: 0;">Company Name:</h4>
+        <h4 style="text-align: left; margin-bottom: 0;">{{ business }}</h4>
+        <h4 style="margin-bottom: 0;">Date Range:</h4>
+        <h4 style="text-align: left;margin-bottom: 0;">{{ start_date }} to {{ end_date }}</h4>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: center;">Date</th>
+                <th style="text-align: left;">Income Type</th>
+                <th style="text-align: left;">Mode of Transaction</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detail in details %}
+            <tr>
+                <td style="text-align: center;">{{ detail.date|date:"d-m-Y" }}</td>
+                <td style="text-align: left;"> {{ detail.income_type }}</td>
+                <td style="text-align: left; text-transform: capitalize;">{{ detail.mode_of_transaction }}</td>
+                <td>{{ detail.amount|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3">Total</th>
+                <th>{{ summary.total_amount|floatformat:2 }}</th>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

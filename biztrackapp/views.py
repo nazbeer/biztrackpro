@@ -2214,7 +2214,12 @@ class SupplierPaymentReportView(View):
             shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+        # suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+        suppliers = Supplier.objects.filter(
+            business_profile=business_profile.id,
+            purchase__isnull=False
+        )
+
         #print('sup',suppliers)
         return render(request, 'supplier_payment_report.html',{'suppliers': suppliers, 'business_profile': business_profile.id} )
 
@@ -2229,8 +2234,17 @@ class CustomerPaymentReportView(View):
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        customers = Customer.objects.filter(business_profile=business_profile.id)
-        #print('sup',suppliers)
+       
+        customers_in_credit_collection = Customer.objects.filter(business_profile=business_profile)
+
+        # Filter customers who are also in CreditCollection
+        customers = Customer.objects.filter(
+            business_profile=business_profile.id,
+            creditcollection__isnull=False
+        )
+
+
+        print('cus',customers)
         return render(request, 'customer_payment_report.html',{'customers': customers, 'business_profile': business_profile.id} )
 
 
@@ -2751,6 +2765,81 @@ class SalesReportAPIView(APIView):
         else:
             return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
         
+class SalesReportPDFView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        if request.user.is_admin or request.user.is_employee:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request, user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            except ValueError:
+                return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Fetch and aggregate data
+            sales_data = (
+                BankSales.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
+                .values('created_on')
+                .annotate(
+                    cash=Sum('amount', filter=Q(mode_of_transaction__name='cash')),
+                    credit=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
+                    card=Sum('amount', filter=Q(mode_of_transaction__name='card')),
+                    bank_transfer=Sum('amount', filter=Q(mode_of_transaction__name='bank transfer')),
+                    credit_card=Sum('amount', filter=Q(mode_of_transaction__name='credit')),
+                    total=Sum('amount')
+                )
+                .order_by('created_on')
+            )
+
+            report_details = [
+                {
+                    'date': sale['created_on'],
+                    'cash': sale['cash'] or 0,
+                    'credit': sale['credit'] or 0,
+                    'card': sale['card'] or 0,
+                    'bank_transfer': sale['bank_transfer'] or 0,
+                    'credit_card': sale['credit_card'] or 0,
+                    'total': sale['total'] or 0
+                } for sale in sales_data
+            ]
+
+            summary = {
+                'total_cash': sum(sale['cash'] for sale in report_details),
+                'total_credit': sum(sale['credit'] for sale in report_details),
+                'total_card': sum(sale['card'] for sale in report_details),
+                'total_bank_transfer': sum(sale['bank_transfer'] for sale in report_details),
+                'total_credit_card': sum(sale['credit_card'] for sale in report_details),
+                'total_amount': sum(sale['total'] for sale in report_details)
+            }
+
+            context = {
+                'details': report_details,
+                'summary': summary,
+                'start_date': start_date,
+                'end_date': end_date,
+                'business': business_profile.name
+            }
+
+            html_string = render_to_string('pdf_template_sales.html', context)
+            pdf = HTML(string=html_string).write_pdf()
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="Sales_Report_{start_date}_to_{end_date}.pdf"'
+            return response
+
+        else:
+            return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class PurchaseReportAPIView(APIView):
@@ -2818,6 +2907,82 @@ class PurchaseReportAPIView(APIView):
             return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PurchaseReportPDFView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request, user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        if start_date and end_date:
+            try:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            except ValueError:
+                return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Fetch and aggregate data
+            purchase_data = (
+                Purchase.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
+                .values('created_on')
+                .annotate(
+                    cash=Sum('invoice_amount', filter=Q(mode_of_transaction__name='cash')),
+                    credit=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),
+                    card=Sum('invoice_amount', filter=Q(mode_of_transaction__name='card')),
+                    bank_transfer=Sum('invoice_amount', filter=Q(mode_of_transaction__name='bank transfer')),
+                    credit_card=Sum('invoice_amount', filter=Q(mode_of_transaction__name='credit')),
+                    total=Sum('invoice_amount')
+                )
+                .order_by('created_on')
+            )
+
+            report_details = [
+                {
+                    'date': purchase['created_on'],
+                    'cash': purchase['cash'] or 0,
+                    'credit': purchase['credit'] or 0,
+                    'card': purchase['card'] or 0,
+                    'bank_transfer': purchase['bank_transfer'] or 0,
+                    'credit_card': purchase['credit_card'] or 0,
+                    'total': purchase['total'] or 0
+                } for purchase in purchase_data
+            ]
+
+            summary = {
+                'total_cash': sum(purchase['cash'] for purchase in report_details),
+                'total_credit': sum(purchase['credit'] for purchase in report_details),
+                'total_card': sum(purchase['card'] for purchase in report_details),
+                'total_bank_transfer': sum(purchase['bank_transfer'] for purchase in report_details),
+                'total_credit_card': sum(purchase['credit_card'] for purchase in report_details),
+                'total_amount': sum(purchase['total'] for purchase in report_details)
+            }
+
+            context = {
+                'details': report_details,
+                'summary': summary,
+                'start_date': start_date,
+                'end_date': end_date,
+                'business': business_profile.name
+            }
+
+            html_string = render_to_string('pdf_template_purchase.html', context)
+            pdf = HTML(string=html_string).write_pdf()
+
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="Purchase_Report_{start_date}_to_{end_date}.pdf"'
+            return response
+
+        else:
+            return Response({'error': 'Invalid date range'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class MscIncomeReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -2848,6 +3013,53 @@ class MscIncomeReportAPIView(APIView):
         }
         
         return Response(report_data)
+
+
+class MscIncomeReportPDFView(APIView):
+    def get(self, request):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request, user=request.user)
+
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+        # Query the database for Miscellaneous Income within the provided date range
+        msc_income = MiscellaneousIncome.objects.filter(
+            created_on__range=[start_date, end_date], 
+            business_profile=business_profile.id
+        )
+
+        # Prepare the data to be returned
+        report_details = [{
+            'date': income.created_on,
+            'amount': income.amount,
+            'income_type': income.receipt_type.name,
+            'mode_of_transaction': income.mode_of_transaction.name
+        } for income in msc_income]
+
+        summary = {
+            'total_amount': msc_income.aggregate(Sum('amount'))['amount__sum']
+        }
+
+        context = {
+            'details': report_details,
+            'summary': summary,
+            'start_date': start_date,
+            'end_date': end_date,
+            'business': business_profile.name
+        }
+
+        html_string = render_to_string('pdf_template_msc_income.html', context)
+        pdf = HTML(string=html_string).write_pdf()
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Msc_Income_Report_{start_date}_to_{end_date}.pdf"'
+        return response
 
 
 
@@ -3109,7 +3321,9 @@ class CustomerPaymentReportAPIView(APIView):
         #initial_opening_balance = customer.outstanding
 
         # Get all customers in the business profile
-        customers = Customer.objects.filter(business_profile=business_profile.id)
+        customers_in_credit_collection = Customer.objects.filter(business_profile=business_profile.id)
+        customers = customers_in_credit_collection.filter(creditcollection__isnull=False)
+        print('customers', customers)
 
         # Fetch customer payments including opening_outstanding
         customer_payments = CreditCollection.objects.filter(
@@ -3118,7 +3332,10 @@ class CustomerPaymentReportAPIView(APIView):
         
         initial_opening_balance_o = CreditCollection.objects.filter( customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id).order_by('created_on').first()
 
-        initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
+        if(initial_opening_balance_o.opening_outstanding == 'None' or 0):
+            initial_opening_balance = 0
+        else:
+            initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
 
         # Fetch purchases
         cash_purchases = BankSales.objects.filter(
@@ -3240,8 +3457,11 @@ class CustomerPaymentReportPDFAPIView(APIView):
 
            
         initial_opening_balance_o = CreditCollection.objects.filter( customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id).order_by('created_on').first()
-
-        initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
+        if(initial_opening_balance_o.opening_outstanding == 'None' or 0):
+            initial_opening_balance = 0
+        else:
+            initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
+       
 
         # Fetch purchases
         cash_purchases = BankSales.objects.filter(

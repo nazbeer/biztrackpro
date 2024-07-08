@@ -43,7 +43,7 @@
                             <th style="background-color: #8a8a8a; text-align:center;">Credit</th>
                             <th style="background-color: #8a8a8a; text-align:center;">Card</th>
                             <th style="background-color: #8a8a8a; text-align:center;">Bank Transfer</th>
-                            <th style="background-color: #8a8a8a; text-align:center;">Credit Card</th>
+                            <th style="background-color: #8a8a8a; text-align:center;">Cheque</th>
                             <th style="background-color: #8a8a8a; text-align:center;">Total</th>
                         </tr>
                     </thead>
@@ -106,10 +106,10 @@ document.getElementById('report-form').addEventListener('submit', function(event
         });
 });
 
-// document.getElementById('download-pdf-cc').addEventListener('click', function() {
-//     const startDate = document.getElementById('start_date').value;
-//     const endDate = document.getElementById('end_date').value;
-//     window.location.href = `/download-pdf-cc/?start_date=${startDate}&end_date=${endDate}`;
-// });
+document.getElementById('download-pdf-cc').addEventListener('click', function() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+    window.location.href = `/api/sales-report-pdf/?start_date=${startDate}&end_date=${endDate}`;
+});
 </script>
 {% endblock %}

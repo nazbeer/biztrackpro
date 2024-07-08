@@ -3889,31 +3889,42 @@ class ExpenseReportPDFView(APIView):
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            shop_admin = get_shop_admin(request,user=request.user)
+            shop_admin = get_shop_admin(request, user=request.user)
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
-        # if start_date and end_date:
         expenses = Expense.objects.filter(created_on__range=[start_date, end_date], business_profile=business_profile.id)
 
         expense_data = [{
-          
-            
+            'start_date': start_date,
+            'end_date': end_date,
+            'business': business_profile.name,
             'expense_type': expense.expense_type.name,
             'amount': float(expense.amount),
             'remark': expense.invoice_no,
             'mode_of_transaction': expense.mode_of_transaction.name,
             'date': expense.created_on.isoformat(),
         } for expense in expenses]
-        # else:
-        #     expenses = Expense.objects.all()
-        html_string = render_to_string('expense_report_pdf.html', {'details': expense_data,   'start_date': start_date,
+
+        # Render HTML template to string
+        html_string = render_to_string('expense_report_pdf.html', {
+            'details': expense_data,
+            'start_date': start_date,
             'end_date': end_date,
-            'business':business_profile.name})
+            'business': business_profile.name
+        })
+
+        # Generate PDF from HTML string
         pdf = HTML(string=html_string).write_pdf()
+
+        # Prepare HTTP response with PDF content
         response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="expense_report.pdf"'
+
+        # Set filename for download
+        filename = f"Expense_Report_{start_date}_to_{end_date}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
         return response
     
 

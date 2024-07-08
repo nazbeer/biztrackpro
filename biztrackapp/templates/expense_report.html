@@ -3,6 +3,11 @@
 {% block title %}Expense Report{% endblock %}
 
 {% block content %}
+<style>
+    h4{
+        font-size: 14px;
+    }
+    </style>
 <div class="container mt-5">
     <div class="card">
         <div class="card-header bg-primary text-white">
@@ -41,8 +46,9 @@
                             <th  style="background-color: #8a8a8a; text-align:center;">Date</th>
                             <th  style="background-color: #8a8a8a; text-align:left;"> Type</th>
                            
-                            <th  style="background-color: #8a8a8a; text-align:left;">Remark</th>
+                           
                             <th  style="background-color: #8a8a8a; text-align:left;">Mode of Transaction</th>
+                            <th  style="background-color: #8a8a8a; text-align:left;">Remark</th>
                             <th  style="background-color: #8a8a8a; text-align:right;">Amount</th>
                            
                         </tr>
@@ -83,8 +89,9 @@
                                 })}</td>
                                 <td style="text-align:left;">${detail.expense_type}</td>
                               
+                                
+                                <td style="text-align:left;text-transform:capitalize;">${detail.mode_of_transaction}</td>
                                 <td style="text-align:left;">${detail.remark}</td> 
-                                <td style="text-align:left;">${detail.mode_of_transaction}</td>
                                   <td style="text-align:right;">${detail.amount.toFixed(2)}</td>
                             </tr>
                         `;

@@ -11,9 +11,10 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table  class="table table-bordered table-striped nowrap"  style="width: 100%;">
+                <table  id="customerTable"  class="table table-bordered table-striped nowrap"  style="width: 100%;">
                 <thead>
                     <tr>
+                        <th class="text-center">#</th> 
                         <th>Name</th>
                         <th>Outstanding</th>
                         <th>Location</th>
@@ -25,6 +26,7 @@
                 <tbody>
                     {% for customer in customers %}
                     <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
                         <td>{{ customer.name }}</td>
                         <td>{{ customer.outstanding }}</td>
                         <td>{{ customer.location }}</td>
@@ -41,4 +43,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+      
+const dataTable = new DataTable('#customerTable', {
+  responsive: true,
+  dom: 'lfrtip',
+  order: [[0, 'asc']],
+//   buttons: [
+//     {
+//       text: 'Print',
+//       extend: 'print',
+//       exportOptions: {
+//         stripHtml: false,
+//         columns: [0, 1, 2, 3, 4]
+//       }
+//     },
+//     {
+//       text: 'Export PDF',
+//       extend: 'pdf',
+//       exportOptions: {
+//         stripHtml: true,
+//       },
+//     }
+//   ],
+  
+});
+    });
+</script>
 {% endblock %}

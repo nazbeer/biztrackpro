@@ -197,10 +197,9 @@
     document.addEventListener('DOMContentLoaded', (event) => {
         
         const dateInput = document.getElementById('id_date');
-        const today = new Date();
-
+        const today = dateInput.value;
         // Format today's date as 'YYYY-MM-DD'
-        const formattedToday = today.toISOString().split('T')[0];
+        // const formattedToday = today.toISOString().split('T')[0];
         // $('#modal_date').val() = formattedToday;
         // Get start and end times from the server in 'g:i A' format
         const startTimeValue = "{{ start_time|default_if_none:''|date:'g:i A' }}";
@@ -244,9 +243,10 @@
         // dateInput.value = formattedToday;
         // dateInput.min = formattedToday;
         // dateInput.max = formattedTomorrow;
-        dateInput.value = dateInput.value;
-        dateInput.min = dateInput.value;
-        dateInput.max = dateInput.value;
+        
+        // dateInput.value = dateInput.value;
+        // dateInput.min = dateInput.value;
+        // dateInput.max = dateInput.value;
 
         // Set the start and end times in the hidden inputs
         const startTimeInput = document.getElementById('start_time');
@@ -262,9 +262,12 @@
 
     $(document).ready(function() {
         $('#confirmModal').on('show.bs.modal', function(event) {
-            const today = new Date();
-            const formattedToday = today.toISOString().split('T')[0];
+            const currentDate = document.getElementById('id_date').value;
+            const today = new Date(currentDate);
+            // const formattedToday = today.toISOString().split('T')[0];
+            const formattedToday = formatDate(today);
 
+            
             // Set the current date in the #modal_date <td> element
             $('#modal_date').text(formattedToday);
             $('#date_span').text(formattedToday);
@@ -290,6 +293,15 @@
             // $('#modal_status').val(dailySummary.status);
             // $('#modal_daily_summary_id').val(dailySummary.id);
         });
+
+        function formatDate(date) {
+            const day = ("0" + date.getDate()).slice(-2);
+            const month = ("0" + (date.getMonth() + 1)).slice(-2);
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+    
+
 
         function toggleChequeDetails() {
             const modal = $('.modal.show'); 
@@ -401,6 +413,7 @@
     function get_closing_balance() {
         // Modify the function to accept the selected date as a parameter
         id = document.getElementById('daily_summary_id').value
+        console.log(0,id)
         fetch(`/get_closing_balance/${id}/`)
             .then(response => response.json())
             .then(data => {
@@ -424,7 +437,7 @@
 
 <script>
     function confirmDelete() {
-        return confirm('Are you sure you want to delete this bank deposit?');
+        return confirm('Are you sure you want to delete ?');
     }
     </script>
 
@@ -470,7 +483,7 @@ const element = document.getElementById(hashValue);
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="id_date">Date:</label>
-                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1" value="{{ daily_summary.date|date:'Y-m-d' }}">
+                                <input type="date" name="date" required class="form-control bg-light" id="id_date" tabindex="-1" value="{{ daily_summary.date|date:'Y-m-d' }}" readonly>
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="daily_summary_id" name="daily_summary_id" value="">
                                 <input type="hidden" id="start_time" value="{{ start_time|default_if_none:''|date:'g:i A' }}">

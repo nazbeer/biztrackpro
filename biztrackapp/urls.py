@@ -176,6 +176,8 @@ urlpatterns = [
     path('api/daily_summary_exists/', CheckDailySummaryExists.as_view(), name='daily_summary_exists'),
     path('api/login/', CustomTokenObtainView.as_view(),name = 'api_login'),
 
+    path('daily_summary_detail/<str:daily_summary_id>/', daily_summary_detail, name='daily_summary_detail'),
+
 ]
 # handler404 = 'custom_404_view'
 if settings.DEBUG:

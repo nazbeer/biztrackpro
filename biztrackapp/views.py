@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.template.loader import render_to_string
-# from weasyprint import HTML, CSS
+from weasyprint import HTML, CSS
 import tempfile
 from rest_framework.request import Request
 from django.contrib.auth.hashers import make_password
@@ -4302,20 +4302,6 @@ def daily_summary_detail(request,daily_summary_id):
 
     return render(request, 'daily_summary_detail.html',{
 
-            # 'daily_summary_opening_balance': daily_summary.opening_balance,
-            # 'daily_summary_date': daily_summary.date,
-            # 'daily_summary_closing_balance': daily_summary.closing_balance,
-            # 'daily_summary_cash_sale': daily_summary.cash_sale,
-            # 'daily_summary_credit_sale': daily_summary.credit_sale,
-            # 'daily_summary_card_sale': daily_summary.card_sale,
-            # 'daily_summary_sales': daily_summary.sales,
-            # 'daily_summary_credit_collection': daily_summary.credit_collection,
-            # 'daily_summary_miscellaneous_income': daily_summary.miscellaneous_income,
-            # 'daily_summary_purchase': daily_summary.purchase,
-            # 'daily_summary_supplier_payment': daily_summary.supplier_payment,
-            # 'daily_summary_expense': daily_summary.expense,
-            # 'daily_summary_withdrawal': daily_summary.withdrawal,
-            # 'daily_summary_bank_deposit': daily_summary.bank_deposit,
             'daily_summary': daily_summary,
 
             'bank_sales':bank_sales,

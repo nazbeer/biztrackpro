@@ -1173,6 +1173,7 @@ def save_after_submit(request):
     # else:
     closing_balance = bankdata or 0
     return render(request, 'edit_daily_summary.html', {
+        'old_daily_summary_date':daily_summary.date.strftime('%Y-%m-%d'),
         'daily_summary': daily_summary,
         'business_profile': business_profile.id,
         'today': today,
@@ -4363,4 +4364,29 @@ def daily_summary_detail(request,daily_summary_id):
             'total_withdrawal_amount':total_withdrawal_amount,
 
     })
-  
+
+
+
+from django.contrib.auth import update_session_auth_hash
+def change_password(request, id):
+    user = get_object_or_404(User, id=id)
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            new_password1 = form.cleaned_data['new_password1']
+            new_password2 = form.cleaned_data['new_password2']
+
+            if new_password1 != new_password2:
+                form.add_error('new_password2', 'New passwords do not match.')
+            else:
+                user.set_password(new_password1)
+                user.save()
+                # update_session_auth_hash(request, user)
+                messages.success(request, 'Password changed successfully')
+                return redirect('employee_list')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ChangePasswordForm()
+
+    return render(request, 'change_password.html', {'form': form})

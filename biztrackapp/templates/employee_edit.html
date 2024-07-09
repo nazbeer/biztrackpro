@@ -178,9 +178,16 @@
       
   </div>  -->
   </div>
-  <a href="{% url 'employee_list' %}" class="btn btn-secondary text-white">Back</a>
-
+  <div class="d-flex justify-content-between">
+    <div>
+      <a href="{% url 'employee_list' %}" class="btn btn-secondary text-white">Back</a>
       <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+    <a href="{% url 'change_password' employee.user.id %}" class="btn btn-secondary text-white">Change Password</a>
+  </div>
+  
+
+    
     </form>
 
 
@@ -221,7 +228,6 @@
 function checkUsernameAvailability() {
         var username = document.getElementById('phone_number').value;
         if (username.trim() !== '') {
-          console.log('kkkkkkkkkkkkkkkkkkkkkkk');
             // Make an AJAX request to check username availability
             fetch('/check-username-availability/?username=' + username)
                 .then(response => response.json())

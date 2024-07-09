@@ -33,6 +33,7 @@
                 <div class="form-group">
                   <label for="id_cheque_date">Cheque Date</label>
                   <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="54">
+                  <div id="chequeErrors" class="alert alert-danger d-none"></div>
                 </div>
               </div>
               </div>
@@ -75,4 +76,48 @@
       </div>
     </div>
   </div>
-  
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const chequeDateInput = document.getElementById('id_cheque_date');
+    const bankSaleForm = document.getElementById('bankSaleForm');
+    const formErrors = document.getElementById('form-errors');
+    
+    bankSaleForm.addEventListener('submit', function (e) {
+        formErrors.classList.add('d-none');
+        formErrors.innerHTML = '';
+
+        const chequeDateValue = chequeDateInput.value;
+        if (chequeDateValue) {
+            const chequeDate = new Date(chequeDateValue);
+            const year = chequeDate.getFullYear();
+            if (year.toString().length !== 4 || year < 1000 || year > 9999) {
+                e.preventDefault();
+                chequeDateInput.classList.add('is-invalid');
+                formErrors.classList.remove('d-none');
+                formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
+                return;
+            } else {
+                chequeDateInput.classList.remove('is-invalid');
+            }
+        }
+    });
+
+    chequeDateInput.addEventListener('change', function() {
+        formErrors.classList.add('d-none');
+        formErrors.innerHTML = '';
+
+        const chequeDateValue = chequeDateInput.value;
+        if (chequeDateValue) {
+            const chequeDate = new Date(chequeDateValue);
+            const year = chequeDate.getFullYear();
+            if (year.toString().length !== 4 || year < 1000 || year > 9999) {
+                chequeDateInput.classList.add('is-invalid');
+                formErrors.classList.remove('d-none');
+                formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
+            } else {
+                chequeDateInput.classList.remove('is-invalid');
+            }
+        }
+    });
+});
+</script>

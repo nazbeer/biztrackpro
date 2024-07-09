@@ -245,3 +245,15 @@ class ExpenseForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['mode_of_transaction'].queryset = TransactionMode.objects.filter(business_profile=business_profile,status = True).exclude(name__in=['credit'])
         self.fields['expense_type'].queryset = ExpenseType.objects.filter(business_profile=business_profile,status = True)
+
+class ChangePasswordForm(forms.Form):
+    new_password1 = forms.CharField(
+        label='New Password',
+        min_length=8,
+        help_text="Your password must be at least 8 characters long.",
+        widget=forms.PasswordInput(attrs={'class': 'form-control mb-2', 'placeholder': 'New Password'}),
+    )
+    new_password2 = forms.CharField(
+        label='Confirm Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control mb-2', 'placeholder': 'Confirm Password'}),
+    )

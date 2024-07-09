@@ -177,6 +177,8 @@ urlpatterns = [
     path('api/login/', CustomTokenObtainView.as_view(),name = 'api_login'),
 
     path('daily_summary_detail/<str:daily_summary_id>/', daily_summary_detail, name='daily_summary_detail'),
+    path('change_password/<int:id>/', change_password, name='change_password'),
+
 
 ]
 # handler404 = 'custom_404_view'

@@ -52,7 +52,8 @@ def login_view(request):
             login(request, user)
             return redirect('home')
         else:
-            return render(request, 'login.html', {'error': 'Invalid username or password'})
+            messages.error(request, 'Invalid username or password')
+            return render(request, 'login.html')
     else:
         return render(request, 'login.html')
     
@@ -4212,7 +4213,7 @@ def daily_summary_detail(request,daily_summary_id):
     try:
         daily_summary = DailySummary.objects.get(business_profile=business_profile.id, daily_summary_id=daily_summary_id)
     except DailySummary.DoesNotExist:
-        return HttpResponse ("Daily summary not found")
+        return redirect('daily_summary_list')
     
     try:
         cheque_transaction_mode = TransactionMode.objects.filter(name="cheque",business_profile=business_profile.id).first()

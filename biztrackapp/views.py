@@ -4311,8 +4311,8 @@ def daily_summary_detail(request,daily_summary_id):
             'msc_income':msc_income,
             'purchases':purchases,
             'supplier_payments':supplier_payments,
-            'expense':expense,
-            'bank_deposit':bank_deposit,
+            'expenses':expense,
+            'bank_deposits':bank_deposit,
             'withdrawal':withdrawal,
 
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,

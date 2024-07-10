@@ -2057,7 +2057,7 @@ def list_withdrawal(request):
     return render(request, 'create_daily_summary.html', {'withdrawals': withdrawals, 'business_profile': business_profile.id})
 from decimal import Decimal, ROUND_HALF_UP
 
-def get_daily_summary_data(request,id):
+def get_daily_summary_data(request,id,date_data):
     # id = request.GET.get('id')
     today = date.today()
     # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
@@ -2139,9 +2139,9 @@ def get_daily_summary_data(request,id):
 
 
     # if DailySummary.objects.exists():
-    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = today).exists():
+    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = date_data).exists():
         # last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
-        last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+        last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=date_data).order_by('-date').first()
         last_daily_summary_data = last_daily_summary.closing_balance
     else:
         last_daily_summary = business_profile.opening_balance

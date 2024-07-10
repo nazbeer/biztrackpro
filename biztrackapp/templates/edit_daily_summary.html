@@ -413,8 +413,9 @@
     function get_closing_balance() {
         // Modify the function to accept the selected date as a parameter
         id = document.getElementById('daily_summary_id').value
-        console.log(0,id)
-        fetch(`/get_closing_balance/${id}/`)
+        date = document.getElementById('id_date').value
+        console.log("id: ", id, "date: ", date)
+        fetch(`/get_closing_balance/${id}/${date}/`)
             .then(response => response.json())
             .then(data => {
                 console.log('pp',data.closing_balance)
@@ -492,9 +493,13 @@ const element = document.getElementById(hashValue);
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
+                                <label for="id_opening_balance">Opening Balance</label>
+                                <input type="number" name="opening_balance" value="{{daily_summary.opening_balance|floatformat:'2'}}" required class="form-control bg-light" id="id_opening_balance" tabindex="0" readonly>   
+                            </div>
+                            <!-- <div class="form-group">
                                 <label for="id_cash_on_hand">Opening Balance</label>
                                 <input type="number" name="opening_balance" value="{{cash_on_hand|floatformat:'2'}}" required class="form-control bg-light" id="id_cash_on_hand" tabindex="0" readonly>   
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>

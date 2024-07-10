@@ -23,7 +23,8 @@ class LoginRequiredMiddleware:
             reverse('customer-payment-report-pdf'),
             reverse('passDS'),
             reverse('daily_summary_exists'),
-            reverse('api_login')
+            reverse('api_login'),
+            reverse('daily_summary_report_api')
         ]
 
     def __call__(self, request):

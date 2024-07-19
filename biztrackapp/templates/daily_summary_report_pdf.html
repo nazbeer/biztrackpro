@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Daily Summary Report</title>
     <style>
-         @page {
-            size: A4 landscape; /* A4 page size with landscape orientation */
+        @page {
+            size: A3 landscape; /* A4 page size with landscape orientation */
             margin: 1cm; /* Adjust margins as needed */
         }
         body { 
@@ -41,12 +41,12 @@
 <body>
     <h2>Daily Summary Report</h2>
       
-    <div style="display: flex;justify-content: space-between; align-items: center;margin-bottom:0px;" >
-        <h6 style="margin-bottom:0px;">Company Name:</h6>
-        <h6 style="text-align: left; margin-bottom:0px;">{{ business }}</h6>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0px;">
+        <h6 style="margin-bottom: 0px;">Company Name:</h6>
+        <h6 style="text-align: left; margin-bottom: 0px;">{{ business }}</h6>
     </div>
    
-    <div style="display: flex;justify-content: space-between; align-items: center;" >
+    <div style="display: flex; justify-content: space-between; align-items: center;">
         <h6>Date Range:</h6>
         <h6 style="text-align: left;">{{ start_date }} to {{ end_date }}</h6>
     </div>
@@ -55,39 +55,43 @@
             <tr>
                 <th>Date</th>
                 <th>Opening Bal.</th>
-                <!-- <th>Cash Sale</th>
+                <th>Cash Sale</th>
                 <th>Credit Sale</th>
-                <th>Card Sale</th> -->
+                <th>Card Sale</th>
                 <th>Sales</th>
                 <th>Credit Col.</th>
                 <th>Msc. Income</th>
-                <th>Purchase</th>
+                <th>Cash Purchase</th>
+                <th>Credit Purchase</th>
+                <th>Card Purchase</th>
+                <th>Total Purchase</th>
                 <th>Sup. Payment</th>
                 <th>Expense</th>
                 <th>Withdrawal</th>
                 <th>Bank Deposit</th>
                 <th>Closing Bal.</th>
-             
             </tr>
         </thead>
         <tbody>
             {% for summary in summaries %}
             <tr>
-                <td>{{ summary.date|date:"d-m-Y" }}</td>
+                <td>{{ summary.date }}</td>
                 <td>{{ summary.opening_balance }}</td>
-                <!-- <td>{{ summary.cash_sale }}</td>
+                <td>{{ summary.cash_sale }}</td>
                 <td>{{ summary.credit_sale }}</td>
-                <td>{{ summary.card_sale }}</td> -->
+                <td>{{ summary.card_sale }}</td>
                 <td>{{ summary.sales }}</td>
                 <td>{{ summary.credit_collection }}</td>
                 <td>{{ summary.miscellaneous_income }}</td>
-                <td>{{ summary.purchase }}</td>
+                <td>{{ summary.total_cash_purchase|floatformat:2 }}</td>
+                <td>{{ summary.total_credit_purchase|floatformat:2 }}</td>
+                <td>{{ summary.total_card_purchase|floatformat:2 }}</td>
+                <td>{{ summary.purchase|floatformat:2 }}</td>
                 <td>{{ summary.supplier_payment }}</td>
                 <td>{{ summary.expense }}</td>
                 <td>{{ summary.withdrawal }}</td>
                 <td>{{ summary.bank_deposit }}</td>
                 <td>{{ summary.closing_balance }}</td>
-             
             </tr>
             {% endfor %}
         </tbody>

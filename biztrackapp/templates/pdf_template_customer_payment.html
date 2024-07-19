@@ -5,9 +5,10 @@
     <title>Customer Payment Report</title>
     <style>
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
+
         body {
             font-family: Arial, sans-serif;
             font-size: 12px !important;
@@ -61,6 +62,9 @@
                 <th>Opening Balance</th>
                 <th>Cash Sales</th>
                 <th>Credit Sales</th>
+                <th>Bank Transfer Sales</th>
+                <th>Cheque Sales</th>
+                <th>Card Sales</th>
                 <th>Total Sales</th>
                 <th>Credit Collection</th>
                 <th>Closing Balance</th>
@@ -73,6 +77,9 @@
                 <td style="text-align:right;">{{ item.1.opening_balance|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.cash_purchase|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.credit_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.bank_transfer_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.cheque_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.card_purchase|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.total_sales|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.customer_payment|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.closing_balance|floatformat:2 }}</td>
@@ -80,12 +87,14 @@
             {% endfor %}
         </tbody>
         <tfoot>
-           
             <tr>
                 <td style="background-color: #8a8a8a; color: white; text-align: right;">Total:</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.opening_balance|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cash_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_credit_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_bank_transfer_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cheque_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_card_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_customer_payments|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.closing_balance|floatformat:2 }}</td>

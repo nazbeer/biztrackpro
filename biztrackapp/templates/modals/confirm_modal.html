@@ -40,7 +40,7 @@
                             <input type="hidden" name="business_profile" value="{{ business_profile }}">
                             <input type="hidden" id="modal_daily_summary_idc" name="daily_summary_id">
                             <td id="modal_date" style="text-align: center;" >{{ date }}</td>
-                            <td id="modal_opening_balance" style="text-align: right;">{{ cash_on_hand|floatformat:2 }}</td>
+                            <td id="modal_opening_balance" style="text-align: right;">{{ daily_summary.opening_balance|floatformat:2 }}</td>
                             <!-- <td id="modal_cash_sale">{{ bank_sale_total_cash_sale }}</td>
                             <td id="modal_credit_sale">{{ bank_sale_total_credit_sale }}</td>
                             <td id="modal_card_sale">{{ bank_sale_total_card_sale }}</td>

@@ -2,7 +2,8 @@
 from django.urls import path
 from .views import (
     DailyCollectionReportAPIView, SalesReportAPIView, PurchaseReportAPIView,
-    MscIncomeReportAPIView, SupplierPaymentReportAPIView, BankStatementAPIView
+    MscIncomeReportAPIView, SupplierPaymentReportAPIView, BankStatementAPIView,
+    BankStatementPDFView, DailyCollectionReportPDFView, PassDSDailySummaryAPIView
 )
 
 custom_api_urls = [
@@ -12,9 +13,9 @@ custom_api_urls = [
     path('msc-income-report/', MscIncomeReportAPIView.as_view(), name='msc_income_report'),
     path('supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
-    # path('bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
-    # path('daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
-    # path('passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
+    path('bank-statement-pdf/', BankStatementPDFView.as_view(), name='bank-statement-pdf'),
+    path('daily-report-pdf/', DailyCollectionReportPDFView.as_view(), name='daily-report-pdf'),
+    path('passDS/', PassDSDailySummaryAPIView.as_view(), name='passDS'),
 ]
 
 urlpatterns = custom_api_urls

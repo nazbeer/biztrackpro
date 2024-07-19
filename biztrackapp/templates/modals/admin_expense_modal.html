@@ -1,0 +1,84 @@
+<div class="modal fade" id="adminExpenseModal" tabindex="199" aria-labelledby="adminExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-primary">
+                <h5 class="modal-title text-white" id="adminExpenseModalLabel">Add Expense</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="adminAddexpenseForm" method="post" action="{% url 'admin_create_expense' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div id="adminAddexpenseErrors" class="alert alert-danger d-none"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_expense_type">Expense Type</label>
+                                <input type="hidden" name="created_on" value="{{daily_summary.date}}">
+                                <input type="hidden" name="business_profile" value={{daily_summary.business_profile}}>
+                                <input type="hidden" id="modal_daily_summary_id7" name="daily_summary_id">
+                                <select id="id_expense_type" name="expense_type" class="form-control" tabindex="200" required>
+                                    <option value="">-- Select Expense Type --</option>
+                                    {% for expense_type in expense_form.expense_type.field.queryset %}
+                                        <option value="{{ expense_type.id }}">{{ expense_type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_amount">Amount</label>
+                                <input type="number" id="id_amount" name="amount" class="form-control"  tabindex="202" required>
+                            </div>
+                            <div id="chequeDetails1" class="d-none">
+                            <div class="form-group">
+                                <label for="id_cheque_no">Cheque Number</label>
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="204">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                                <div id="bank_detail1" class="d-none">
+                                <label for="id_bank">Bank</label>
+                                <select id="id_bank" name="bank" class="form-control" tabindex="206">
+                                    <option value="">-- Select Bank --</option>
+                                    {% for bank in expense_form.bank.field.queryset %}
+                                        <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="id_mode_of_transaction">Payment Mode</label>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="201" required>
+                                    <option value="">-- Payment Mode --</option>
+                                    {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_invoice_no">Remark</label>
+                                <input type="text" id="id_invoice_no" name="invoice_no" class="form-control" tabindex="203" required>
+                            </div>
+                            
+                            <div id="chequeDetails" class="d-none">
+                            <div class="form-group">
+                                <label for="id_cheque_date">Cheque Date</label>
+                                <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="205">
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div id="adminAddexpenseErrors" class="text-danger"></div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="209">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="208">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

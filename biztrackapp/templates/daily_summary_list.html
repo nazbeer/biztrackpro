@@ -100,10 +100,18 @@
                   {% if summary.date == last_daily_summary.date %}
                     <a href="{% url 'save_after_submit' %}?id={{ summary.daily_summary_id }}" target="_blank" class="btn btn-primary btn-sm">Edit</a>
                   {% else %}
-                    <button class="btn btn-primary btn-sm" disabled>Edit</button>
+                  {% if request.user.is_superuser %}
+                    <button class="btn btn-primary text-white btn-sm d-none" disabled>Edit</button>
+                    {% else %}
+                    <button class="btn btn-primary text-white btn-sm" disabled>Edit</button>
+                    {% endif %}
                   {% endif %}
-                  <a href="{% url 'daily_summary_detail' summary.daily_summary_id %}" class="btn btn-success btn-sm">View</a>
-                </td>  
+                  <a href="{% url 'daily_summary_detail' summary.daily_summary_id %}" class="btn btn-success btn-sm text-white">View</a>
+                  {% if request.user.is_superuser and summary.date != last_daily_summary.date %}
+                  <a href="{% url 'admin_daily_summary_update' summary.daily_summary_id %}" class="btn btn-primary btn-sm">Admin Edit</a>                    
+                  {% endif %}
+
+                </td>   
               </tr>
             {% endfor %}
           </tbody>

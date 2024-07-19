@@ -15,6 +15,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_receipt_type">Income Type</label>
+                                <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="modal_daily_summary_id2" name="daily_summary_id">
                                 <select id="id_receipt_type" name="receipt_type" class="form-control" tabindex="80"  required>
@@ -41,7 +43,7 @@
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="81"  required>
                                     <option value="">-- Mode of Transaction --</option>
                                     {% for transaction_mode in msc_income_form.mode_of_transaction.field.queryset %}
-                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

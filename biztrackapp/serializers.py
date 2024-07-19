@@ -25,3 +25,10 @@ class UserSerializer(serializers.ModelSerializer):
 class CustomTokenObtainSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
+
+class ShopBankSerializer(serializers.ModelSerializer):
+    bank_name = serializers.CharField(source='bank.name', read_only=True)
+
+    class Meta:
+        model = Bank
+        fields = ['id','bank_name', 'account_number', 'opening_balance', 'business_profile', 'status', 'created_on', 'update_on']

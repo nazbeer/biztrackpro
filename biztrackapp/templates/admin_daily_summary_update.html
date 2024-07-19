@@ -1,0 +1,1192 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Update Daily Summary{% endblock %}
+
+{% block content %}
+
+<style>
+    .awesomplete ul {
+        width: 100%;
+        box-sizing: border-box;
+        max-height: 50px !important;
+        overflow-y: auto;
+    }
+
+    thead>tr>th {
+        background-color: dimgray !important;
+
+    }
+
+    .sticky-button {
+        position: fixed;
+        bottom: 5px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        width: 81%;
+        text-align: center;
+        /* Center the button */
+    }
+
+</style>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        get_admin_closing_balance();
+        const hashValue = window.location.hash.substring(1);
+        const element = document.getElementById(hashValue);
+        if (element) {
+            element.focus();
+                    element.style.scrollMarginTop = '100px';
+        } else {
+            console.log('scroll code');
+        }
+    });
+</script>
+<script>
+    function get_admin_closing_balance() {
+        daily_summary_id = document.getElementById('daily_summary_id').value
+        fetch(`/admin_closing_balance/${daily_summary_id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('id_closing_balance').innerHTML = `Closing Balance: ${data.closing_balance}`;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function saveFunction() {
+        document.getElementById('status').value = 'completed';
+        document.getElementById("daily_summary_form").submit();
+    }
+    function submitFunction() {
+        document.getElementById('status').value = 'completed';
+        document.getElementById("daily_summary_form").submit();
+    }
+</script>
+<script>
+    $(document).ready(function() {
+      function fetchChequeNumbers(did) {
+        console.log('Fetching cheque numbers for daily summary ID:', did);
+    
+        if (!did) {
+          console.error('Invalid daily summary ID');
+          return;
+        }
+    
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              console.log('Fetched cheque details:', data);
+    
+              if (data.length === 0) {
+                console.warn('No cheque details found for given ID:', did);
+              }
+    
+              $('#adminBankDepositModal .js-cheque-number-select2').each(function() {
+                var $select = $(this);
+                console.log('$select', $select);
+                $select.empty();
+                $select.append($('<option>').attr('value', '').text('-- Select Cheque Number --'));
+                $select.append($('<option>').attr('value', 'other').text('Other'));
+    
+                data.forEach(function(cheque) {
+                  $select.append($('<option>').attr('value', cheque.cheque_no).text(cheque.cheque_no));
+                });
+    
+                $select.select2({
+                  dropdownParent: $('#adminBankDepositModal'),
+                  placeholder: "-- Select Cheque Number --",
+                  allowClear: true,
+                  minimumResultsForSearch: 0,
+                  tags: true,
+                  tokenSeparators: [',', ' '],
+                });
+              });
+            } catch (error) {
+              console.error('Error parsing response:', error);
+            }
+          } else {
+            console.error('Error fetching cheque details:', xhr.statusText);
+          }
+        };
+        xhr.onerror = function() {
+          console.error('Request failed');
+        };
+        xhr.send();
+      }
+    
+      $('#bankDepositModal').on('shown.bs.modal', function() {
+        var modalDailySummaryId = $('#modal_daily_summary_id1').val();
+        if (modalDailySummaryId) {
+          fetchChequeNumbers(modalDailySummaryId);
+        }
+    
+        $('#modal_daily_summary_id1').on('change', function() {
+          var newDailySummaryId = $(this).val();
+          if (newDailySummaryId) {
+            fetchChequeNumbers(newDailySummaryId);
+          }
+        });
+    
+        $('#adminBankDepositModal').on('change', '.js-cheque-number-select2', function() {
+          var selectedChequeNo = $(this).val();
+          var did = $('#modal_daily_summary_id1').val();
+    
+          if (!did) {
+            console.error('Invalid daily summary ID');
+            return;
+          }
+    
+          const modal = $('#adminBankDepositModal');
+          const amount = modal.find('#id_amount');
+          const chequeDate = modal.find('#id_cheque_date');
+          const bank = modal.find('#id_bank');
+          const chequeInputContainer = $('#cheque_no_input_container');
+    
+          if (selectedChequeNo === 'other') {
+            chequeInputContainer.show();
+            $('#id_cheque_no_input').val('');
+            amount.val(''); // Clear amount
+            chequeDate.val(''); // Clear cheque date
+            bank.val(''); // Clear bank
+          } else {
+            chequeInputContainer.hide();
+            $('#id_cheque_no_input').val(selectedChequeNo);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/fetch_cheque_numbers/' + did + '/');
+            xhr.onload = function() {
+              if (xhr.status === 200) {
+                try {
+                  var data = JSON.parse(xhr.responseText);
+                  console.log('Fetched cheque details:', data);
+    
+                  var selectedChequeDetails = data.find(function(cheque) {
+                    return cheque.cheque_no === selectedChequeNo;
+                  });
+    
+                  if (selectedChequeDetails) {
+                    console.log('Cheque Date:', selectedChequeDetails.cheque_date);
+                    console.log('Amount:', selectedChequeDetails.amount);
+                    console.log('Bank:', selectedChequeDetails.bank.id);
+    
+                    // Update input fields with selected cheque details
+                    amount.val(selectedChequeDetails.amount);
+                    chequeDate.val(selectedChequeDetails.cheque_date);
+                    bank.val(selectedChequeDetails.bank.id);
+                  } else {
+                    console.error('Selected cheque number details not found in fetched data.');
+                  }
+                } catch (error) {
+                  console.error('Error parsing response:', error);
+                }
+              } else {
+                console.error('Error fetching cheque details:', xhr.statusText);
+              }
+            };
+            xhr.onerror = function() {
+              console.error('Request failed');
+            };
+            xhr.send();
+          }
+        });
+      });
+    });
+    </script>
+
+
+<script>
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete ?');
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        function toggleChequeDetails() {
+            const modal = $('.modal.show');
+            const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
+            const chequeDetails = modal.find('#chequeDetails');
+            const chequeDetails1 = modal.find('#chequeDetails1');
+            const chequeDetails2 = modal.find('#chequeDetails2');
+            const bank_detail1 = modal.find('#bank_detail1');
+            const date_detail1 = modal.find('#date_detail1');
+            if (modeOfTransactionSelect.length > 0) {
+                const selectedMode = modeOfTransactionSelect.find('option:selected').text().toLowerCase();
+
+                if (selectedMode === 'cheque') {
+                    chequeDetails.removeClass('d-none');
+                    chequeDetails1.removeClass('d-none');
+                    chequeDetails2.removeClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.addClass('d-none');
+
+                    chequeDetails1.find('input, select, textarea').prop('required', true);
+                    chequeDetails.find('input, select, textarea').prop('required', true);
+                    chequeDetails2.find('input, select, textarea').prop('required', true);
+                    bank_detail1.find('input, select, textarea').prop('required', true);
+                    date_detail1.find('input, select, textarea').prop('required', false).val('');
+
+                } else if (selectedMode === 'cash' || selectedMode === 'credit') {
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.addClass('d-none');
+                    date_detail1.addClass('d-none');
+
+                    chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails2.find('input, select, textarea').prop('required', false).val('');
+                    bank_detail1.find('input, select, textarea').prop('required', false).val('');
+                    date_detail1.find('input, select, textarea').prop('required', false).val('');
+
+                }
+                else if (selectedMode === 'bank transfer') {
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.addClass('d-none');
+
+                    chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails2.find('input, select, textarea').prop('required', false).val('');
+                    bank_detail1.find('input, select, textarea').prop('required', true);
+                    date_detail1.find('input, select, textarea').prop('required', false).val('');
+                }
+                else {
+                    chequeDetails.addClass('d-none');
+                    chequeDetails1.addClass('d-none');
+                    chequeDetails2.addClass('d-none');
+                    bank_detail1.removeClass('d-none');
+                    date_detail1.addClass('d-none');
+
+                    chequeDetails.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails1.find('input, select, textarea').prop('required', false).val('');
+                    chequeDetails2.find('input, select, textarea').prop('required', false).val('');
+                    bank_detail1.find('input, select, textarea').prop('required', true);
+                    date_detail1.find('input, select, textarea').prop('required', false).val('');
+
+                }
+            }
+        }
+
+        function setDailySummaryId(modalId, inputId) {
+            const modal = $(`#${modalId}`);
+            modal.on('show.bs.modal', function (event) {
+                // var urlParams = new URLSearchParams(window.location.search);
+                // var dailySummaryId = urlParams.get('id');
+                // document.getElementById(inputId).value = dailySummaryId;
+                // $(`#${inputId}`).val(dailySummaryId);
+                var daily_summary_Id = document.getElementById('daily_summary_id').value;
+                console.log("daily_summary_Id: ", daily_summary_Id);
+
+                document.getElementById(inputId).value = daily_summary_Id;
+
+                $(`#${inputId}`).val(daily_summary_Id);
+
+                // Initial check when the modal is opened
+                toggleChequeDetails();
+
+                // Add change event listener within the context of the modal
+                const modeOfTransactionSelect = modal.find('#id_mode_of_transaction');
+                modeOfTransactionSelect.on('change', toggleChequeDetails);
+            });
+
+            modal.on('hidden.bs.modal', function () {
+                const modeOfTransactionSelect = $(this).find('#id_mode_of_transaction');
+                modeOfTransactionSelect.off('change', toggleChequeDetails);
+            });
+        }
+
+        setDailySummaryId('adminBankSaleModal', 'modal_daily_summary_id4');
+        setDailySummaryId('adminCreditCollectionModal', 'modal_daily_summary_id3');
+        setDailySummaryId('adminMiscIncomeModal', 'modal_daily_summary_id2');
+        setDailySummaryId('adminWithdrawalModal', 'modal_daily_summary_idw');
+        setDailySummaryId('adminBankDepositModal', 'modal_daily_summary_id1');
+        setDailySummaryId('adminPurchaseModal', 'modal_daily_summary_id5');
+        setDailySummaryId('adminSupplierPaymentModal', 'modal_daily_summary_id6');
+        setDailySummaryId('adminExpenseModal', 'modal_daily_summary_id7');
+        setDailySummaryId('confirmModal', 'modal_daily_summary_idc');
+
+    });
+
+</script>
+
+<style>
+    .bg-white {
+        color: #000 !important;
+    }
+
+    .br-5 {
+        border-radius: 5px !important;
+    }
+
+    .toggle-content {
+        display: none;
+    }
+</style>
+<div class="container ">
+    <div class="card  ">
+        <div class="card-header">
+            <h5 class="mb-0">Admin Update Daily Summary</h5>
+        </div>
+        <form method="post" enctype="multipart/form-data" class="form" id="daily_summary_form">
+            <div class="card-body ">
+                {% csrf_token %}
+                <div class="card mt-0">
+                    <div class="card-body bg-white br-5">
+                        <div class="row ">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_date">Date:</label>
+                                    <input type="date" name="date" required class="form-control bg-light" id="id_date"
+                                        tabindex="-1" value="{{ daily_summary.date|date:'Y-m-d' }}" readonly>
+                                    <input type="hidden" name="business_profile"
+                                        value={{daily_summary.business_profile}}>
+                                    <input type="hidden" id="daily_summary_id" name="daily_summary_id"
+                                        value="{{daily_summary.daily_summary_id}}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="id_opening_balance">Opening Balance</label>
+                                    <input type="number" name="opening_balance"
+                                        value="{{daily_summary.opening_balance|floatformat:'2'}}" required
+                                        class="form-control bg-light" id="id_opening_balance" tabindex="0" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Sale</h5>
+                    </div>
+                    <div class="card-body bg-white br-5">
+                        <div class="row ">
+                            <div class="col-md-2">
+                                <label>Cash </label>
+                                <input type="number" name="cash_sale" required class="form-control bg-light"
+                                    id="id_cash_sale" value="{{ bank_sale_total_cash_sale|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Credit </label>
+                                <input type="number" name="credit_sale" required class="form-control bg-light"
+                                    id="id_credit_sale" value="{{ bank_sale_total_credit_sale|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Card </label>
+                                <input type="number" name="card_sale" required class="form-control bg-light"
+                                    id="id_card_sale" value="{{ bank_sale_total_card_sale|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque</label>
+                                <input type="number" name="cheque_sale" required class="form-control bg-light"
+                                    id="id_cheque_sale" value="{{ bank_sale_total_cheque_sale|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank</label>
+                                <input type="number" name="bank_sale" required class="form-control bg-light"
+                                    id="id_bank_sale" value="{{ bank_sale_total_bank_sale|floatformat:'2' }}" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-4 ">
+                                <label>Sales Total</label>
+                                <div class="bg-light p-2 rounded">{{total_bank_sale_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="sales" value="{{ total_bank_sale_amount|floatformat:'2' }}"
+                                    required class="form-control bg-light" id="id_bank_sale_total">
+                            </div>
+
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="1" data-toggle="modal"
+                                    data-target="#adminBankSaleModal" tabindex="1">Add</button>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="1">
+                            <table class="table table-bordered table-striped " id="tablebanksale">
+                                <thead style="color:transparent !important;">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Transaction Mode</th>
+                                        <th>Bank</th>
+                                        <th>Amount</th>
+                                        <th>Dep. Date</th>
+                                        <th>Chq. Date</th>
+                                        <th>Chq No.</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sale in bank_sales %}
+                                    <tr>
+                                        <td>{{ sale.customer.name }}</td>
+                                        <td class="text-capitalize">{{ sale.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ sale.bank.name }}</td>
+                                        <td>{{ sale.amount }}</td>
+                                        <td>{{ sale.created_on|date:"d/m/Y" }}</td>
+                                        <td>{{ sale.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ sale.cheque_no }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_bank_sale' sale.id %}" class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_bank_sale' sale.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Credit Collection</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+                        <div class="row ">
+                            <div class="col-md-3">
+                                <label>Cash</label>
+                                <input type="number" name="cash_collection" required class="form-control bg-light"
+                                    id="id_cash_collection" value="{{ credit_sale_total_cash_sale|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank </label>
+                                <input type="number" name="bank_collection" required class="form-control bg-light"
+                                    id="id_bank_collection" value="{{ credit_sale_total_bank_sale|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Card </label>
+                                <input type="number" name="card_collection" required class="form-control bg-light"
+                                    id="id_card_collection" value="{{ credit_sale_total_card_sale|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque</label>
+                                <input type="number" name="cheque_collection" required class="form-control bg-light"
+                                    id="id_cheque_collection"
+                                    value="{{ credit_sale_total_cheque_sale|floatformat:'2' }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Credit Collection Total</label>
+                                <div class="bg-light p-2 rounded">{{total_credit_sale_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="credit_collection"
+                                    value="{{total_credit_sale_amount|floatformat:'2'}}" required
+                                    class="form-control bg-light" id="id_credit_collection_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="2" data-toggle="modal"
+                                    data-target="#adminCreditCollectionModal" tabindex="3">Add </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="2">
+                            <table id="tablecreditcollection" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color:transparent !important;">
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Op. Outstanding</th>
+                                        <th>Payment Mode</th>
+                                        <th>Bank</th>
+                                        <th>Amount</th>
+                                        <th>Dep. Date</th>
+                                        <th>Chq. Date</th>
+                                        <th>Chq No.</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for creditcol in credit_collections %}
+                                    <tr>
+                                        <td>{{ creditcol.customer.name }}</td>
+                                        <td>{{ creditcol.opening_outstanding }}</td>
+                                        <td class="text-capitalize">{{ creditcol.payment_mode.transaction_name }}</td>
+                                        <td>{{ creditcol.bank.name }}</td>
+                                        <td>{{ creditcol.amount }}</td>
+                                        <td>{{ creditcol.created_on|date:"d/m/Y" }}</td>
+                                        <td>{{ creditcol.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ creditcol.cheque_no }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_credit_collection' creditcol.id %}"
+                                                    class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_credit_collection' creditcol.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Miscellaneous Income</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+                        <div class="row ">
+                            <div class="col-md-3">
+                                <label>Cash </label>
+                                <input type="number" name="cash_msc_income" required class="form-control bg-light"
+                                    id="id_cash_msc_income" value="{{ mis_income_total_cash|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank </label>
+                                <input type="number" name="bank_msc_income" required class="form-control bg-light"
+                                    id="id_bank_msc_income" value="{{ mis_income_total_bank|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Card </label>
+                                <input type="number" name="card_msc_income" required class="form-control bg-light"
+                                    id="id_card_msc_income" value="{{ mis_income_total_card|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_msc_income" required class="form-control bg-light"
+                                    id="id_cheque_msc_income" value="{{ mis_income_total_cheque|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Msc. Income Total</label>
+                                <div class="bg-light p-2 rounded">{{total_mis_income_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="miscellaneous_income"
+                                    value="{{total_mis_income_amount|floatformat:'2'}}" required
+                                    class="form-control bg-light" id="id_msc_income_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="3" data-toggle="modal"
+                                    data-target="#adminMiscIncomeModal" tabindex="5">Add</button>
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="3">
+                            <table id="tablemscincome" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                        <th>Income Type</th>
+                                        <th>Mode of Transaction</th>
+                                        <th>Bank</th>
+                                        <th>Amount</th>
+                                        <th>Dep. Date</th>
+                                        <th>Chq. Date</th>
+                                        <th>Chq No.</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for msc_incomes in msc_income %}
+                                    <tr>
+                                        <td>{{ msc_incomes.receipt_type.name }}</td>
+                                        <td class="text-capitalize">{{ msc_incomes.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ msc_incomes.bank.name }}</td>
+                                        <td>{{ msc_incomes.amount }}</td>
+                                        <td>{{ msc_incomes.created_on|date:"d/m/Y" }}</td>
+                                        <td>{{ msc_incomes.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ msc_incomes.cheque_no }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_miscellaneous_income' msc_incomes.id %}"
+                                                    class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_miscellaneous_income' msc_incomes.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Withdrawal</h5>
+                    </div>
+                    <div class="card-body bg-white br-5">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label>Cash </label>
+                                <input type="number" name="cash_withdrawal" required class="form-control bg-light"
+                                    id="id_cash_withdrawal" value="{{ withdrawal_total_cash|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_withdrawal" required class="form-control bg-light"
+                                    id="id_cheque_withdrawal" value="{{ withdrawal_total_cheque|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Withdrawal Total</label>
+                                <div class="bg-light p-2 rounded">{{total_withdrawal_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="withdrawal"
+                                    value="{{total_withdrawal_amount|floatformat:'2'}}" required
+                                    class="form-control bg-light" id="id_withdrawal_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="4" data-toggle="modal"
+                                    data-target="#adminWithdrawalModal" tabindex="7">Add </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive" id="4">
+                            <table id="tablewithdrawal" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                        <th>Bank</th>
+                                        <th>With. Date</th>
+                                        <th>Amount</th>
+                                        <th>Mode of Transaction</th>
+                                        <th>Created On</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for withdrawal in withdrawal %}
+                                    <tr>
+                                        <td>{{ withdrawal.bank.bank.name }}</td>
+                                        <td>{{ withdrawal.withdrawal_date|date:"d/m/Y" }}</td>
+                                        <td>{{ withdrawal.amount }}</td>
+                                        <td class="text-capitalize">{{ withdrawal.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ withdrawal.created_on|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_withdrawal' withdrawal.id %}" class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_withdrawal' withdrawal.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Purchases</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+                        <div class="row ">
+                            <div class="col-md-2">
+                                <label>Cash </label>
+                                <input type="number" name="cash_purchase" required class="form-control bg-light"
+                                    id="id_cash_purchase" value="{{ purchase_total_cash|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Bank </label>
+                                <input type="number" name="bank_purchase" required class="form-control bg-light"
+                                    id="id_bank_purchase" value="{{ purchase_total_bank|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Card </label>
+                                <input type="number" name="card_purchase" required class="form-control bg-light"
+                                    id="id_card_purchase" value="{{ purchase_total_card|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_purchase" required class="form-control bg-light"
+                                    id="id_cheque_purchase" value="{{ purchase_total_cheque|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Credit </label>
+                                <input type="number" name="credit_purchase" required class="form-control bg-light"
+                                    id="id_credit_purchase" value="{{ purchase_total_credit|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+
+                            <div class="col-md-3">
+                                <label>Purchases Total</label>
+                                <div class="bg-light p-2 rounded">{{total_purchase_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="purchase" value="{{total_purchase_amount|floatformat:'2'}}"
+                                    required class="form-control bg-light" id="id_purchases_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="5" data-toggle="modal"
+                                    data-target="#adminPurchaseModal" tabindex="9">Add</button>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="5">
+                            <table id="tablepurchases" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                    <tr>
+                                        <th>Supplier</th>
+                                        <th>Opening Outstanding</th>
+                                        <th>Mode of Transaction</th>
+                                        <th>Invoice Date</th>
+                                        <th>Invoice No</th>
+                                        <th>Invoice Amount</th>
+                                        <th>Cheque Date</th>
+                                        <th>Cheque No</th>
+                                        <th>Bank</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for purchase in purchases %}
+                                    <tr>
+                                        <td>{{ purchase.supplier.name }}</td>
+                                        <td>{{ purchase.opening_outstanding }}</td>
+                                        <td class="text-capitalize">{{ purchase.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ purchase.invoice_date|date:"d/m/Y" }}</td>
+                                        <td>{{ purchase.invoice_no }}</td>
+                                        <td>{{ purchase.invoice_amount }}</td>
+                                        <td>{{ purchase.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ purchase.cheque_no }}</td>
+                                        <td>{{ purchase.bank.bank.name }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_purchase' purchase.id %}" class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_purchase' purchase.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Supplier Payment</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+                        <div class="row ">
+                            <div class="col-md-3">
+                                <label>Cash</label>
+                                <input type="number" name="cash_supplier_payment" required class="form-control bg-light"
+                                    id="id_cash_supplier_payment"
+                                    value="{{ supplier_payment_total_cash|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank</label>
+                                <input type="number" name="bank_supplier_payment" required class="form-control bg-light"
+                                    id="id_bank_supplier_payment"
+                                    value="{{ supplier_payment_total_bank|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Card </label>
+                                <input type="number" name="card_supplier_payment" required class="form-control bg-light"
+                                    id="id_card_supplier_payment"
+                                    value="{{ supplier_payment_total_card|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_supplier_payment" required
+                                    class="form-control bg-light" id="id_cheque_supplier_payment"
+                                    value="{{ supplier_payment_total_cheque|floatformat:'2' }}" readonly>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Supplier Payment Total</label>
+                                <div class="bg-light p-2 rounded">{{total_supplier_payment_amount|floatformat:'2'}}
+                                </div>
+                                <input type="hidden" name="supplier_payment"
+                                    value="{{total_supplier_payment_amount|floatformat:'2'}}" required
+                                    class="form-control bg-light" id="id_supplier_payment_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="6" data-toggle="modal"
+                                    data-target="#adminSupplierPaymentModal" tabindex="11">Add </button>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="6">
+                            <table id="tablesupplierpayment" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                        <th>Supplier</th>
+                                        <th>Opening Outstanding</th>
+                                        <th>Payment Mode</th>
+                                        <th>Amount</th>
+                                        <th>Cheque Date</th>
+                                        <th>Cheque No</th>
+                                        <th>Bank</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for supplier_payment in supplier_payments %}
+                                    <tr>
+                                        <td>{{ supplier_payment.supplier.name }}</td>
+                                        <td class="text-capitalize">{{ supplier_payment.opening_outstanding }}</td>
+                                        <td>{{ supplier_payment.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ supplier_payment.amount }}</td>
+                                        <td>{{ supplier_payment.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ supplier_payment.cheque_no }}</td>
+                                        <td>{{ supplier_payment.bank.bank.name }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_supplier_payment' supplier_payment.id %}"
+                                                    class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_supplier_payment' supplier_payment.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Expenses</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+
+                        <div class="row ">
+                            <div class="col-md-3">
+                                <label>Cash </label>
+                                <input type="number" name="cash_expense" required class="form-control bg-light"
+                                    id="id_cash_expense" value="{{ expense_total_cash|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank </label>
+                                <input type="number" name="bank_expense" required class="form-control bg-light"
+                                    id="id_bank_expense" value="{{ expense_total_bank|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Card </label>
+                                <input type="number" name="card_expense" required class="form-control bg-light"
+                                    id="id_card_expense" value="{{ expense_total_card|floatformat:'2' }}" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_expense" required class="form-control bg-light"
+                                    id="id_cheque_expense" value="{{ expense_total_cheque|floatformat:'2' }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Expense Total</label>
+                                <div class="bg-light p-2 rounded">{{total_expense_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="expense" value="{{total_expense_amount|floatformat:'2'}}"
+                                    required class="form-control bg-light" id="id_expense_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="7" data-toggle="modal"
+                                    data-target="#adminExpenseModal" tabindex="13">Add </button>
+
+                            </div>
+                        </div>
+                        <div class="table-responsive" id="7">
+                            <table id="tableexpense" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                        <th>Income Type</th>
+                                        <th>Payment Mode</th>
+                                        <th>Bank</th>
+                                        <th>Amount</th>
+                                        <th>Remark</th>
+                                        <th>Create Date</th>
+                                        <th>Chq. Date</th>
+                                        <th>Chq No.</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for expense in expenses %}
+                                    <tr>
+                                        <td>{{ expense.expense_type.name }}</td>
+                                        <td class="text-capitalize">{{ expense.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ expense.bank.bank.name }}</td>
+                                        <td>{{ expense.amount }}</td>
+                                        <td>{{ expense.invoice_no}}</td>
+                                        <td>{{ expense.created_on|date:"d/m/Y" }}</td>
+                                        <td>{{ expense.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ expense.cheque_no }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_expense' expense.id %}" class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_expense' expense.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card  mt-4">
+                    <div class="card-header text-white">
+                        <h5 class="text-left mb-0">Bank Deposit</h5>
+                    </div>
+                    <div class="card-body bg-white  br-5">
+
+                        <div class="row ">
+                            <div class="col-md-3">
+                                <label>Cash </label>
+                                <input type="number" name="cash_bank_deposit" required class="form-control bg-light"
+                                    id="id_cash_bank_deposit" value="{{ bank_deposit_total_cash|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Bank </label>
+                                <input type="number" name="bank_bank_deposit" required class="form-control bg-light"
+                                    id="id_bank_bank_deposit" value="{{ bank_deposit_total_bank|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Card </label>
+                                <input type="number" name="card_bank_deposit" required class="form-control bg-light"
+                                    id="id_card_bank_deposit" value="{{ bank_deposit_total_card|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label>Cheque </label>
+                                <input type="number" name="cheque_bank_deposit" required class="form-control bg-light"
+                                    id="id_cheque_bank_deposit" value="{{ bank_deposit_total_cheque|floatformat:'2' }}"
+                                    readonly>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3 mt-2">
+                            <div class="col-md-3">
+                                <label>Bank Deposit Total</label>
+                                <div class="bg-light p-2 rounded">{{bank_deposit_amount|floatformat:'2'}}</div>
+                                <input type="hidden" name="bank_deposit" value="{{bank_deposit_amount|floatformat:'2'}}"
+                                    required class="form-control bg-light" id="id_bank_deposit_total">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary mt-3" id="8" data-toggle="modal"
+                                    data-target="#adminBankDepositModal" tabindex="15">Add </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive" id="8">
+                            <table id="tablebankdeposit" class="table table-bordered table-striped nowrap"
+                                style="width: 100%;">
+                                <thead class="thead-light" style="border-color: transparent !important;">
+                                    <tr>
+                                        <!-- <th>Customer</th> -->
+                                        <th>Dep. Bank</th>
+                                        <th>Payment Mode</th>
+                                        <th>Bank</th>
+                                        <th>Amount</th>
+                                        <th>Dep. Date</th>
+                                        <th>Chq. Date</th>
+                                        <th>Chq No.</th>
+                                        <th>Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {% for bank_deposit in bank_deposits %}
+                                    <tr>
+                                        <!-- <td>{{ bank_deposit.customer.name }}</td> -->
+                                        <td>{{ bank_deposit.bank_deposit_bank.bank.name }}</td>
+                                        <td class="text-capitalize">{{ bank_deposit.mode_of_transaction.transaction_name }}</td>
+                                        <td>{{ bank_deposit.bank.name }}</td>
+                                        <td>{{ bank_deposit.amount }}</td>
+                                        <td>{{ bank_deposit.created_on|date:"d/m/Y" }}</td>
+                                        <td>{{ bank_deposit.cheque_date|date:"d/m/Y" }}</td>
+                                        <td>{{ bank_deposit.cheque_no }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <a href="{% url 'admin_edit_bank_deposit' bank_deposit.id %}"
+                                                    class="me-2">
+                                                    <i class="fas fa-pen text-dark"></i>
+                                                </a>
+                                                <a href="{% url 'admin_delete_bank_deposit' bank_deposit.id %}"
+                                                    onclick="return confirmDelete();">
+                                                    <i class="fas fa-trash text-dark"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header " style="border-radius:5px; border:transparent;">
+                        <h5 class="text-white mb-0" id="id_closing_balance"></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer mb-0">
+                <div class="form-group d-flex justify-content-center align-items-center gap-3 mb-0">
+
+                    <input type="hidden" name="status" id="status" value="completed">
+
+                    <button type="button" class="btn btn-primary text-white sticky-button" id="save-btn"
+                        onclick="saveFunction()" tabindex="18">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include 'modals/admin_bank_sale_modal.html' %}
+{% include 'modals/admin_credit_collection_modal.html' %}
+{% include 'modals/admin_msc_income_modal.html' %}
+{% include 'modals/admin_withdrawal_modal.html' %}
+{% include 'modals/admin_bank_deposit_modal.html' %}
+{% include 'modals/admin_supplier_payment_modal.html' %}
+{% include 'modals/admin_expense_modal.html' %}
+{% include 'modals/admin_purchase_modal.html' %}
+
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Initialize DataTables
+        $('#tablebanksale, #tablecreditcollection, #tablebankdeposit, #tableexpense, #tablepurchase, #tablemscincome, #tablesupplierpayment').DataTable({
+            responsive: true,
+            dom: 'lBfrtip',
+            buttons: [
+                {
+                    text: 'Print',
+                    extend: 'print',
+                    exportOptions: {
+                        stripHtml: false,
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                {
+                    text: 'Export PDF',
+                    extend: 'pdf',
+                    exportOptions: {
+                        stripHtml: true,
+                    },
+                }
+            ],
+        });
+
+
+    });
+
+</script>
+
+{% endblock %}

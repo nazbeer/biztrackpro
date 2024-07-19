@@ -16,6 +16,8 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="id_customer">Customer</label>
+                  <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
                   <input type="hidden" name="business_profile" value="{{ business_profile }}">
                   <input type="hidden" id="modal_daily_summary_id4" name="daily_summary_id">
                   <select id="id_customer" name="customer" class="form-control" tabindex="50" required >
@@ -32,7 +34,7 @@
                 <div id="chequeDetails" class="d-none">
                 <div class="form-group">
                   <label for="id_cheque_date">Cheque Date</label>
-                  <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="54">
+                  <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="54" >
                   <div id="chequeErrors" class="alert alert-danger d-none"></div>
                 </div>
               </div>
@@ -43,7 +45,7 @@
                   <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="51" required>
                     <option value="">-- Mode of Transaction --</option>
                     {% for transaction_mode in bank_sale_form.mode_of_transaction.field.queryset %}
-                      <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                      <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
                     {% endfor %}
                   </select>
                 </div>
@@ -57,6 +59,7 @@
                     {% endfor %}
                   </select>
                 </div>
+                
                 
                 <div class="form-group">
                   <label for="id_cheque_no">Cheque Number</label>
@@ -77,47 +80,51 @@
     </div>
   </div>
   <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const chequeDateInput = document.getElementById('id_cheque_date');
-    const bankSaleForm = document.getElementById('bankSaleForm');
-    const formErrors = document.getElementById('form-errors');
-    
-    bankSaleForm.addEventListener('submit', function (e) {
-        formErrors.classList.add('d-none');
-        formErrors.innerHTML = '';
+    document.addEventListener('DOMContentLoaded', function () {
+        const chequeDateInput = document.getElementById('id_cheque_date');
+        const bankSaleForm = document.getElementById('bankSaleForm');
+        const formErrors = document.getElementById('form-errors');
+        
+        // Set the min and max attributes for the date input
+        // chequeDateInput.min = '2020-01-01';
+        // chequeDateInput.max = '2030-12-31';
 
-        const chequeDateValue = chequeDateInput.value;
-        if (chequeDateValue) {
-            const chequeDate = new Date(chequeDateValue);
-            const year = chequeDate.getFullYear();
-            if (year.toString().length !== 4 || year < 1000 || year > 9999) {
-                e.preventDefault();
-                chequeDateInput.classList.add('is-invalid');
-                formErrors.classList.remove('d-none');
-                formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
-                return;
-            } else {
-                chequeDateInput.classList.remove('is-invalid');
+        bankSaleForm.addEventListener('submit', function (e) {
+            formErrors.classList.add('d-none');
+            formErrors.innerHTML = '';
+
+            const chequeDateValue = chequeDateInput.value;
+            if (chequeDateValue) {
+                const chequeDate = new Date(chequeDateValue);
+                const year = chequeDate.getFullYear();
+                if (year.toString().length !== 4 || year < 2020 || year > 2030) {
+                    e.preventDefault();
+                    chequeDateInput.classList.add('is-invalid');
+                    formErrors.classList.remove('d-none');
+                    formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
+                    return;
+                } else {
+                    chequeDateInput.classList.remove('is-invalid');
+                }
             }
-        }
-    });
+        });
 
-    chequeDateInput.addEventListener('change', function() {
-        formErrors.classList.add('d-none');
-        formErrors.innerHTML = '';
+        chequeDateInput.addEventListener('change', function() {
+            formErrors.classList.add('d-none');
+            formErrors.innerHTML = '';
 
-        const chequeDateValue = chequeDateInput.value;
-        if (chequeDateValue) {
-            const chequeDate = new Date(chequeDateValue);
-            const year = chequeDate.getFullYear();
-            if (year.toString().length !== 4 || year < 1000 || year > 9999) {
-                chequeDateInput.classList.add('is-invalid');
-                formErrors.classList.remove('d-none');
-                formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
-            } else {
-                chequeDateInput.classList.remove('is-invalid');
+            const chequeDateValue = chequeDateInput.value;
+            if (chequeDateValue) {
+                const chequeDate = new Date(chequeDateValue);
+                const year = chequeDate.getFullYear();
+                if (year.toString().length !== 4 || year < 2020 || year > 2030) {
+                    chequeDateInput.classList.add('is-invalid');
+                    formErrors.classList.remove('d-none');
+                    formErrors.innerHTML = 'Year must be in the format YYYY (e.g., 2024).';
+                } else {
+                    chequeDateInput.classList.remove('is-invalid');
+                }
             }
-        }
+        });
     });
-});
 </script>

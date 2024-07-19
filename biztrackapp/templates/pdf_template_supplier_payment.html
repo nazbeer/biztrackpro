@@ -5,7 +5,7 @@
     <title>Supplier Report</title>
     <style>
         @page {
-            size: A4;
+            size: A4 landscape;
             margin: 1cm;
         }
         body {
@@ -59,6 +59,9 @@
                 <th style="text-align:right;">Opening Balance</th>
                 <th style="text-align:right;">Cash Purchase</th>
                 <th style="text-align:right;">Credit Purchase</th>
+                <th style="text-align:right;">Bank Transfer Purchase</th>
+                <th style="text-align:right;">Cheque Purchase</th>
+                <th style="text-align:right;">Card Purchase</th>
                 <th style="text-align:right;">Total Purchases</th>
                 <th style="text-align:right;">Supplier Payments</th>
                 <th style="text-align:right;">Closing Balance</th>
@@ -71,6 +74,9 @@
                 <td style="text-align:right;">{{ item.1.opening_balance|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.cash_purchase|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.credit_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.bank_transfer_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.cheque_purchase|floatformat:2 }}</td>
+                <td style="text-align:right;">{{ item.1.card_purchase|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.total_purchases|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.supplier_payment|floatformat:2 }}</td>
                 <td style="text-align:right;">{{ item.1.closing_balance|floatformat:2 }}</td>
@@ -83,6 +89,9 @@
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.opening_balance|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cash_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_credit_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_bank_transfer_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_cheque_purchases|floatformat:2 }}</td>
+                <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_card_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_purchases|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.total_supplier_payments|floatformat:2 }}</td>
                 <td style="background-color: #8a8a8a;text-align:right;">{{ summary.closing_balance|floatformat:2 }}</td>

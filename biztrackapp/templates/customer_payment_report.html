@@ -5,31 +5,30 @@
 {% block content %}
 <style>
     .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 5px;
-    align-items: center;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.button-group {
-    grid-column: span 3; 
-    text-align: right;
-}
-@media (max-width: 767px) {
-    .form-grid {
-        grid-template-columns: 1fr; /* Single column layout for mobile */
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 5px;
+        align-items: center;
     }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
     .button-group {
-        grid-column: span 1; /* Ensure button group spans single column */
-        text-align: center; /* Center the button on mobile */
+        grid-column: span 3; 
+        text-align: right;
     }
-}
-
+    @media (max-width: 767px) {
+        .form-grid {
+            grid-template-columns: 1fr; /* Single column layout for mobile */
+        }
+        .button-group {
+            grid-column: span 1; /* Ensure button group spans single column */
+            text-align: center; /* Center the button on mobile */
+        }
+    }
 </style>
 <div class="container">
     <div class="card">
@@ -38,31 +37,26 @@
         </div>
         <div class="card-body">
             <form id="report-form" class="form-grid">
-             
-                        <div class="form-group ">
-                            <label for="customer_id">Customer</label>
-                            <select id="customer_id" name="customer_id" class="form-control" required>
-                                <option value="">Select Customer</option>
-                                {% for customer in customers %}
-                                    <option value="{{ customer.id }}">{{ customer.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    
-                        <div class="form-group ">
-                            <label for="start_date" >Start Date</label>
-                            <input type="date" id="start_date" name="start_date" class="form-control" required>
-                        </div>
-                    
-                    
-                        <div class="form-group ">
-                            <label for="end_date" >End Date</label>
-                            <input type="date" id="end_date" name="end_date" class="form-control" required>
-                        </div>
-                    
-                    <div class="form-group button-group my-0">
-                        <button type="submit" class="btn btn-primary">Generate Report</button>
-                    </div>
+                <div class="form-group">
+                    <label for="customer_id">Customer</label>
+                    <select id="customer_id" name="customer_id" class="form-control" required>
+                        <option value="">Select Customer</option>
+                        <option value="-1">All Customers</option>
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}">{{ customer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" required>
+                </div>
+                <div class="form-group button-group my-0">
+                    <button type="submit" class="btn btn-primary">Generate Report</button>
                 </div>
             </form>
             <div id="report-results" class="mt-4 d-none">
@@ -70,22 +64,25 @@
                     <h5 class="text-dark">Report Results</h5>
                 </div>
                 <div class="p-2">
-                <table class="table table-bordered table-striped text-center">
-                    <thead>
-                        <tr>
-                            <th style="background-color: #8a8a8a !important;">Date</th>
-                            <th style="text-align: right;background-color: #8a8a8a !important;">Opening Balance</th>
-                            <th style="text-align: right;background-color: #8a8a8a !important;">Cash Sales</th>
-                            <th style="text-align: right;background-color: #8a8a8a !important;">Credit Sales</th>
-                            <th style="text-align: right; background-color: #8a8a8a !important;">Total Sales</th>
-                            <th style="text-align: right;background-color: #8a8a8a !important;">Credit Collections</th>
-                            <th style="text-align: right;background-color: #8a8a8a !important;">Closing Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-body"></tbody>
-                    <tfoot id="report-footer"></tfoot>
-                </table>
-                <button id="download-pdf-cc" class="btn btn-success mt-2">Download PDF</button>
+                    <table class="table table-bordered table-striped text-center">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #8a8a8a !important;">Date</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Opening Balance</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Cash Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Credit Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Bank Transfer Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Cheque Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Card Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Total Sales</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Credit Collections</th>
+                                <th style="text-align: right;background-color: #8a8a8a !important;">Closing Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-body"></tbody>
+                        <tfoot id="report-footer"></tfoot>
+                    </table>
+                    <button id="download-pdf-cc" class="btn btn-success mt-2">Download PDF</button>
                 </div>
             </div>
         </div>
@@ -114,14 +111,17 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     month: 'long',
                     year: 'numeric'
                 });
-                const closingBalance = openingBalance + d.credit_purchase - d.customer_payment;
+                const closingBalance = d.closing_balance;
                 const rowHTML = `
                     <tr>
                         <td>${formattedDate}</td>
-                        <td style="text-align:right;">${openingBalance.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.opening_balance.toFixed(2)}</td>
                         <td style="text-align:right;">${d.cash_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${d.credit_purchase.toFixed(2)}</td>
-                        <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase).toFixed(2)}</td>
+                        <td style="text-align:right;">${d.bank_transfer_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.cheque_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.card_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.total_sales.toFixed(2)}</td>
                         <td style="text-align:right;">${d.customer_payment.toFixed(2)}</td>
                         <td style="text-align:right;">${closingBalance.toFixed(2)}</td>
                     </tr>
@@ -136,6 +136,9 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     <td style="background-color: #8a8a8a !important;color: #fff !important; text-align:right;">${data.summary.opening_balance.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_cash_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_credit_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_bank_transfer_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_cheque_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_card_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_customer_payments.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.closing_balance.toFixed(2)}</td>

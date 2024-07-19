@@ -47,7 +47,7 @@
                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="063" required>
                   <option value="">-- Payment Mode --</option>
                   {% for transaction_mode in form.mode_of_transaction.field.queryset %}
-                  <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == expense_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
+                  <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == expense_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.transaction_name }}</option>
                   {% endfor %}
                 </select>
               </div>           

@@ -15,6 +15,8 @@
       <div class="form-group">
        <label for="id_customer1">Customer</label>
        <input type="hidden" name="business_profile" value={{business_profile}}>
+       <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
        <input type="hidden" id="modal_daily_summary_id3" name="daily_summary_id">
        <select id="id_customer1" name="customer" class="form-control" tabindex="111" required>
        <option value="">-- Select Customer --</option>
@@ -55,7 +57,7 @@
        <select id="id_mode_of_transaction" name="payment_mode" class="form-control text-capitalize" tabindex="114" required>
        <option value="">-- Select Payment Mode --</option>
        {% for payment_mode in credit_collection_form.payment_mode.field.queryset %}
-        <option value="{{ payment_mode.id }}">{{ payment_mode.name }}</option>
+        <option value="{{ payment_mode.id }}">{{ payment_mode.transaction_name }}</option>
        {% endfor %}
        </select>
       </div>

@@ -949,29 +949,6 @@ def save_after_submit(request):
     credit_transaction_mode = None
     card_transaction_mode = None
 
-
-    # try:
-    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    # except TransactionMode.DoesNotExist:
-    #     pass
-    # try:
-    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    # except TransactionMode.DoesNotExist:
-    #     pass
-    # try:
-    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    # except TransactionMode.DoesNotExist:
-    #     pass
-    # try:
-    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    # except TransactionMode.DoesNotExist:
-    #     pass
-    # try:
-    #     card_transaction_mode = TransactionMode.objects.get(name="card")
-    # except TransactionMode.DoesNotExist:
-    #     pass
-
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     if request.user.is_admin:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
@@ -1003,6 +980,10 @@ def save_after_submit(request):
         card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
     except TransactionMode.DoesNotExist:
         pass 
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass
 
 
     if request.method == 'POST':
@@ -1010,14 +991,14 @@ def save_after_submit(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.daily_summary_id = id
-            msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-            purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-            supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-            expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-            bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-            credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+            purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+            supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+            expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+            bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+            credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode)
 
-            withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
             withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
             total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
@@ -1052,7 +1033,7 @@ def save_after_submit(request):
             #print('withdrawal_total',withdrawal_total)
 
             #print('opening_balance',instance.opening_balance)
-            closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
+            closing_balance = (instance.opening_balance + net_collection) - (net_payment + bank_deposit_collection)
             #print('closing_balance',closing_balance)
             instance.closing_balance = closing_balance
 
@@ -1117,48 +1098,48 @@ def save_after_submit(request):
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id=id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
     bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
-    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_bank_sale_amount = bank_sales.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     credit_sale_total_cheque_sales = CreditCollection.objects.filter(payment_mode=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     credit_sale_total_cash_sales = CreditCollection.objects.filter(payment_mode=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     credit_sale_total_bank_sales = CreditCollection.objects.filter(payment_mode=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     credit_sale_total_card_sales = CreditCollection.objects.filter(payment_mode=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_credit_sale_amount = credit_collections.exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     mis_income_total_cheque = MiscellaneousIncome.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     mis_income_total_cash = MiscellaneousIncome.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     mis_income_total_bank = MiscellaneousIncome.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     mis_income_total_card = MiscellaneousIncome.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_mis_income_amount = msc_income.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     purchase_total_cheque = Purchase.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('invoice_amount'))['total_cheque_amount'] or 0
     purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
     purchase_total_bank = Purchase.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('invoice_amount'))['total_bank_amount'] or 0
     purchase_total_card = Purchase.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('invoice_amount'))['total_card_amount'] or 0
     purchase_total_credit = Purchase.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id=id).aggregate(total_credit_amount=Sum('invoice_amount'))['total_credit_amount'] or 0
-    total_purchase_amount = purchases.aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
+    total_purchase_amount = purchases.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
 
     supplier_payment_total_cheque = SupplierPayments.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     supplier_payment_total_bank = SupplierPayments.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     supplier_payment_total_card = SupplierPayments.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_supplier_payment_amount = supplier_payments.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_supplier_payment_amount = supplier_payments.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     expense_total_cheque = Expense.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     expense_total_bank = Expense.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     expense_total_card = Expense.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_expense_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_expense_amount = expense.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_deposit_amount = bank_deposit.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     withdrawal_total_cheque = Withdrawal.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     withdrawal_total_cash = Withdrawal.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
-    total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
+    total_withdrawal_amount = withdrawal.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
 
 
     # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
@@ -1317,29 +1298,12 @@ def create_daily_summary(request):
         card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
     except TransactionMode.DoesNotExist:
         pass 
-
-
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free", business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass
     
-    # try:
-    #     cheque_transaction_mode = TransactionMode.objects.get(name="cheque")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     cash_transaction_mode = TransactionMode.objects.get(name="cash")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     bank_transaction_mode = TransactionMode.objects.get(name="bank transfer")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     credit_transaction_mode = TransactionMode.objects.get(name="credit")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
-    # try:
-    #     card_transaction_mode = TransactionMode.objects.get(name="card")
-    # except TransactionMode.DoesNotExist:
-    #     pass 
+
     if BusinessTiming.objects.filter(business_profile=business_profile.id).exists():
         business_timing = BusinessTiming.objects.filter(business_profile=business_profile.id).first()
     else:
@@ -1385,14 +1349,14 @@ def create_daily_summary(request):
                 #     + instance.expense)
                     
                 # )
-                msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-                purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-                supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-                expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-                bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-                credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+                purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+                supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+                expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+                bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+                credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode)
 
-                withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+                withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
                 withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
                 total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
@@ -1427,7 +1391,7 @@ def create_daily_summary(request):
                 #print('withdrawal_total',withdrawal_total)
 
                 #print('opening_balance',instance.opening_balance)
-                closing_balance = instance.opening_balance + net_collection - net_payment - bank_deposit_collection
+                closing_balance = (instance.opening_balance + net_collection) - (net_payment + bank_deposit_collection)
                 #print('closing_balance',closing_balance)
                 instance.closing_balance = closing_balance
 
@@ -1508,69 +1472,57 @@ def create_daily_summary(request):
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
     bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
-    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_bank_sale_amount = bank_sales.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # credit_sale
     credit_sale_total_cheque_sales = CreditCollection.objects.filter(payment_mode=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     credit_sale_total_cash_sales = CreditCollection.objects.filter(payment_mode=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     credit_sale_total_bank_sales = CreditCollection.objects.filter(payment_mode=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     credit_sale_total_card_sales = CreditCollection.objects.filter(payment_mode=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_credit_sale_amount = credit_collections.exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # mis_income
     mis_income_total_cheque = MiscellaneousIncome.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     mis_income_total_cash = MiscellaneousIncome.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     mis_income_total_bank = MiscellaneousIncome.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     mis_income_total_card = MiscellaneousIncome.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_mis_income_amount = msc_income.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     purchase_total_cheque = Purchase.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('invoice_amount'))['total_cheque_amount'] or 0
     purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
     purchase_total_bank = Purchase.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('invoice_amount'))['total_bank_amount'] or 0
     purchase_total_card = Purchase.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('invoice_amount'))['total_card_amount'] or 0
     purchase_total_credit = Purchase.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('invoice_amount'))['total_credit_amount'] or 0
-    total_purchase_amount = purchases.aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
+    total_purchase_amount = purchases.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
 
     supplier_payment_total_cheque = SupplierPayments.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     supplier_payment_total_bank = SupplierPayments.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     supplier_payment_total_card = SupplierPayments.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_supplier_payment_amount = supplier_payments.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_supplier_payment_amount = supplier_payments.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     expense_total_cheque = Expense.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     expense_total_bank = Expense.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     expense_total_card = Expense.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_expense_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_expense_amount = expense.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_deposit_amount = bank_deposit.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     withdrawal_total_cheque = Withdrawal.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     withdrawal_total_cash = Withdrawal.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
-    total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
+    total_withdrawal_amount = withdrawal.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
 
-    # daily_summary_today = DailySummary.objects.get(business_profile=business_profile.id, status='ongoing',daily_summary_id = id, date=today)
-    # daily_summary_today = DailySummary.objects.filter(business_profile=business_profile.id, status='ongoing')
-
-    # #print('daily_summary_today', daily_summary_today)
-    # #print(daily_summary_today.bank_deposit)
-    # if daily_summary_today:
-    #     closing_balance = (
-    #                 (bankdata + daily_summary_today.sales + daily_summary_today.bank_deposit +
-    #                 daily_summary_today.credit_collection + daily_summary_today.miscellaneous_income) -
-    #                 (daily_summary_today.purchase + daily_summary_today.supplier_payment + daily_summary_today.expense)
-    #             )
-    # else:
     lastest_dailysummary_date = DailySummary.objects.filter(business_profile = business_profile.id).exists()
 
     if lastest_dailysummary_date:
         old_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-date').first()
         old_daily_summary_date = old_daily_summary.date + timedelta(days=1)
-        print(old_daily_summary_date,'----------------------------------------')
+        
     else:
         old_daily_summary_date = datetime.now().date()
     
@@ -1792,21 +1744,19 @@ def create_misc_income(request):
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
+          
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
         elif DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-                # Redirect to the edit page if the daily summary already exists
+                
             return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#3')
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#3')
 
 
 def list_msc_income(request):
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
     if request.user.is_admin:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
@@ -1832,8 +1782,8 @@ def create_purchase(request):
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
-            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
-            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            daily_summary_id = request.POST.get('daily_summary_id')  
+            form.daily_summary_id = daily_summary_id  
             # form.save()
             if form.mode_of_transaction.name == 'credit':
                 supplier = form.supplier
@@ -1841,9 +1791,6 @@ def create_purchase(request):
                 supplier.save()
             form.save()
 
-            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#5')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#5')
@@ -1855,14 +1802,14 @@ def create_purchase(request):
 
 
 def list_purchases(request):
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
     if request.user.is_admin:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
         shop_admin = get_shop_admin(request,user=request.user)
     shop = shop_admin.shop
     
-    # Retrieve the business profile associated with the shop
+
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     purchases = Purchase.objects.filter(business_profile=business_profile.id)
     return render(request, 'create_daily_summary.html', {'purchases': purchases})
@@ -1879,17 +1826,14 @@ def create_supplier_payment(request):
         daily_summary_id = request.POST.get('daily_summary_id')
         if form.is_valid():
             form = form.save(commit=False)
-            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
-            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            daily_summary_id = request.POST.get('daily_summary_id')  
+            form.daily_summary_id = daily_summary_id  
             # form.save()
             supplier = form.supplier
             supplier.outstanding = supplier.outstanding - form.amount
             supplier.save() 
             form.save()
 
-            # Redirect to the 'create_daily_summary' URL with the dailySummaryId in the query parameters
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#6')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#6')
@@ -1931,8 +1875,7 @@ def create_bank_deposit(request):
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
+    
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#8')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#8')
@@ -1954,7 +1897,7 @@ def list_bank_deposit(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id)
-    # #print(bank_sales)
+    
     return render(request, 'create_daily_summary.html', {'bank_deposit': bank_deposit})
 
 def create_expense(request):
@@ -1973,8 +1916,7 @@ def create_expense(request):
             daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
             form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
             form.save()
-    #         return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-    # return redirect('create_daily_summary')
+
             if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
                 return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}#7')
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#7')
@@ -1997,7 +1939,7 @@ def list_expense(request):
     # Retrieve the business profile associated with the shop
     business_profile = get_object_or_404(BusinessProfile, name=shop.name)
     expense = Expense.objects.filter(business_profile=business_profile.id)
-    # #print(bank_sales)
+    
     return render(request, 'create_daily_summary.html', {'expenses': expense})
 
 def edit_daily_summary(request, id):
@@ -2045,7 +1987,7 @@ def create_withdrawal(request):
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#4')
 
 def list_withdrawal(request):
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
     if request.user.is_admin:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
@@ -2058,9 +2000,9 @@ def list_withdrawal(request):
 from decimal import Decimal, ROUND_HALF_UP
 
 def get_daily_summary_data(request,id,date_data):
-    # id = request.GET.get('id')
+    
     today = date.today()
-    # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    
     if request.user.is_admin:
         shop_admin = get_object_or_404(ShopAdmin, user=request.user)
     else:
@@ -2094,19 +2036,23 @@ def get_daily_summary_data(request,id,date_data):
     try:
         card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
     except TransactionMode.DoesNotExist:
-        pass 
+        pass
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free", business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass
 
 
 
-    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
     # purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
     # supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
     # expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
 
-    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode)
 
-    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
     withdrawal_total = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
@@ -2132,26 +2078,25 @@ def get_daily_summary_data(request,id,date_data):
 
 
 
-    net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
+    net_collection = total_cash_sale + total_credit_sale_amount  + withdrawal_total + total_mis_income_amount
     net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
     bank_deposit_collection = bank_deposit_total_cash + bank_deposit_total_bank + bank_deposit_total_cheque + bank_deposit_total_card
 
 
 
     # if DailySummary.objects.exists():
-    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date = date_data).exists():
-        # last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=today).order_by('-date').first()
+    if DailySummary.objects.filter(business_profile = business_profile.id).exclude(date=date_data).exists():
         last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).exclude(date=date_data).order_by('-date').first()
         last_daily_summary_data = last_daily_summary.closing_balance
     else:
         last_daily_summary = business_profile.opening_balance
         last_daily_summary_data = last_daily_summary
-    closing_balance = last_daily_summary_data + net_collection - net_payment - bank_deposit_collection
+        
+    closing_balance = (Decimal(last_daily_summary_data) + net_collection) - (net_payment + bank_deposit_collection)
 
     # Convert closing_balance to Decimal with 2 decimal places
     closing_balance = closing_balance.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
-    # #print('closing_balance',closing_balance)
     return JsonResponse({'closing_balance':closing_balance}, safe=False)
 
 
@@ -2187,26 +2132,21 @@ class MscIncomeReportView(View):
 
 class SupplierPaymentReportView(View):
     def get(self, request):
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
             shop_admin = get_shop_admin(request,user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
-        # suppliers = Supplier.objects.filter(business_profile=business_profile.id)
-        suppliers = Supplier.objects.filter(
-            business_profile=business_profile.id,
-            purchase__isnull=False
-        )
-
-        #print('sup',suppliers)
+        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+       
         return render(request, 'supplier_payment_report.html',{'suppliers': suppliers, 'business_profile': business_profile.id} )
 
 
 class CustomerPaymentReportView(View):
     def get(self, request):
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
@@ -2215,16 +2155,7 @@ class CustomerPaymentReportView(View):
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
        
-        customers_in_credit_collection = Customer.objects.filter(business_profile=business_profile)
-
-        # Filter customers who are also in CreditCollection
-        customers = Customer.objects.filter(
-            business_profile=business_profile.id,
-            creditcollection__isnull=False
-        )
-
-
-        print('cus',customers)
+        customers = Customer.objects.filter(business_profile=business_profile.id)
         return render(request, 'customer_payment_report.html',{'customers': customers, 'business_profile': business_profile.id} )
 
 
@@ -2234,7 +2165,6 @@ class BankStatementView(View):
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
             shop_admin = get_shop_admin(request,user=request.user)
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
         
@@ -2269,7 +2199,6 @@ def edit_bank_sale(request, pk):
         else:
             return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}#1')
     else:
-        # form = BankSaleForm(instance=bank_sale)
         form = BankSaleForm(instance=bank_sale,initial={},business_profile = bank_sale.business_profile)
 
     return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
@@ -2403,14 +2332,6 @@ def edit_bank_deposit(request, pk):
     return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
 
 
-# def delete_bank_deposit(request, pk):
-#     bank_deposit = get_object_or_404(BankDeposits, pk=pk)
-#     daily_summary_id = bank_deposit.daily_summary_id
-#     bank_deposit.delete()
-#     if DailySummary.objects.filter(daily_summary_id=daily_summary_id).exists():
-#         return redirect(reverse('save_after_submit') + f'?id={daily_summary_id}')
-#     return redirect(reverse('create_daily_summary') + f'?id={daily_summary_id}')
-
 def delete_bank_sale(request, pk):
     try:
         bank_sale = BankSales.objects.get(pk=pk)    
@@ -2539,17 +2460,12 @@ class DailyCollectionReportAPIView(APIView):
         # Parse dates and add timezone info
         start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
-        #print('end date', end_date)
 
         # Fetch summaries
         summaries = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id)
         
         op_bal = DailySummary.objects.filter(date__gte=start_date, business_profile=business_profile.id).first()
         cl_bal = DailySummary.objects.filter(date__range=[start_date, end_date], business_profile=business_profile.id).last()
-        # #print('cls',cl_bal.values_list('date','opening_balance', 'closing_balance'))
-        # #print(cl_bal.closing_balance)
-        # Initialize totals
-        # total_opening_balance = 0
         total_net_collections = 0
         total_net_payments = 0
         total_bank_deposits = 0
@@ -3040,9 +2956,6 @@ class MscIncomeReportPDFView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Msc_Income_Report_{start_date}_to_{end_date}.pdf"'
         return response
-
-
-
 class SupplierPaymentReportAPIView(APIView):
 
     def get(self, request):
@@ -3061,58 +2974,68 @@ class SupplierPaymentReportAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            shop_admin = get_shop_admin(request,user=request.user)
+            shop_admin = get_shop_admin(request, user=request.user)
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
-        # Get supplier and its outstanding balance
-        supplier = get_object_or_404(Supplier, id=supplier_id)
-
-        # Fetch initial opening balance for supplier
-        initial_opening_balance = supplier.outstanding
-
-        # Get all suppliers in the business profile
-        suppliers = Supplier.objects.filter(business_profile=business_profile.id)
-
-        # Fetch supplier payments
-        supplier_payments = SupplierPayments.objects.filter(
-            supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
+        combined_data = defaultdict(lambda: {
+            'cash_purchase': 0, 'credit_purchase': 0, 'bank_transfer_purchase': 0,
+            'cheque_purchase': 0, 'card_purchase': 0, 'supplier_payment': 0
+        })
         
-        # Combine purchases and supplier payments by date
-        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'supplier_payment': 0})
-        
-        # Fetch cash purchases
-        cash_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
+        if supplier_id == '-1':
+            suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+        else:
+            suppliers = Supplier.objects.filter(id=supplier_id, business_profile=business_profile.id)
+            if not suppliers.exists():
+                return Response({"error": "Supplier not found."}, status=404)
+            suppliers = [suppliers.first()]
 
-        for cp in cash_purchases:
-            combined_data[cp['created_on']]['cash_purchase'] += cp['invoice_amount']
+        initial_opening_balance = 0
 
-        # Fetch credit purchases
-        credit_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
+        for supplier in suppliers:
+            initial_opening_balance += supplier.outstanding
 
-        for crp in credit_purchases:
-            combined_data[crp['created_on']]['credit_purchase'] += crp['invoice_amount']
+            # Fetch supplier payments
+            supplier_payments = SupplierPayments.objects.filter(
+                supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
 
-        # Add supplier payments
-        for sp in supplier_payments:
-            combined_data[sp['created_on']]['supplier_payment'] += sp['amount']
+            # Fetch purchases
+            purchases = Purchase.objects.filter(
+                supplier=supplier, invoice_date__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
+
+            for purchase in purchases:
+                date = purchase['created_on']
+                amount = purchase['invoice_amount']
+                mode = purchase['mode_of_transaction__name']
+
+                if mode == 'cash':
+                    combined_data[date]['cash_purchase'] += amount
+                elif mode == 'credit':
+                    combined_data[date]['credit_purchase'] += amount
+                elif mode == 'bank transfer':
+                    combined_data[date]['bank_transfer_purchase'] += amount
+                elif mode == 'cheque':
+                    combined_data[date]['cheque_purchase'] += amount
+                elif mode == 'card':
+                    combined_data[date]['card_purchase'] += amount
+
+            # Add supplier payments
+            for sp in supplier_payments:
+                combined_data[sp['created_on']]['supplier_payment'] += sp['amount']
 
         # Calculate opening and closing balances
         current_opening_balance = initial_opening_balance
         for date, data in sorted(combined_data.items()):
             data['opening_balance'] = current_opening_balance
-            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['supplier_payment']
-            current_opening_balance = data['closing_balance']  # Set the next opening balance
+            data['closing_balance'] = (current_opening_balance + data['credit_purchase'] + data['cash_purchase'] + data['bank_transfer_purchase'] + data['cheque_purchase'] + data['card_purchase']) - data['supplier_payment']
+            current_opening_balance = data['closing_balance']
 
         # Prepare combined data list for response
         combined_data_list = [
@@ -3121,6 +3044,9 @@ class SupplierPaymentReportAPIView(APIView):
                 'opening_balance': data['opening_balance'],
                 'cash_purchase': data['cash_purchase'],
                 'credit_purchase': data['credit_purchase'],
+                'bank_transfer_purchase': data['bank_transfer_purchase'],
+                'cheque_purchase': data['cheque_purchase'],
+                'card_purchase': data['card_purchase'],
                 'supplier_payment': data['supplier_payment']
             }
             for date, data in sorted(combined_data.items())
@@ -3129,35 +3055,43 @@ class SupplierPaymentReportAPIView(APIView):
         # Calculate totals and closing balance for summary
         total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
         total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_bank_transfer_purchases = sum(item['bank_transfer_purchase'] for item in combined_data_list)
+        total_cheque_purchases = sum(item['cheque_purchase'] for item in combined_data_list)
+        total_card_purchases = sum(item['card_purchase'] for item in combined_data_list)
         total_supplier_payments = sum(item['supplier_payment'] for item in combined_data_list)
-        total_purchases = total_cash_purchases + total_credit_purchases
-        closing_balance = (initial_opening_balance + total_credit_purchases) - total_supplier_payments
+        total_purchases = total_cash_purchases + total_credit_purchases + total_bank_transfer_purchases + total_cheque_purchases + total_card_purchases
+        closing_balance = (current_opening_balance + total_purchases) - total_supplier_payments
 
         # Prepare response data
         report_data = {
             'details': {
-                'supplier_name': supplier.name,
-                'supplier_location': supplier.location,
-                'supplier_list': list(suppliers.values('id', 'name', 'business_profile', 'outstanding')),
+                'supplier_name': "All Suppliers" if supplier_id == '-1' else supplier.name,
+                'supplier_location': "N/A" if supplier_id == '-1' else supplier.location,
+                'supplier_list': list(Supplier.objects.filter(business_profile=business_profile.id).values('id', 'name', 'business_profile', 'outstanding')),
                 'start_date': start_date,
                 'end_date': end_date,
-                'opening_balance': initial_opening_balance,
+                'opening_balance': current_opening_balance,
                 'supplier_payment_list': list(supplier_payments),
-                'cash_purchases_list': list(cash_purchases),
-                'credit_purchases_list': list(credit_purchases),
+                'purchases_list': list(purchases),
                 'combined_data': combined_data_list,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,
+                'total_bank_transfer_purchases': total_bank_transfer_purchases,
+                'total_cheque_purchases': total_cheque_purchases,
+                'total_card_purchases': total_card_purchases,
                 'total_purchases': total_purchases,
-                'closing_balance': closing_balance,
+                'closing_balance': current_opening_balance,
             },
             'summary': {
                 'total_purchases': total_purchases,
                 'total_supplier_payments': total_supplier_payments,
-                'closing_balance': closing_balance,
+                'closing_balance': current_opening_balance,
                 'opening_balance': initial_opening_balance,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,
+                'total_bank_transfer_purchases': total_bank_transfer_purchases,
+                'total_cheque_purchases': total_cheque_purchases,
+                'total_card_purchases': total_card_purchases,
             }
         }
 
@@ -3182,60 +3116,69 @@ class SupplierPaymentReportPDFAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            shop_admin = get_shop_admin(request,user=request.user)
+            shop_admin = get_shop_admin(request, user=request.user)
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
-        # Get supplier and its outstanding balance
-        supplier = get_object_or_404(Supplier, id=supplier_id)
+        if supplier_id == '-1':
+            suppliers = Supplier.objects.filter(business_profile=business_profile.id)
+        else:
+            suppliers = Supplier.objects.filter(id=supplier_id, business_profile=business_profile.id)
 
-        # Fetch initial opening balance for supplier
-        initial_opening_balance = supplier.outstanding
-
-        # Fetch supplier payments
-        supplier_payments = SupplierPayments.objects.filter(
-            supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
-        
-        # Fetch purchases
-        cash_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
-
-        credit_purchases = Purchase.objects.filter(
-            supplier=supplier, invoice_date__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
-
-        # Combine transactions by date
-        transactions = list(cash_purchases) + list(credit_purchases) + list(supplier_payments)
         transactions_by_date = defaultdict(lambda: {
-            'cash_purchase': 0, 'credit_purchase': 0, 'total_purchases': 0,
+            'cash_purchase': 0, 'credit_purchase': 0, 'bank_transfer_purchase': 0,
+            'cheque_purchase': 0, 'card_purchase': 0, 'total_purchases': 0,
             'supplier_payment': 0, 'opening_balance': 0, 'closing_balance': 0
         })
 
-        for transaction in transactions:
-            date = transaction['created_on']
+        initial_opening_balance = 0
 
-            if 'invoice_amount' in transaction:
-                if transaction['mode_of_transaction__name'] == 'cash':
-                    transactions_by_date[date]['cash_purchase'] += transaction['invoice_amount']
-                elif transaction['mode_of_transaction__name'] == 'credit':
-                    transactions_by_date[date]['credit_purchase'] += transaction['invoice_amount']
-                transactions_by_date[date]['total_purchases'] += transaction['invoice_amount']
+        for supplier in suppliers:
+            # Fetch initial opening balance for supplier
+            initial_opening_balance += supplier.outstanding
 
-            if 'amount' in transaction:
-                transactions_by_date[date]['supplier_payment'] += transaction['amount']
+            # Fetch supplier payments
+            supplier_payments = SupplierPayments.objects.filter(
+                supplier=supplier, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('created_on', 'amount', 'mode_of_transaction__name', 'opening_outstanding')
+
+            # Fetch purchases
+            purchases = Purchase.objects.filter(
+                supplier=supplier, invoice_date__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('created_on', 'invoice_amount', 'mode_of_transaction__name')
+
+            # Combine transactions by date
+            transactions = list(purchases) + list(supplier_payments)
+            for transaction in transactions:
+                date = transaction['created_on']
+                amount = transaction.get('invoice_amount', transaction.get('amount', 0))
+                mode = transaction.get('mode_of_transaction__name')
+
+                if 'invoice_amount' in transaction:
+                    if mode == 'cash':
+                        transactions_by_date[date]['cash_purchase'] += amount
+                    elif mode == 'credit':
+                        transactions_by_date[date]['credit_purchase'] += amount
+                    elif mode == 'bank transfer':
+                        transactions_by_date[date]['bank_transfer_purchase'] += amount
+                    elif mode == 'cheque':
+                        transactions_by_date[date]['cheque_purchase'] += amount
+                    elif mode == 'card':
+                        transactions_by_date[date]['card_purchase'] += amount
+                    transactions_by_date[date]['total_purchases'] += amount
+
+                if 'amount' in transaction:
+                    transactions_by_date[date]['supplier_payment'] += amount
 
         # Calculate balances for each date
         current_opening_balance = initial_opening_balance
         for date, data in sorted(transactions_by_date.items()):
             data['opening_balance'] = current_opening_balance
-            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['supplier_payment']
+            data['closing_balance'] = (current_opening_balance + data['total_purchases']) - data['supplier_payment']
             current_opening_balance = data['closing_balance']
 
         # Calculate totals
@@ -3243,6 +3186,9 @@ class SupplierPaymentReportPDFAPIView(APIView):
             'opening_balance': initial_opening_balance,
             'total_cash_purchases': sum(data['cash_purchase'] for data in transactions_by_date.values()),
             'total_credit_purchases': sum(data['credit_purchase'] for data in transactions_by_date.values()),
+            'total_bank_transfer_purchases': sum(data['bank_transfer_purchase'] for data in transactions_by_date.values()),
+            'total_cheque_purchases': sum(data['cheque_purchase'] for data in transactions_by_date.values()),
+            'total_card_purchases': sum(data['card_purchase'] for data in transactions_by_date.values()),
             'total_purchases': sum(data['total_purchases'] for data in transactions_by_date.values()),
             'total_supplier_payments': sum(data['supplier_payment'] for data in transactions_by_date.values()),
             'closing_balance': current_opening_balance,
@@ -3250,9 +3196,9 @@ class SupplierPaymentReportPDFAPIView(APIView):
 
         # Prepare report data
         report_data = {
-            'supplier_name': supplier.name,
+            'supplier_name': 'All Suppliers' if supplier_id == '-1' else suppliers.first().name,
             'business': business_profile.name,
-            'supplier_location': supplier.location,
+            'supplier_location': 'N/A' if supplier_id == '-1' else suppliers.first().location,
             'start_date': start_date,
             'end_date': end_date,
             'transactions_by_date': sorted(transactions_by_date.items()),
@@ -3268,14 +3214,14 @@ class SupplierPaymentReportPDFAPIView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Supplier_Payment_Report_{start_date}_to_{end_date}.pdf"'
         return response
-    
+
 class CustomerPaymentReportAPIView(APIView):
 
     def get(self, request):
         customer_id = request.GET.get('customer_id')
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
-
+ 
         # Validate dates
         try:
             start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -3287,71 +3233,83 @@ class CustomerPaymentReportAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            shop_admin = get_shop_admin(request,user=request.user)
+            shop_admin = get_shop_admin(request, user=request.user)
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
-        # Get supplier and its outstanding balance
-        customer = get_object_or_404(Customer, id=customer_id)
-        #initial_opening_balance = customer.outstanding
-
-        # Get all customers in the business profile
-        customers_in_credit_collection = Customer.objects.filter(business_profile=business_profile.id)
-        customers = customers_in_credit_collection.filter(creditcollection__isnull=False)
-        print('customers', customers)
-
-        # Fetch customer payments including opening_outstanding
-        customer_payments = CreditCollection.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        ).values('customer', 'created_on', 'amount', 'payment_mode__name', 'opening_outstanding')
-        
-        initial_opening_balance_o = CreditCollection.objects.filter( customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id).order_by('created_on').first()
-
-        if(initial_opening_balance_o.opening_outstanding == 'None' or 0):
-            initial_opening_balance = 0
+        if customer_id == '-1':
+            # Fetch all customers if customer_id is -1
+            customers = Customer.objects.filter(business_profile=business_profile.id)
         else:
-            initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
+            # Fetch specific customer
+            customers = Customer.objects.filter(id=customer_id, business_profile=business_profile.id)
+            if not customers.exists():
+                return Response({"error": "Customer not found."}, status=404)
+            customers = [customers.first()]
 
-        # Fetch purchases
-        cash_purchases = BankSales.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
-
-        credit_purchases = BankSales.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
-
-        combined_data = defaultdict(lambda: {'cash_purchase': 0, 'credit_purchase': 0, 'total_sales': 0, 'customer_payment': 0, 'opening_balance': 0, 'closing_balance': 0})
-        current_opening_balance = initial_opening_balance
-
-        # Sort transactions by date
-        transactions = sorted(list(cash_purchases) + list(credit_purchases) + list(customer_payments), key=lambda x: x['created_on'])
-
-        for transaction in transactions:
-            date = transaction['created_on']
-            if transaction.get('amount'):
-                if transaction.get('mode_of_transaction__name') == 'cash':
-                    combined_data[date]['cash_purchase'] += transaction['amount']
-                elif transaction.get('mode_of_transaction__name') == 'credit':
-                    combined_data[date]['credit_purchase'] += transaction['amount']
-                combined_data[date]['total_sales'] = combined_data[date]['cash_purchase'] + combined_data[date]['credit_purchase']
-            if transaction.get('payment_mode__name'):
-                combined_data[date]['customer_payment'] += transaction['amount']
-            
-            combined_data[date]['opening_balance'] = current_opening_balance
-            current_opening_balance = (current_opening_balance + combined_data[date]['credit_purchase']) - combined_data[date]['customer_payment']
-            combined_data[date]['closing_balance'] = current_opening_balance
+        combined_data = defaultdict(lambda: {
+            'cash_purchase': 0, 'credit_purchase': 0, 'bank_transfer_purchase': 0,
+            'cheque_purchase': 0, 'card_purchase': 0, 'total_sales': 0, 'customer_payment': 0,
+            'opening_balance': 0, 'closing_balance': 0
+        })
         
+        initial_opening_balance = 0
+
+        for customer in customers:
+            # Fetch customer payments including opening_outstanding
+            customer_payments = CreditCollection.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('customer', 'created_on', 'amount', 'payment_mode__name', 'opening_outstanding')
+
+            initial_opening_balance_o = CreditCollection.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).order_by('created_on').first()
+
+            if initial_opening_balance_o:
+                initial_opening_balance += initial_opening_balance_o.opening_outstanding or customer.outstanding
+
+            # Fetch purchases
+            purchases = BankSales.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
+
+            # Sort transactions by date
+            transactions = sorted(list(purchases) + list(customer_payments), key=lambda x: x['created_on'])
+
+            for transaction in transactions:
+                date = transaction['created_on']
+                if transaction.get('amount'):
+                    mode = transaction.get('mode_of_transaction__name')
+                    if mode == 'cash':
+                        combined_data[date]['cash_purchase'] += transaction['amount']
+                    elif mode == 'credit':
+                        combined_data[date]['credit_purchase'] += transaction['amount']
+                    elif mode == 'bank transfer':
+                        combined_data[date]['bank_transfer_purchase'] += transaction['amount']
+                    elif mode == 'cheque':
+                        combined_data[date]['cheque_purchase'] += transaction['amount']
+                    elif mode == 'card':
+                        combined_data[date]['card_purchase'] += transaction['amount']
+                    combined_data[date]['total_sales'] += transaction['amount']
+                if transaction.get('payment_mode__name'):
+                    combined_data[date]['customer_payment'] += transaction['amount']
+            
+                combined_data[date]['opening_balance'] = initial_opening_balance
+                initial_opening_balance = (initial_opening_balance + combined_data[date]['credit_purchase']) - combined_data[date]['customer_payment']
+                combined_data[date]['closing_balance'] = initial_opening_balance
+
         combined_data_list = [
             {
                 'date': date,
                 'cash_purchase': data['cash_purchase'],
                 'credit_purchase': data['credit_purchase'],
+                'bank_transfer_purchase': data['bank_transfer_purchase'],
+                'cheque_purchase': data['cheque_purchase'],
+                'card_purchase': data['card_purchase'],
                 'total_sales': data['total_sales'],
                 'customer_payment': data['customer_payment'],
                 'opening_balance': data['opening_balance'],
@@ -3359,28 +3317,34 @@ class CustomerPaymentReportAPIView(APIView):
             }
             for date, data in sorted(combined_data.items())
         ]
+
         # Calculate totals for the period
         total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
         total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_bank_transfer_purchases = sum(item['bank_transfer_purchase'] for item in combined_data_list)
+        total_cheque_purchases = sum(item['cheque_purchase'] for item in combined_data_list)
+        total_card_purchases = sum(item['card_purchase'] for item in combined_data_list)
         total_customer_payments = sum(item['customer_payment'] for item in combined_data_list)
-        total_purchases = total_cash_purchases + total_credit_purchases
+        total_purchases = total_cash_purchases + total_credit_purchases + total_bank_transfer_purchases + total_cheque_purchases + total_card_purchases
         closing_balance = (initial_opening_balance + total_credit_purchases) - total_customer_payments
 
         # Prepare response data
         report_data = {
             'details': {
-                'customer_name': customer.name,
-                'customer_location': customer.location,
-                'customer_list': list(customers.values('id', 'name', 'business_profile', 'outstanding')),
+                'customer_name': "All Customers" if customer_id == '-1' else customer.name,
+                'customer_location': "N/A" if customer_id == '-1' else customer.location,
+                'customer_list': list(Customer.objects.filter(business_profile=business_profile.id).values('id', 'name', 'business_profile', 'outstanding')),
                 'start_date': start_date,
                 'end_date': end_date,
                 'opening_balance': initial_opening_balance,
                 'customer_payment_list': list(customer_payments),
-                'cash_purchases_list': list(cash_purchases),
-                'credit_purchases_list': list(credit_purchases),
+                'purchases_list': list(purchases),
                 'combined_data': combined_data_list,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,
+                'total_bank_transfer_purchases': total_bank_transfer_purchases,
+                'total_cheque_purchases': total_cheque_purchases,
+                'total_card_purchases': total_card_purchases,
                 'total_purchases': total_purchases,
                 'closing_balance': closing_balance,
             },
@@ -3391,6 +3355,9 @@ class CustomerPaymentReportAPIView(APIView):
                 'opening_balance': initial_opening_balance,
                 'total_cash_purchases': total_cash_purchases,
                 'total_credit_purchases': total_credit_purchases,
+                'total_bank_transfer_purchases': total_bank_transfer_purchases,
+                'total_cheque_purchases': total_cheque_purchases,
+                'total_card_purchases': total_card_purchases,
             }
         }
 
@@ -3414,90 +3381,122 @@ class CustomerPaymentReportPDFAPIView(APIView):
             return Response({"error": "End date must be after start date."}, status=400)
 
         # Get business context
-        # shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         if request.user.is_admin:
             shop_admin = get_object_or_404(ShopAdmin, user=request.user)
         else:
-            shop_admin = get_shop_admin(request,user=request.user)
+            shop_admin = get_shop_admin(request, user=request.user)
 
         shop = shop_admin.shop
         business_profile = get_object_or_404(BusinessProfile, name=shop.name)
 
-        # Get customer and its outstanding balance
-        customer = get_object_or_404(Customer, id=customer_id)
-        # initial_opening_balance = customer.outstanding
-
-        # Get all customers in the business profile
-        customers = Customer.objects.filter(business_profile=business_profile.id)
-
-        # Fetch customer payments including opening_outstanding
-        customer_payments = CreditCollection.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
-        ).values('created_on', 'amount', 'payment_mode__name', 'opening_outstanding')
-
-           
-        initial_opening_balance_o = CreditCollection.objects.filter( customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id).order_by('created_on').first()
-        if(initial_opening_balance_o.opening_outstanding == 'None' or 0):
-            initial_opening_balance = 0
+        if customer_id == '-1':
+            # Fetch all customers if customer_id is -1
+            customers = Customer.objects.filter(business_profile=business_profile.id)
         else:
-            initial_opening_balance = initial_opening_balance_o.opening_outstanding or customer.outstanding
-       
+            # Fetch specific customer
+            customers = Customer.objects.filter(id=customer_id, business_profile=business_profile.id)
+            if not customers.exists():
+                return Response({"error": "Customer not found."}, status=404)
+            customers = [customers.first()]
 
-        # Fetch purchases
-        cash_purchases = BankSales.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='cash', business_profile=business_profile.id
-        ).values('created_on', 'amount', 'mode_of_transaction__name')
-
-        credit_purchases = BankSales.objects.filter(
-            customer=customer, created_on__range=[start_date, end_date], mode_of_transaction__name='credit', business_profile=business_profile.id
-        ).values('created_on', 'amount', 'mode_of_transaction__name')
-
-        # Combine transactions by date
-        transactions = list(cash_purchases) + list(credit_purchases) + list(customer_payments)
-        transactions_by_date = defaultdict(lambda: {
-            'cash_purchase': 0, 'credit_purchase': 0, 'total_sales': 0,
-            'customer_payment': 0, 'opening_balance': 0, 'closing_balance': 0
+        combined_data = defaultdict(lambda: {
+            'cash_purchase': 0, 'credit_purchase': 0, 'bank_transfer_purchase': 0,
+            'cheque_purchase': 0, 'card_purchase': 0, 'total_sales': 0, 'customer_payment': 0,
+            'opening_balance': 0, 'closing_balance': 0
         })
+        
+        initial_opening_balance = 0
 
-        for transaction in transactions:
-            date = transaction['created_on']
-            if transaction.get('amount'):
-                if transaction.get('mode_of_transaction__name') == 'cash':
-                    transactions_by_date[date]['cash_purchase'] += transaction['amount']
-                elif transaction.get('mode_of_transaction__name') == 'credit':
-                    transactions_by_date[date]['credit_purchase'] += transaction['amount']
-                transactions_by_date[date]['total_sales'] = transactions_by_date[date]['cash_purchase'] + transactions_by_date[date]['credit_purchase']
-            if transaction.get('payment_mode__name'):
-                transactions_by_date[date]['customer_payment'] += transaction['amount']
+        for customer in customers:
+            # Fetch customer payments including opening_outstanding
+            customer_payments = CreditCollection.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('customer', 'created_on', 'amount', 'payment_mode__name', 'opening_outstanding')
 
-        # Calculate balances for each date
-        current_opening_balance = initial_opening_balance
-        for date, data in transactions_by_date.items():
-            data['opening_balance'] = current_opening_balance
-            data['closing_balance'] = (current_opening_balance + data['credit_purchase']) - data['customer_payment']
-            current_opening_balance = data['closing_balance']
+            initial_opening_balance_o = CreditCollection.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).order_by('created_on').first()
 
-        # Calculate totals
-        summary = {
-            'opening_balance': initial_opening_balance,
-            'total_cash_purchases': sum(data['cash_purchase'] for data in transactions_by_date.values()),
-            'total_credit_purchases': sum(data['credit_purchase'] for data in transactions_by_date.values()),
-            'total_purchases': sum(data['total_sales'] for data in transactions_by_date.values()),
-            'total_customer_payments': sum(data['customer_payment'] for data in transactions_by_date.values()),
-            'closing_balance': current_opening_balance,
-        }
+            if initial_opening_balance_o:
+                initial_opening_balance += initial_opening_balance_o.opening_outstanding or customer.outstanding
+
+            # Fetch purchases
+            purchases = BankSales.objects.filter(
+                customer=customer, created_on__range=[start_date, end_date], business_profile=business_profile.id
+            ).values('customer', 'created_on', 'amount', 'mode_of_transaction__name')
+
+            # Sort transactions by date
+            transactions = sorted(list(purchases) + list(customer_payments), key=lambda x: x['created_on'])
+
+            for transaction in transactions:
+                date = transaction['created_on']
+                if transaction.get('amount'):
+                    mode = transaction.get('mode_of_transaction__name')
+                    if mode == 'cash':
+                        combined_data[date]['cash_purchase'] += transaction['amount']
+                    elif mode == 'credit':
+                        combined_data[date]['credit_purchase'] += transaction['amount']
+                    elif mode == 'bank transfer':
+                        combined_data[date]['bank_transfer_purchase'] += transaction['amount']
+                    elif mode == 'cheque':
+                        combined_data[date]['cheque_purchase'] += transaction['amount']
+                    elif mode == 'card':
+                        combined_data[date]['card_purchase'] += transaction['amount']
+                    combined_data[date]['total_sales'] += transaction['amount']
+                if transaction.get('payment_mode__name'):
+                    combined_data[date]['customer_payment'] += transaction['amount']
+            
+                combined_data[date]['opening_balance'] = initial_opening_balance
+                initial_opening_balance = (initial_opening_balance + combined_data[date]['credit_purchase']) - combined_data[date]['customer_payment']
+                combined_data[date]['closing_balance'] = initial_opening_balance
+
+        combined_data_list = [
+            {
+                'date': date,
+                'cash_purchase': data['cash_purchase'],
+                'credit_purchase': data['credit_purchase'],
+                'bank_transfer_purchase': data['bank_transfer_purchase'],
+                'cheque_purchase': data['cheque_purchase'],
+                'card_purchase': data['card_purchase'],
+                'total_sales': data['total_sales'],
+                'customer_payment': data['customer_payment'],
+                'opening_balance': data['opening_balance'],
+                'closing_balance': data['closing_balance'],
+            }
+            for date, data in sorted(combined_data.items())
+        ]
+
+        # Calculate totals for the period
+        total_cash_purchases = sum(item['cash_purchase'] for item in combined_data_list)
+        total_credit_purchases = sum(item['credit_purchase'] for item in combined_data_list)
+        total_bank_transfer_purchases = sum(item['bank_transfer_purchase'] for item in combined_data_list)
+        total_cheque_purchases = sum(item['cheque_purchase'] for item in combined_data_list)
+        total_card_purchases = sum(item['card_purchase'] for item in combined_data_list)
+        total_customer_payments = sum(item['customer_payment'] for item in combined_data_list)
+        total_purchases = total_cash_purchases + total_credit_purchases + total_bank_transfer_purchases + total_cheque_purchases + total_card_purchases
+        closing_balance = (initial_opening_balance + total_credit_purchases) - total_customer_payments
 
         # Prepare report data
         report_data = {
-            'customer_name': customer.name,
+            'customer_name': "All Customers" if customer_id == '-1' else customer.name,
             'business': business_profile.name,
-            'customer_location': customer.location,
-            'customer_list': list(customers.values('id', 'name', 'business_profile', 'outstanding')),
+            'customer_location': "N/A" if customer_id == '-1' else customer.location,
+            'customer_list': list(Customer.objects.filter(business_profile=business_profile.id).values('id', 'name', 'business_profile', 'outstanding')),
             'start_date': start_date,
             'end_date': end_date,
+            'transactions_by_date': sorted(combined_data.items()),
             'opening_balance': initial_opening_balance,
-            'transactions_by_date': sorted(transactions_by_date.items()),
-            'summary': summary,
+            'summary': {
+                'opening_balance': initial_opening_balance,
+                'total_cash_purchases': total_cash_purchases,
+                'total_credit_purchases': total_credit_purchases,
+                'total_bank_transfer_purchases': total_bank_transfer_purchases,
+                'total_cheque_purchases': total_cheque_purchases,
+                'total_card_purchases': total_card_purchases,
+                'total_purchases': total_purchases,
+                'total_customer_payments': total_customer_payments,
+                'closing_balance': closing_balance,
+            },
         }
 
         # Render the PDF template
@@ -3508,6 +3507,8 @@ class CustomerPaymentReportPDFAPIView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="Customer_Payment_Report_{start_date}_to_{end_date}.pdf"'
         return response
+
+
 
 class BankStatementAPIView(APIView):
     @swagger_auto_schema(
@@ -3571,14 +3572,15 @@ class BankStatementAPIView(APIView):
             return transactions
         
         # Fetching transactions
-        banksale = get_transactions(BankSales, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank__id')
-        mscincome = get_transactions(MiscellaneousIncome, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank__id')
-        creditcol = get_transactions(CreditCollection, 'created_on', 'cheque_date','amount', 'payment_mode__name', 'bank__id')
-        deposits = get_transactions(BankDeposits, 'deposit_date', 'cheque_date','amount', 'mode_of_transaction__name', 'bank_deposit_bank')
-        withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank')
-        purchases = get_transactions(Purchase, 'invoice_date', 'cheque_date','invoice_amount', 'mode_of_transaction__name', 'bank')
-        expenses = get_transactions(Expense, 'created_on', 'cheque_date','amount', 'mode_of_transaction__name', 'bank')
-        supplierpayment = get_transactions(SupplierPayments, 'created_on', 'cheque_date','amount', 'mode_of_transaction__name', 'bank')
+        free_transaction_mode = "free"  # Define your free_transaction_mode value
+        banksale = get_transactions(BankSales, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank__id')
+        mscincome = get_transactions(MiscellaneousIncome, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank__id')
+        creditcol = get_transactions(CreditCollection, 'created_on', 'cheque_date','amount', 'payment_mode__transaction_name', 'bank__id')
+        deposits = get_transactions(BankDeposits, 'deposit_date', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank_deposit_bank')
+        withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank')
+        purchases = get_transactions(Purchase, 'invoice_date', 'cheque_date','invoice_amount', 'mode_of_transaction__transaction_name', 'bank')
+        expenses = get_transactions(Expense, 'created_on', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank')
+        supplierpayment = get_transactions(SupplierPayments, 'created_on', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank')
 
         # Combine transactions into a single list
         transactions_list = []
@@ -3718,14 +3720,15 @@ class BankStatementPDFView(APIView):
             return transactions
         
         # Fetching transactions
-        banksale = get_transactions(BankSales, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank__id')
-        mscincome = get_transactions(MiscellaneousIncome, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank__id')
-        creditcol = get_transactions(CreditCollection, 'created_on', 'cheque_date','amount', 'payment_mode__name', 'bank__id')
-        deposits = get_transactions(BankDeposits, 'deposit_date', 'cheque_date','amount', 'mode_of_transaction__name', 'bank_deposit_bank')
-        withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'cheque_date', 'amount', 'mode_of_transaction__name', 'bank')
-        purchases = get_transactions(Purchase, 'invoice_date', 'cheque_date','invoice_amount', 'mode_of_transaction__name', 'bank')
-        expenses = get_transactions(Expense, 'created_on', 'cheque_date','amount', 'mode_of_transaction__name', 'bank')
-        supplierpayment = get_transactions(SupplierPayments, 'created_on', 'cheque_date','amount', 'mode_of_transaction__name', 'bank')
+        free_transaction_mode='free'
+        banksale = get_transactions(BankSales, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank__id')
+        mscincome = get_transactions(MiscellaneousIncome, 'created_on', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank__id')
+        creditcol = get_transactions(CreditCollection, 'created_on', 'cheque_date','amount', 'payment_mode__transaction_name', 'bank__id')
+        deposits = get_transactions(BankDeposits, 'deposit_date', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank_deposit_bank')
+        withdrawals = get_transactions(Withdrawal, 'withdrawal_date', 'cheque_date', 'amount', 'mode_of_transaction__transaction_name', 'bank')
+        purchases = get_transactions(Purchase, 'invoice_date', 'cheque_date','invoice_amount', 'mode_of_transaction__transaction_name', 'bank')
+        expenses = get_transactions(Expense, 'created_on', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank')
+        supplierpayment = get_transactions(SupplierPayments, 'created_on', 'cheque_date','amount', 'mode_of_transaction__transaction_name', 'bank')
 
         # Combine transactions into a single list
         transactions_list = []
@@ -3906,8 +3909,6 @@ class ExpenseReportPDFView(APIView):
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
         return response
-    
-
 class DailySummaryReportAPIView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -3929,32 +3930,46 @@ class DailySummaryReportAPIView(APIView):
             business_profile=business_profile.id
         ).order_by('date')
 
-        result = [{
-            'date': summary.date.isoformat(),
-            'start_date':start_date,
-            'end_date':end_date,
-            'business':business_profile.name,
-            'opening_balance': str(summary.opening_balance),
-            'daily_summary_id': summary.daily_summary_id,
-            'cash_sale': str(summary.cash_sale),
-            'credit_sale': str(summary.credit_sale),
-            'card_sale': str(summary.card_sale),
-            'sales': str(summary.sales),
-            'credit_collection': str(summary.credit_collection),
-            'miscellaneous_income': str(summary.miscellaneous_income),
-            'purchase': str(summary.purchase),
-            'supplier_payment': str(summary.supplier_payment),
-            'expense': str(summary.expense),
-            'withdrawal': str(summary.withdrawal),
-            'bank_deposit': str(summary.bank_deposit),
-            'closing_balance': str(summary.closing_balance),
-            'status': summary.status,
-            'created_on': summary.created_on.isoformat(),
-            'updated_on': summary.updated_on.isoformat()
-        } for summary in summaries]
+        result = []
+        for summary in summaries:
+            purchases = Purchase.objects.filter(
+                daily_summary_id=summary.daily_summary_id,
+                business_profile=business_profile.id
+            )
+            cash_purchase = purchases.filter(mode_of_transaction__name='cash').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            credit_purchase = purchases.filter(mode_of_transaction__name='credit').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            card_purchase = purchases.filter(mode_of_transaction__name='card').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            total_purchase = cash_purchase + credit_purchase + card_purchase
+
+            result.append({
+                'date': summary.date.isoformat(),
+                'start_date': start_date,
+                'end_date': end_date,
+                'business': business_profile.name,
+                'opening_balance': str(summary.opening_balance),
+                'daily_summary_id': summary.daily_summary_id,
+                'cash_sale': str(summary.cash_sale),
+                'credit_sale': str(summary.credit_sale),
+                'card_sale': str(summary.card_sale),
+                'sales': str(summary.sales),
+                'credit_collection': str(summary.credit_collection),
+                'miscellaneous_income': str(summary.miscellaneous_income),
+                'cash_purchase': cash_purchase,
+                'credit_purchase': credit_purchase,
+                'card_purchase': card_purchase,
+                'total_purchase': total_purchase,
+                'supplier_payment': str(summary.supplier_payment),
+                'expense': str(summary.expense),
+                'withdrawal': str(summary.withdrawal),
+                'bank_deposit': str(summary.bank_deposit),
+                'closing_balance': str(summary.closing_balance),
+                'status': summary.status,
+                'created_on': summary.created_on.isoformat(),
+                'updated_on': summary.updated_on.isoformat()
+            })
 
         return Response(result)
-    
+
 class DailySummaryPDFView(APIView):
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -3973,12 +3988,48 @@ class DailySummaryPDFView(APIView):
             business_profile=business_profile.id
         ).order_by('date')
 
+        report_data = []
+        for summary in summaries:
+            purchases = Purchase.objects.filter(
+                daily_summary_id=summary.daily_summary_id,
+                business_profile=business_profile.id
+            )
+            cash_purchase = purchases.filter(mode_of_transaction__name='cash').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            credit_purchase = purchases.filter(mode_of_transaction__name='credit').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            card_purchase = purchases.filter(mode_of_transaction__name='card').aggregate(total=Sum('invoice_amount'))['total'] or 0
+            total_purchase = cash_purchase + credit_purchase + card_purchase
+            report_data.append({
+                'date': summary.date.isoformat(),
+                'start_date': start_date,
+                'end_date': end_date,
+                'business': business_profile.name,
+                'opening_balance': str(summary.opening_balance),
+                'daily_summary_id': summary.daily_summary_id,
+                'cash_sale': str(summary.cash_sale),
+                'credit_sale': str(summary.credit_sale),
+                'card_sale': str(summary.card_sale),
+                'sales': str(summary.sales),
+                'credit_collection': str(summary.credit_collection),
+                'miscellaneous_income': str(summary.miscellaneous_income),
+                'purchase': summary.purchase,
+                'total_cash_purchase': cash_purchase,
+                'total_credit_purchase': credit_purchase,
+                'total_card_purchase': card_purchase,
+                'supplier_payment': str(summary.supplier_payment),
+                'expense': str(summary.expense),
+                'withdrawal': str(summary.withdrawal),
+                'bank_deposit': str(summary.bank_deposit),
+                'closing_balance': str(summary.closing_balance),
+                'status': summary.status,
+                'created_on': summary.created_on.isoformat(),
+                'updated_on': summary.updated_on.isoformat()
+            })
+
         context = {
-            'summaries': summaries,
+            'summaries': report_data,
             'start_date': start_date,
             'end_date': end_date,
             'business': business_profile.name,
-
         }
 
         html_string = render_to_string('daily_summary_report_pdf.html', context)
@@ -3987,6 +4038,7 @@ class DailySummaryPDFView(APIView):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="daily_summary_report.pdf"'
         return response
+
     
 class PassDSDailySummaryAPIView(APIView):
     def post(self, request):
@@ -4168,7 +4220,7 @@ def fetch_cheque_numbers(request, did):
                         'cheque_date': obj.cheque_date,
                         'amount': amount,
                     })
-            print(cheque_details)
+            # print(cheque_details)
         return JsonResponse(cheque_details, safe=False)
     
     # except Exception as e:
@@ -4236,69 +4288,73 @@ def daily_summary_detail(request,daily_summary_id):
         card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile.id).first()
     except TransactionMode.DoesNotExist:
         pass 
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free",business_profile=business_profile.id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
 
 
 
     id = daily_summary_id
 
-    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
-    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode)
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode)
 
     bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
     bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
     bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
-    total_bank_sale_amount = bank_sales.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_bank_sale_amount = bank_sales.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # credit_sale
     credit_sale_total_cheque_sales = CreditCollection.objects.filter(payment_mode=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     credit_sale_total_cash_sales = CreditCollection.objects.filter(payment_mode=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     credit_sale_total_bank_sales = CreditCollection.objects.filter(payment_mode=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     credit_sale_total_card_sales = CreditCollection.objects.filter(payment_mode=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_credit_sale_amount = credit_collections.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_credit_sale_amount = credit_collections.exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     # mis_income
     mis_income_total_cheque = MiscellaneousIncome.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     mis_income_total_cash = MiscellaneousIncome.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     mis_income_total_bank = MiscellaneousIncome.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     mis_income_total_card = MiscellaneousIncome.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_mis_income_amount = msc_income.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_mis_income_amount = msc_income.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     purchase_total_cheque = Purchase.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('invoice_amount'))['total_cheque_amount'] or 0
     purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
     purchase_total_bank = Purchase.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('invoice_amount'))['total_bank_amount'] or 0
     purchase_total_card = Purchase.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('invoice_amount'))['total_card_amount'] or 0
     purchase_total_credit = Purchase.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('invoice_amount'))['total_credit_amount'] or 0
-    total_purchase_amount = purchases.aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
+    total_purchase_amount = purchases.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
 
     supplier_payment_total_cheque = SupplierPayments.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     supplier_payment_total_bank = SupplierPayments.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     supplier_payment_total_card = SupplierPayments.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_supplier_payment_amount = supplier_payments.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_supplier_payment_amount = supplier_payments.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     expense_total_cheque = Expense.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     expense_total_bank = Expense.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     expense_total_card = Expense.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    total_expense_amount = expense.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    total_expense_amount = expense.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
     bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id = id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
     bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id = id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
-    bank_deposit_amount = bank_deposit.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_deposit_amount = bank_deposit.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
 
     withdrawal_total_cheque = Withdrawal.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
     withdrawal_total_cash = Withdrawal.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
-    total_withdrawal_amount = withdrawal.aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
+    total_withdrawal_amount = withdrawal.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
 
     
 
@@ -4311,8 +4367,8 @@ def daily_summary_detail(request,daily_summary_id):
             'msc_income':msc_income,
             'purchases':purchases,
             'supplier_payments':supplier_payments,
-            'expenses':expense,
-            'bank_deposits':bank_deposit,
+            'expense':expense,
+            'bank_deposit':bank_deposit,
             'withdrawal':withdrawal,
 
             'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
@@ -4365,6 +4421,37 @@ def daily_summary_detail(request,daily_summary_id):
 
     })
 
+def get_object_or_none_api(model, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+def get_employee_api(request, user):
+    return get_object_or_none_api(Employee, user=user)
+
+def get_business_profile_api(request, id):
+    return get_object_or_none_api(BusinessProfile, pk=id)
+    
+def get_shop_admin_api(request,user):
+    employee = get_employee_api(request, user=user)
+    if employee:
+        business_profile = get_business_profile_api(request, id=employee.business_profile_id)
+        if business_profile:
+            shop = get_object_or_none_api(Shop, name=business_profile.name)
+            if shop:
+                shop_admin = get_object_or_none_api(ShopAdmin, shop=shop)
+                if shop_admin:
+                    return shop_admin
+                else:
+                    return Response({'message': 'No shop admin associated with the current user.'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'message': 'No shop associated with the current user.'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'message': 'No business profile associated with the current user.'}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response({'message': 'No employee associated with the current user.'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 from django.contrib.auth import update_session_auth_hash
@@ -4390,3 +4477,992 @@ def change_password(request, id):
         form = ChangePasswordForm()
 
     return render(request, 'change_password.html', {'form': form})
+
+class shopBankListAPIView(APIView):
+    def get(self, request):
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin_api(request,user=request.user)
+    
+        shop = shop_admin.shop.name
+
+        business_profile = get_object_or_404(BusinessProfile, name=shop)
+        bank = Bank.objects.filter(business_profile=business_profile.id)
+
+        serializer = ShopBankSerializer(bank, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+from django.db import transaction
+
+def admin_edit_daily_summary(request):
+    if not request.user.is_admin:
+        messages.error(request, 'You do not have permission to perform this action.')
+        return redirect('daily_summary_remark_list')
+    
+    shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    shop = shop_admin.shop.name
+    business_profile = get_object_or_404(BusinessProfile, name=shop)
+
+    last_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('-date').first().date
+    first_daily_summary = DailySummary.objects.filter(business_profile=business_profile.id).order_by('date').first().date
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        closing_balance = request.POST.get('closing_balance')
+        new_closing_balance = request.POST.get('new_closing_balance')
+        remark = request.POST.get('remark')
+
+        if not date or not closing_balance or not new_closing_balance:
+            messages.error(request, 'Please provide all required fields')
+            return redirect('admin_edit_daily_summary')
+        
+        new_closing_balance = Decimal(new_closing_balance)
+        closing_balance = Decimal(closing_balance)
+        difference_in_closing_balance =  closing_balance - new_closing_balance
+        print('difference_in_closing_balance',f"{difference_in_closing_balance}={closing_balance} - {new_closing_balance}")
+        business_profile = get_object_or_404(BusinessProfile, name=shop)
+        daily_summary = DailySummary.objects.filter(date=date, business_profile=business_profile.id).first()
+        
+        if not daily_summary:
+            messages.error(request, 'Daily Summary not found')
+            return redirect('admin_edit_daily_summary')
+        
+        try:
+            with transaction.atomic():
+                daily_summary.closing_balance = new_closing_balance
+                daily_summary.save()
+
+                subsequent_summaries = DailySummary.objects.filter(date__gt=daily_summary.date, business_profile=business_profile.id).order_by('date')
+                for summary in subsequent_summaries:                    
+                    summary.opening_balance -= difference_in_closing_balance
+                    summary.closing_balance -= difference_in_closing_balance
+                    summary.save()
+
+                daily_summary_report = DailySummaryRemark.objects.create(
+                date=date,
+                business_profile=business_profile.id,
+                daily_summary_id = daily_summary.daily_summary_id,
+                closing_balance = closing_balance,
+                remarks = remark
+                )
+                daily_summary_report.save()
+                
+                messages.success(request, 'Daily summary and subsequent summaries updated successfully')
+                return redirect('daily_summary_remark_list')
+            
+        except Exception as e:
+            messages.error(request, f'An error occurred: {e}')
+            return redirect('admin_edit_daily_summary')
+
+    return render(request, 'admin_edit_daily_summary.html', {'last_daily_summary': last_daily_summary, 'first_daily_summary': first_daily_summary})
+
+
+def admin_edit_daily_summary_api(request, date):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin_api(request,user=request.user)
+    
+    shop = shop_admin.shop.name
+    if not date:
+        return JsonResponse({'daily_summary': 'Please select a valid date'})
+
+    business_profile = get_object_or_404(BusinessProfile, name=shop)
+    daily_summary = DailySummary.objects.filter(date=date, business_profile=business_profile.id).first()
+    if daily_summary:
+        data = {key: value for key, value in daily_summary.__dict__.items() if key != '_state'}
+        return JsonResponse({'daily_summary': data},status=200)
+    else:
+        return JsonResponse({'error': f'Daily summary is not found on {date}'}, status=404)
+    
+
+
+    # data = {}
+    # for key, value in daily_summary.__dict__.items():
+    #     if key != '_state':
+    #         data[key] = value
+    # if daily_summary:
+    #     return JsonResponse({'daily_summary': data})
+    # else:
+    #     return JsonResponse({'daily_summary': f"Daily summary is not found on {date}"})
+
+
+def daily_summary_remark_list(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin_api(request,user=request.user)
+    
+    shop = shop_admin.shop.name
+    business_profile = get_object_or_404(BusinessProfile, name=shop)
+    daily_summary = DailySummaryRemark.objects.filter(business_profile = business_profile.id)
+    return render(request, 'daily_summary_remark_list.html', {'daily_summary': daily_summary})
+
+def admin_daily_summary_update(request, daily_summary_id):
+    id = daily_summary_id
+    cheque_transaction_mode = None
+    cash_transaction_mode = None
+    bank_transaction_mode = None
+    credit_transaction_mode = None
+    card_transaction_mode = None
+    
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    daily_summary = get_object_or_404(DailySummary, daily_summary_id=id, business_profile=business_profile.id)
+    business_profile_id = business_profile.id
+    try:
+        cheque_transaction_mode = TransactionMode.objects.filter(name="cheque",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        bank_transaction_mode = TransactionMode.objects.filter(name="bank transfer",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        card_transaction_mode = TransactionMode.objects.filter(name="card",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+
+    old_closing_balance = daily_summary.closing_balance
+
+    # print('old_closing_balance', old_closing_balance)
+
+    if request.method == 'POST':
+        form = DailySummaryForm(request.POST, instance=daily_summary)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.daily_summary_id = id
+
+            msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+            withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+            total_bank_sale_amount = bank_sales.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            total_credit_sale_amount = credit_collections.exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            total_mis_income_amount = msc_income.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            withdrawal_total = withdrawal.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+            purchase_total_cash = Purchase.exclude(mode_of_transaction=free_transaction_mode).objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+            supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+            expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+            total_bank_deposit_amount = bank_deposit.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+            bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+            total_cash_sale = (total_bank_sale_amount  - bank_sale_total_credit_sales)
+
+            net_collection = total_cash_sale + total_credit_sale_amount + total_mis_income_amount + withdrawal_total
+            net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+
+            # print('net_collection',net_collection)
+            # print('net_payment',net_payment)
+            # print('bank_deposit_collection',total_bank_deposit_amount)
+            # print('withdrawal_total',withdrawal_total)
+            # print('opening_balance',instance.opening_balance)
+
+            closing_balance = (instance.opening_balance + net_collection) - (net_payment + total_bank_deposit_amount)
+            instance.closing_balance = closing_balance
+            instance.save()
+            new_closing_balance = instance.closing_balance
+            difference_in_closing_balance =  old_closing_balance - new_closing_balance
+            # print('difference_in_closing_balance',f"{difference_in_closing_balance}={old_closing_balance} - {new_closing_balance}")
+            subsequent_summaries = DailySummary.objects.filter(date__gt=daily_summary.date, business_profile=business_profile.id).order_by('date')
+            for summary in subsequent_summaries:                    
+                summary.opening_balance -= difference_in_closing_balance
+                summary.closing_balance -= difference_in_closing_balance
+                summary.save()
+
+            return redirect('daily_summary_list')
+    else:
+        form = DailySummaryForm(instance=daily_summary)
+        bank_sale_form = BankSaleForm(initial={}, business_profile=business_profile.id)
+        credit_collection_form = CreditCollectionForm(initial={}, business_profile=business_profile.id)
+        msc_income_form = MiscellaneousIncomeForm(initial={}, business_profile=business_profile.id)
+        purchase_form = PurchaseForm(initial={}, business_profile=business_profile.id)
+        supplier_payments_form = SupplierPaymentForm(initial={}, business_profile=business_profile.id)
+        bank_deposit_form = BankDepositsForm(initial={}, business_profile=business_profile.id)
+        expense_form = ExpenseForm(initial={}, business_profile=business_profile.id)
+        withdrawal_form = WithdrawalForm(initial={}, business_profile=business_profile.id)
+
+        expense_type = ExpenseType.objects.filter(business_profile=business_profile.id)
+        receipt_type = ReceiptType.objects.filter(business_profile=business_profile.id)
+
+        bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        purchases = Purchase.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        supplier_payments = SupplierPayments.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        expense = Expense.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        bank_deposit = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id=id)
+        withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id)
+
+        bank_sale_total_cheque_sales = BankSales.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        bank_sale_total_cash_sales = BankSales.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id=id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+        bank_sale_total_card_sales = BankSales.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        bank_sale_total_bank_sales = BankSales.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        total_bank_sale_amount = bank_sales.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        credit_sale_total_cheque_sales = CreditCollection.objects.filter(payment_mode=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        credit_sale_total_cash_sales = CreditCollection.objects.filter(payment_mode=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        credit_sale_total_bank_sales = CreditCollection.objects.filter(payment_mode=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        credit_sale_total_card_sales = CreditCollection.objects.filter(payment_mode=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        total_credit_sale_amount = credit_collections.exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        mis_income_total_cheque = MiscellaneousIncome.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        mis_income_total_cash = MiscellaneousIncome.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        mis_income_total_bank = MiscellaneousIncome.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        mis_income_total_card = MiscellaneousIncome.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        total_mis_income_amount = msc_income.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        purchase_total_cheque = Purchase.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('invoice_amount'))['total_cheque_amount'] or 0
+        purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+        purchase_total_bank = Purchase.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('invoice_amount'))['total_bank_amount'] or 0
+        purchase_total_card = Purchase.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('invoice_amount'))['total_card_amount'] or 0
+        purchase_total_credit = Purchase.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id=id).aggregate(total_credit_amount=Sum('invoice_amount'))['total_credit_amount'] or 0
+        total_purchase_amount = purchases.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('invoice_amount'))['total_amount'] or 0
+
+        supplier_payment_total_cheque = SupplierPayments.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        supplier_payment_total_bank = SupplierPayments.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        supplier_payment_total_card = SupplierPayments.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        total_supplier_payment_amount = supplier_payments.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        expense_total_cheque = Expense.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        expense_total_bank = Expense.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        expense_total_card = Expense.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        total_expense_amount = expense.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        bank_deposit_total_cheque = BankDeposits.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id=id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        bank_deposit_total_cash = BankDeposits.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id=id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        bank_deposit_total_bank = BankDeposits.objects.filter(mode_of_transaction=bank_transaction_mode, daily_summary_id=id).aggregate(total_bank_amount=Sum('amount'))['total_bank_amount'] or 0
+        bank_deposit_total_card = BankDeposits.objects.filter(mode_of_transaction=card_transaction_mode, daily_summary_id=id).aggregate(total_card_amount=Sum('amount'))['total_card_amount'] or 0
+        bank_deposit_amount = bank_deposit.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+
+        withdrawal_total_cheque = Withdrawal.objects.filter(mode_of_transaction=cheque_transaction_mode, daily_summary_id = id).aggregate(total_cheque_amount=Sum('amount'))['total_cheque_amount'] or 0
+        withdrawal_total_cash = Withdrawal.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+        total_withdrawal_amount = withdrawal.exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0   
+
+    return render(request, 'admin_daily_summary_update.html',{
+            'daily_summary': daily_summary,
+            
+            'bank_sales':bank_sales,
+            'credit_collections':credit_collections,
+            'msc_income':msc_income,
+            'purchases':purchases,
+            'supplier_payments':supplier_payments,
+            'expenses':expense,
+            'bank_deposits':bank_deposit,
+            'withdrawal':withdrawal,
+
+            'form': form,
+            'bank_sale_form': bank_sale_form,
+            'credit_collection_form': credit_collection_form,
+            'msc_income_form': msc_income_form,
+            'purchase_form': purchase_form,
+            'supplier_payments_form': supplier_payments_form,
+            'bank_deposit_form': bank_deposit_form,
+            'expense_form': expense_form,
+            'withdrawal_form':withdrawal_form,
+
+
+            'bank_sale_total_cheque_sale':bank_sale_total_cheque_sales,
+            'bank_sale_total_card_sale':bank_sale_total_card_sales,
+            'bank_sale_total_cash_sale':bank_sale_total_cash_sales,
+            'bank_sale_total_credit_sale':bank_sale_total_credit_sales,
+            'bank_sale_total_bank_sale':bank_sale_total_bank_sales,
+            'total_bank_sale_amount':total_bank_sale_amount,
+
+            'credit_sale_total_cheque_sale':credit_sale_total_cheque_sales,
+            'credit_sale_total_cash_sale':credit_sale_total_cash_sales,
+            'credit_sale_total_bank_sale':credit_sale_total_bank_sales,
+            'credit_sale_total_card_sale':credit_sale_total_card_sales,
+            'total_credit_sale_amount':total_credit_sale_amount,
+
+            'mis_income_total_cheque':mis_income_total_cheque,
+            'mis_income_total_cash':mis_income_total_cash,
+            'mis_income_total_bank':mis_income_total_bank,
+            'mis_income_total_card':mis_income_total_card,
+            'total_mis_income_amount':total_mis_income_amount,
+
+            'purchase_total_cheque':purchase_total_cheque,
+            'purchase_total_cash':purchase_total_cash,
+            'purchase_total_bank':purchase_total_bank,
+            'purchase_total_credit':purchase_total_credit,
+            'purchase_total_card':purchase_total_card,
+            'total_purchase_amount':total_purchase_amount,
+
+            'supplier_payment_total_cheque':supplier_payment_total_cheque,
+            'supplier_payment_total_cash':supplier_payment_total_cash,
+            'supplier_payment_total_bank':supplier_payment_total_bank,
+            'supplier_payment_total_card':supplier_payment_total_card,
+            'total_supplier_payment_amount':total_supplier_payment_amount,
+
+            'expense_total_cheque':expense_total_cheque,
+            'expense_total_cash':expense_total_cash,
+            'expense_total_bank':expense_total_bank,
+            'expense_total_card':expense_total_card,
+            'total_expense_amount':total_expense_amount,
+
+            'bank_deposit_total_cheque':bank_deposit_total_cheque,
+            'bank_deposit_total_cash':bank_deposit_total_cash,
+            'bank_deposit_total_bank':bank_deposit_total_bank,
+            'bank_deposit_total_card':bank_deposit_total_card,
+            'bank_deposit_amount':bank_deposit_amount,
+
+            'withdrawal_total_cheque':withdrawal_total_cheque,
+            'withdrawal_total_cash':withdrawal_total_cash,
+            'total_withdrawal_amount':total_withdrawal_amount,
+
+    })
+
+def admin_edit_bank_sale(request, pk):
+    bank_sale = get_object_or_404(BankSales, pk=pk)
+    daily_summary_id = bank_sale.daily_summary_id
+    if request.method == 'POST':
+        form = BankSaleForm(request.POST, request.FILES, instance=bank_sale,initial={},business_profile = bank_sale.business_profile)    
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+    else:
+        form = BankSaleForm(instance=bank_sale,initial={},business_profile = bank_sale.business_profile)
+    return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
+
+
+
+def admin_edit_credit_collection(request, pk):
+    credit_instance = get_object_or_404(CreditCollection, pk=pk)
+    daily_summary_id = credit_instance.daily_summary_id
+    if request.method == 'POST':
+        form = CreditCollectionForm(request.POST, request.FILES, instance=credit_instance ,initial={},business_profile = credit_instance.business_profile)    
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+    else:
+        form = CreditCollectionForm(instance=credit_instance,initial={},business_profile = credit_instance.business_profile)
+    return render(request, 'edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
+
+
+def admin_edit_miscellaneous_income(request, pk):
+    misc_instance = get_object_or_404(MiscellaneousIncome, pk=pk)
+    daily_summary_id = misc_instance.daily_summary_id
+    if request.method == 'POST':
+        form = MiscellaneousIncomeForm(request.POST, request.FILES, instance=misc_instance,initial={},business_profile = misc_instance.business_profile)    
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+    else:
+        form = MiscellaneousIncomeForm(instance=misc_instance,initial={},business_profile = misc_instance.business_profile)
+    return render(request, 'edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
+
+def admin_edit_withdrawal(request, pk):
+    withdrawal_instance = get_object_or_404(Withdrawal, pk=pk)
+    daily_summary_id = withdrawal_instance.daily_summary_id
+    if request.method == 'POST':
+        form = WithdrawalForm(request.POST, request.FILES, instance=withdrawal_instance,initial={},business_profile = withdrawal_instance.business_profile)    
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+    else:
+        form = WithdrawalForm(instance=withdrawal_instance,initial={},business_profile = withdrawal_instance.business_profile)
+    return render(request, 'edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
+
+def admin_edit_purchase(request, pk):
+    purchase_instance = get_object_or_404(Purchase, pk=pk)
+    daily_summary_id = purchase_instance.daily_summary_id
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST, request.FILES, instance=purchase_instance,initial={},business_profile = purchase_instance.business_profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+    else:
+        form = PurchaseForm(instance=purchase_instance,initial={},business_profile = purchase_instance.business_profile)
+    return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
+
+
+def admin_edit_supplier_payment(request, pk):
+    supplier_instance = get_object_or_404(SupplierPayments, pk=pk)
+    daily_summary_id = supplier_instance.daily_summary_id
+    if request.method == 'POST':
+        form = SupplierPaymentForm(request.POST, request.FILES, instance=supplier_instance,initial={},business_profile = supplier_instance.business_profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+    else:
+        form = SupplierPaymentForm(instance=supplier_instance,initial={},business_profile = supplier_instance.business_profile)
+    return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
+
+def admin_edit_expense(request, pk):
+    expense_instance = get_object_or_404(Expense, pk=pk)
+    daily_summary_id = expense_instance.daily_summary_id
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, request.FILES, instance=expense_instance,initial={},business_profile = expense_instance.business_profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+    else:
+        form = ExpenseForm(instance=expense_instance,initial={},business_profile = expense_instance.business_profile)
+    return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
+
+def admin_edit_bank_deposit(request, pk):
+    bank_deposit = get_object_or_404(BankDeposits, pk=pk)
+    daily_summary_id = bank_deposit.daily_summary_id
+    if request.method == 'POST':
+        form = BankDepositsForm(request.POST, request.FILES, instance=bank_deposit ,initial={},business_profile = bank_deposit.business_profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+    else:
+        form = BankDepositsForm(instance=bank_deposit,initial={},business_profile = bank_deposit.business_profile)
+    return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
+
+
+
+
+def admin_delete_bank_sale(request, pk):
+    try:
+        bank_sale = BankSales.objects.get(pk=pk)    
+        daily_summary_id = bank_sale.daily_summary_id
+        bank_sale.delete()
+    except BankSales.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+
+
+
+def admin_delete_credit_collection(request, pk):
+    try:
+        credit = CreditCollection.objects.get(pk=pk)
+        daily_summary_id = credit.daily_summary_id
+        credit.delete()
+    except CreditCollection.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+
+def admin_delete_miscellaneous_income(request, pk):
+    try:
+        miscellaneous = MiscellaneousIncome.objects.get(pk=pk)
+        daily_summary_id = miscellaneous.daily_summary_id
+        miscellaneous.delete()
+    except MiscellaneousIncome.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+
+
+def admin_delete_withdrawal(request, pk):
+    try:
+        withdrawal = Withdrawal.objects.get(pk=pk)
+        daily_summary_id = withdrawal.daily_summary_id
+        withdrawal.delete()
+    except Withdrawal.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+
+def admin_delete_purchase(request, pk):
+    try:
+        purchase = Purchase.objects.get(pk=pk)
+        daily_summary_id = purchase.daily_summary_id
+        purchase.delete()
+    except Purchase.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+
+
+def admin_delete_supplier_payment(request, pk):
+    try:
+        supplier = SupplierPayments.objects.get(pk=pk)
+        daily_summary_id = supplier.daily_summary_id
+        supplier.delete()
+    except SupplierPayments.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+
+def admin_delete_expense(request, pk):
+    try:
+        expense = Expense.objects.get(pk=pk)
+        daily_summary_id = expense.daily_summary_id
+        expense.delete()
+    except Expense.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+
+
+
+def admin_delete_bank_deposit(request, pk):
+    try:
+        bank_deposit = BankDeposits.objects.get(pk=pk)
+        daily_summary_id = bank_deposit.daily_summary_id
+        bank_deposit.delete()
+    except BankDeposits.DoesNotExist:
+        return render(request, '404.html')
+    return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+
+
+def admin_create_bank_sale(request):
+    if request.method == 'POST':
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        form = BankSaleForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            if form.mode_of_transaction.name == 'credit':
+                customer = form.customer
+                customer.outstanding = customer.outstanding + form.amount
+                customer.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+
+def admin_create_credit_collection(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = CreditCollectionForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            customer = form.customer
+            customer.outstanding = customer.outstanding - form.amount
+            customer.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+        
+
+def admin_create_misc_income(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = MiscellaneousIncomeForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+
+
+def admin_create_withdrawal(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    if request.method == 'POST':
+        form = WithdrawalForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')
+            form.daily_summary_id = daily_summary_id
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+
+def admin_create_purchase(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id') 
+            form.daily_summary_id = daily_summary_id  
+            if form.mode_of_transaction.name == 'credit':
+                supplier = form.supplier
+                supplier.outstanding = supplier.outstanding + form.invoice_amount
+                supplier.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+
+def admin_create_supplier_payment(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    if request.method == 'POST':
+        form = SupplierPaymentForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            supplier = form.supplier
+            supplier.outstanding = supplier.outstanding - form.amount
+            supplier.save() 
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+        
+
+def admin_create_expense(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id') 
+            form.daily_summary_id = daily_summary_id  
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+
+def admin_create_bank_deposit(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = BankDepositsForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  
+            form.daily_summary_id = daily_summary_id 
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+
+
+
+def admin_closing_balance(request,daily_summary_id):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        messages.error(request, 'You are not authorized to access this page.')
+        return redirect('daily_summary_list')
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    cash_transaction_mode = None
+    credit_transaction_mode = None
+    business_profile_id = business_profile.id 
+    try:
+        daily_summary_data = DailySummary.objects.get(daily_summary_id=daily_summary_id,business_profile = business_profile_id)
+    except DailySummary.DoesNotExist:
+        return JsonResponse({'closing_balance': 'Daily Summary does not exist'})
+    id = daily_summary_id
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+    supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    bank_deposits = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+    total_cash_sale = (bank_sales  - bank_sale_total_credit_sales)
+    net_collection = total_cash_sale + credit_collections + msc_income + withdrawal
+    net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+    opening_balance = daily_summary_data.opening_balance
+    closing_balance = (opening_balance + net_collection) - (net_payment + bank_deposits)
+    closing_balance = closing_balance.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+    return JsonResponse({'closing_balance':closing_balance}, safe=False)
+
+
+def admin_create_bank_sale(request):
+    if request.method == 'POST':
+        if request.user.is_admin:
+            shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+        else:
+            shop_admin = get_shop_admin(request,user=request.user)
+        shop = shop_admin.shop
+        business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+        form = BankSaleForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            if form.mode_of_transaction.name == 'credit':
+                customer = form.customer
+                customer.outstanding = customer.outstanding + form.amount
+                customer.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
+
+def admin_create_credit_collection(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = CreditCollectionForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            customer = form.customer
+            customer.outstanding = customer.outstanding - form.amount
+            customer.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
+        
+
+def admin_create_misc_income(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = MiscellaneousIncomeForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
+
+
+def admin_create_withdrawal(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    if request.method == 'POST':
+        form = WithdrawalForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')
+            form.daily_summary_id = daily_summary_id
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
+
+def admin_create_purchase(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = PurchaseForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id') 
+            form.daily_summary_id = daily_summary_id  
+            if form.mode_of_transaction.name == 'credit':
+                supplier = form.supplier
+                supplier.outstanding = supplier.outstanding + form.invoice_amount
+                supplier.save()
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
+
+def admin_create_supplier_payment(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    if request.method == 'POST':
+        form = SupplierPaymentForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  # Get the daily summary ID from the form
+            form.daily_summary_id = daily_summary_id  # Assign the daily summary ID to the bank sale instance
+            # form.save()
+            supplier = form.supplier
+            supplier.outstanding = supplier.outstanding - form.amount
+            supplier.save() 
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
+        
+
+def admin_create_expense(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id') 
+            form.daily_summary_id = daily_summary_id  
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
+
+def admin_create_bank_deposit(request):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        shop_admin = get_shop_admin(request,user=request.user)
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+
+    if request.method == 'POST':
+        form = BankDepositsForm(request.POST,initial={},business_profile=business_profile.id)
+        daily_summary_id = request.POST.get('daily_summary_id')
+        if form.is_valid():
+            form = form.save(commit=False)
+            daily_summary_id = request.POST.get('daily_summary_id')  
+            form.daily_summary_id = daily_summary_id 
+            form.save()
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+        else:
+            return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
+
+
+
+def admin_closing_balance(request,daily_summary_id):
+    if request.user.is_admin:
+        shop_admin = get_object_or_404(ShopAdmin, user=request.user)
+    else:
+        messages.error(request, 'You are not authorized to access this page.')
+        return redirect('daily_summary_list')
+    shop = shop_admin.shop
+    business_profile = get_object_or_404(BusinessProfile, name=shop.name)
+    cash_transaction_mode = None
+    credit_transaction_mode = None
+    business_profile_id = business_profile.id 
+    try:
+        daily_summary_data = DailySummary.objects.get(daily_summary_id=daily_summary_id,business_profile = business_profile_id)
+    except DailySummary.DoesNotExist:
+        return JsonResponse({'closing_balance': 'Daily Summary does not exist'})
+    id = daily_summary_id
+    try:
+        cash_transaction_mode = TransactionMode.objects.filter(name="cash",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass
+    try:
+        credit_transaction_mode = TransactionMode.objects.filter(name="credit",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    try:
+        free_transaction_mode = TransactionMode.objects.filter(name="free",business_profile=business_profile_id).first()
+    except TransactionMode.DoesNotExist:
+        pass 
+    bank_sales = BankSales.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    credit_collections = CreditCollection.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(payment_mode=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    msc_income = MiscellaneousIncome.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    withdrawal = Withdrawal.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    purchase_total_cash = Purchase.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('invoice_amount'))['total_cash_amount'] or 0
+    supplier_payment_total_cash = SupplierPayments.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    expense_total_cash = Expense.objects.filter(mode_of_transaction=cash_transaction_mode, daily_summary_id = id).aggregate(total_cash_amount=Sum('amount'))['total_cash_amount'] or 0
+    bank_deposits = BankDeposits.objects.filter(business_profile=business_profile.id, daily_summary_id = id).exclude(mode_of_transaction=free_transaction_mode).aggregate(total_amount=Sum('amount'))['total_amount'] or 0
+    bank_sale_total_credit_sales = BankSales.objects.filter(mode_of_transaction=credit_transaction_mode, daily_summary_id = id).aggregate(total_credit_amount=Sum('amount'))['total_credit_amount'] or 0
+    total_cash_sale = (bank_sales  - bank_sale_total_credit_sales)
+    net_collection = total_cash_sale + credit_collections + msc_income + withdrawal
+    net_payment = purchase_total_cash + supplier_payment_total_cash + expense_total_cash
+    opening_balance = daily_summary_data.opening_balance
+    closing_balance = (opening_balance + net_collection) - (net_payment + bank_deposits)
+    closing_balance = closing_balance.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+    return JsonResponse({'closing_balance':closing_balance}, safe=False)

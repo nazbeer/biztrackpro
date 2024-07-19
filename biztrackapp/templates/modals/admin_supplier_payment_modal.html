@@ -1,0 +1,104 @@
+<div class="modal fade" id="adminSupplierPaymentModal" tabindex="400" aria-labelledby="adminSupplierPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-primary">
+                <h5 class="modal-title text-white" id="adminSupplierPaymentModalLabel">Add Supplier Payment</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="adminSupplierPaymentForm" method="post" action="{% url 'admin_create_supplier_payment' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div id="purchaseErrors" class="alert alert-danger d-none"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <input type="hidden" name="business_profile" value="{{ daily_summary.business_profile }}">
+                                <input type="hidden" name="created_on" value="{{daily_summary.date}}">
+
+                                <input type="hidden" id="modal_daily_summary_id6" name="daily_summary_id">
+                              <label for="id_supplier1">Supplier</label>
+                              <select id="id_supplier1" name="supplier" class="form-control" tabindex="401" required>
+                                <option value="">-- Select Supplier --</option>
+                                {% for supplier in supplier_payments_form.supplier.field.queryset %}
+                                  <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            
+                              <div class="form-group">
+                                <label for="id_invoice_amount">Amount</label>
+                                <input type="number" id="id_amount" name="amount" class="form-control" tabindex="403" required>
+                              </div>
+                              <div id="chequeDetails" class="d-none">
+                              <div class="form-group">
+                                <label for="id_cheque_no">Cheque Number</label>
+                                <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="405">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <div id="bank_detail1" class="d-none">
+                                <label for="id_bank">Bank</label>
+                                <select id="id_bank" name="bank" class="form-control" tabindex="407" >
+                                  <option value="">-- Select Bank --</option>
+                                  {% for bank in supplier_payments_form.bank.field.queryset %}
+                                    <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                           
+                            <div class="form-group">
+                                <label for="id_opening_outstanding1">Opening Outstanding</label>
+                                <input type="number" id="id_opening_outstanding1" name="opening_outstanding" class="form-control" step="0.01"  readonly tabindex="402">
+                              </div>
+                              <div class="form-group">
+                                <label for="id_mode_of_transaction">Payment Mode</label>
+                                <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="404"  required>
+                                  <option value="">-- Payment Mode --</option>
+                                  {% for transaction_mode in supplier_payments_form.mode_of_transaction.field.queryset %}
+                                    <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                             
+                              <div id="chequeDetails1" class="d-none">
+                            <div class="form-group">
+                              <label for="id_cheque_date">Cheque Date</label>
+                              <input type="date" id="id_cheque_date" name="cheque_date" class="form-control"  tabindex="406" >
+                            </div>
+                          </div>
+                          <div id="date_detail1" class="d-none">
+                            <div class="form-group">
+                              <label for="id_cheque_date_new"> Date</label>
+                              <input type="date" id="id_cheque_date_new" name="cheque_date_new" class="form-control"  tabindex="408">
+                            </div>
+                          </div>
+                            
+                        </div>
+                    </div>
+                    <div id="adminSupplierPaymentFormErrors" class="text-danger"></div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="410">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="409">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+  document.getElementById('id_supplier1').addEventListener('change', function() {
+      var selectedSupplierId = this.value;
+      fetch(`/get_supplier_outstanding/${selectedSupplierId}/`)
+          .then(response => response.json())
+          .then(data => {
+          document.getElementById('id_opening_outstanding1').value = data.outstanding_amount
+
+          })
+          .catch(error => console.error('Error:', error));
+  });
+</script>

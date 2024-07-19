@@ -277,7 +277,7 @@ class DailySummary(models.Model):
     closing_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     status = models.CharField(max_length=20, choices=CHOICES)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True, null=True)
 
     def __str__(self):
@@ -304,7 +304,7 @@ class BankSales(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -321,7 +321,7 @@ class CreditCollection(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -337,7 +337,7 @@ class MiscellaneousIncome(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255,null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -355,7 +355,7 @@ class Purchase(models.Model):
     cheque_no = models.CharField(max_length=255, null=True, blank=True)
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -372,7 +372,7 @@ class SupplierPayments(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     # create_date = models.DateField(auto_now_add=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -390,7 +390,7 @@ class BankDeposits(models.Model):
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -408,7 +408,7 @@ class Expense(models.Model):
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, null=True, blank=True)
     business_profile = models.CharField(max_length=255, null=True)
     # created_date = models.DateField(auto_now_add=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -425,7 +425,7 @@ class Withdrawal(models.Model):
     business_profile = models.CharField(max_length=255, null=True)
     cheque_date = models.DateField(null=True, blank=True)
     cheque_no = models.CharField(max_length=255, null=True,blank=True)
-    created_on = models.DateField( auto_now_add=True,null=True)
+    created_on = models.DateField( null=True)
     updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):

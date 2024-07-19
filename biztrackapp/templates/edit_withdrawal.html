@@ -42,7 +42,7 @@
               <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="002" required>
                 <option value="">-- Mode of Transaction --</option>
                 {% for transaction_mode in form.mode_of_transaction.field.queryset %}
-                <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == withdrawal_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.name }}</option>
+                <option value="{{ transaction_mode.id }}" {% if transaction_mode.id == withdrawal_instance.mode_of_transaction.id %} selected {% endif %}>{{ transaction_mode.transaction_name }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -72,7 +72,18 @@
 </div>
 </div>
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+        var dateInput = document.getElementById('id_withdrawal_date');
+        var today = new Date();
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        var year = today.getFullYear();
 
+        var todayDate = year + '-' + month + '-' + day;
+        dateInput.max = todayDate;
+    });
+</script>
+<script>
   function toggleChequeDetails2() {
     var modeOfTransactionElement2 = document.getElementById("id_mode_of_transaction");
     var modeOfTransaction = modeOfTransactionElement2.options[modeOfTransactionElement2.selectedIndex].textContent;

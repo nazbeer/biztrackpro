@@ -16,7 +16,10 @@
     <li class="d-n"><a href="/bank-statement/"> Bank Statement</a></li>
 
 <!-- <li class="nav-item " ><a class="nav-link" href="/notifications/"> Notifications</a></li> -->
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-    </li>
+<li class="nav-item d-flex align-items-center">
+    <a class="text-decoration-none text-dark" href="{% url 'home' %}">
+        <span class="d-inline-block">{{shop}}</span>
+    </a>
+    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+</li>
 </ul>

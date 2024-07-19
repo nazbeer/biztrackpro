@@ -1,0 +1,118 @@
+
+<!-- Create Withdrawal Modal -->
+<div class="modal fade" id="adminWithdrawalModal" tabindex="1500" role="dialog" aria-labelledby="adminWithdrawalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white mb-0" id="adminWithdrawalModalLabel">Create Withdrawal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'admin_create_withdrawal' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" id="modal_daily_summary_idw" name="daily_summary_id">
+                    <input type="hidden" name="created_on" value="{{daily_summary.date}}">
+
+                    <input type="hidden" name="business_profile" value="{{ daily_summary.business_profile }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <!-- <label for="bank">Bank</label>
+                            <select id="bank" name="bank" class="form-control">
+                                {% for bank in withdrawal_form.bank.field.queryset %}
+                                    <option value="{{ bank.id }}" {% if bank.id == form.bank.value %}selected{% endif %}>{{ bank.name }}</option>
+                                {% endfor %}
+                            </select>  -->
+                            <label for="id_bank">Bank</label>
+                            <select id="id_bank" name="bank" class="form-control" required tabindex="1501">
+                              <option value="">-- Select Bank --</option>
+                              {% for bank in withdrawal_form.bank.field.queryset %}
+                                <option value="{{ bank.id }}">{{ bank.bank.name }}</option>
+                              {% endfor %}
+                            </select>
+                    </div>
+                       
+                        <div class="form-group col-md-6">
+                            <label for="id_withdrawal_date">Withdrawal Date</label>
+                            <input type="date" id="id_withdrawal_date" name="withdrawal_date" class="form-control" required tabindex="1502">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="id_amount">Amount</label>
+                            
+
+                            <input type="text" placeholder="Enter a valid amount" id="id_amount" name="amount" class="form-control" required tabindex="1503">
+                            
+
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="id_mode_of_transaction">Mode of Transaction</label>
+                           
+                            <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" required tabindex="1504">
+                                <option value="">-- Mode of Transaction --</option>
+                                {% for transaction_mode in withdrawal_form.mode_of_transaction.field.queryset %}
+                                  <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
+                                {% endfor %}
+                              </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <div id="chequeDetails" class="d-none">
+                            <label for="id_cheque_date">Cheque Date</label>
+                            <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="1505" >
+                          </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <div id="chequeDetails1" class="d-none">
+                            <label for="id_cheque_no">Cheque Number</label>
+                            <input type="text" id="id_cheque_no" name="cheque_no" class="form-control" tabindex="1506">
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="1508">Close</button>
+                    <button type="submit" class="btn btn-primary" tabindex="1507">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var dateInput = document.getElementById('id_withdrawal_date');
+        var today = new Date();
+        var day = String(today.getDate()).padStart(2, '0');
+        var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+        var year = today.getFullYear();
+
+        var todayDate = year + '-' + month + '-' + day;
+        dateInput.max = todayDate;
+    });
+</script>
+<!-- 
+<script>
+    // Function to validate and format the amount input
+    document.getElementById('id_amount').addEventListener('input', function() {
+        let input = this.value.trim();
+
+        // Regex pattern to match numbers with up to two decimal places
+        const regex = /^\d*(\.\d{0,2})?$/;
+
+        if (regex.test(input)) {
+            // Input is valid, update the displayed message
+            document.getElementById('validationMessage').textContent = "Typed Valid Character.";
+        } else {
+            // Input is invalid, clear the input and display error message
+            this.value = '';
+            document.getElementById('validationMessage').textContent = "Typed Invalid Character.";
+        }
+    });
+</script> -->
+
+    

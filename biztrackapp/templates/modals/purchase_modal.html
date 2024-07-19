@@ -16,6 +16,8 @@
                             <div class="form-group">
                                 <input type="hidden" name="business_profile" value="{{ business_profile }}">
                                 <input type="hidden" id="modal_daily_summary_id5" name="daily_summary_id">
+                                <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
                               <label for="id_supplier">Supplier</label>
                               <select id="id_supplier" name="supplier" class="form-control" tabindex="301" required >
                                 <option value="">-- Select Supplier --</option>
@@ -29,7 +31,7 @@
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="303" required >
                                   <option value="">-- Mode of Transaction --</option>
                                   {% for transaction_mode in purchase_form.mode_of_transaction.field.queryset %}
-                                    <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                    <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
                                   {% endfor %}
                                 </select>
                               </div>
@@ -101,5 +103,16 @@
 
           })
           .catch(error => console.error('Error:', error));
+  });
+
+  document.addEventListener("DOMContentLoaded", function() {
+      var dateInput = document.getElementById('id_invoice_date');
+      var today = new Date();
+      var day = String(today.getDate()).padStart(2, '0');
+      var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+      var year = today.getFullYear();
+
+      var todayDate = year + '-' + month + '-' + day;
+      dateInput.max = todayDate;
   });
 </script>

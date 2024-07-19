@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Daily Summary{% endblock %}
+
+{% block content %}
+<style>
+
+
+.text_area_remark:focus {
+    border-color:  rgba(2, 101, 207, 0.67);
+    outline: none; 
+    
+}
+
+</style>
+{% if message %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="mb-0">Update Daily Summary</h4>
+    </div>
+    <form method="POST" id="daily-summary-form">
+        <div class="card-body">
+            {% csrf_token %}
+            <div class="row d-flex justify-content-between align-items-center">
+            <div class="col-md-6">
+            <div class="form-group">
+                <label for="id_date" >Select Date:</label>
+                <input type="date" id="id_date" name="date" class="form-control mb-3" required max="{{last_daily_summary|date:'Y-m-d'}}">
+                <input type="hidden" name="business_profile" value="{{ business_profile }}">
+            </div>
+            <div class="form-group">
+                <label for="id_opening_balance">Opening Balance:</label>
+                <input type="number" id="id_opening_balance" name="opening_balance" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_sales">Sales:</label>
+                <input type="number" id="id_sales" name="sales" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_credit_collection">Credit Collection:</label>
+                <input type="number" id="id_credit_collection" name="credit_collection" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_miscellaneous_income">Miscellaneous Income:</label>
+                <input type="number" id="id_miscellaneous_income" name="miscellaneous_income" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_purchase">Purchase:</label>
+                <input type="number" id="id_purchase" name="purchase" step="0.01" class="form-control mb-3" readonly>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="id_supplier_payment">Supplier Payment:</label>
+                <input type="number" id="id_supplier_payment" name="supplier_payment" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_expense">Expense:</label>
+                <input type="number" id="id_expense" name="expense" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_withdrawal">Withdrawal:</label>
+                <input type="number" id="id_withdrawal" name="withdrawal" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_bank_deposit">Bank Deposit:</label>
+                <input type="number" id="id_bank_deposit" name="bank_deposit" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_closing_balance">Closing Balance:</label>
+                <input type="number" id="id_closing_balance" name="closing_balance" step="0.01" class="form-control mb-3" readonly>
+            </div>
+            <div class="form-group">
+                <label for="id_new_closing_balance">New Closing Balance:</label>
+                <input type="number" id="id_new_closing_balance" name="new_closing_balance" step="0.01" class="form-control mb-3" required>
+            </div>
+        </div>
+            <div class="form-group">
+                <label for="id_remark">Remark:</label>
+                <textarea id="id_remark" name="remark" class="text_area_remark"  rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+        <div class="card-footer">
+            <div class="form-group mb-0">
+                <button type="submit" value="Submit" class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('daily-summary-form');
+    const dateInput = form.querySelector('input[name="date"]');
+
+    dateInput.addEventListener('change', function () {
+        const date = dateInput.value;
+        if (!date) {
+            alert('Date is not selected');
+            return;
+        }
+
+        fetch(`/admin_edit_daily_summary/${date}/`)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                const dailySummary = data.daily_summary;
+
+                if (!dailySummary) {
+                    alert('No daily summary data found for the selected date');
+                    return;
+                }
+
+                // Populate form fields with the fetched data
+                for (const key in dailySummary) {
+                    if (key !== 'id' && key !== '_state' && dailySummary.hasOwnProperty(key)) {
+                        const input = form.querySelector(`#id_${key}`);
+
+                        if (input) {
+                            if (input.tagName === 'INPUT') {
+                                if (input.type === 'date') {
+                                    input.value = dailySummary[key];
+                                } else if (input.type === 'number') {
+                                    input.value = dailySummary[key];
+                                }
+                            } else if (input.tagName === 'SELECT') {
+                                input.value = dailySummary[key];
+                            } else if (input.tagName === 'TEXTAREA') {
+                                input.value = dailySummary[key];
+                            }
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching daily summary data:', error));
+    });
+}); 
+
+    // document.addEventListener('change', function () {
+    //     const form = document.getElementById('daily-summary-form');
+
+    //     // Fetch Daily Summary data from the API
+    //     fetch(`/admin_edit_daily_summary/${document.querySelector('input[name="date"]').value}/`)
+    //         .then(response => response.json(),console.log(response))
+    //         .then(data => {
+    //             const dailySummary = data.daily_summary;
+    //             // Populate form fields with the fetched data
+    //             for (const key in dailySummary) {
+    //                 if (key !== 'id' && key !== '_state' && dailySummary.hasOwnProperty(key)) {
+    //                     const input = document.querySelector(`#id_${key}`);
+    //                     if (input) {
+    //                         if (input.type === 'date') {
+    //                             input.value = dailySummary[key];
+    //                         } else if (input.type === 'number') {
+    //                             input.value = dailySummary[key];
+    //                         } else if (input.tagName === 'SELECT') {
+    //                             input.value = dailySummary[key];
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         })
+    //         .catch(error => console.error('Error fetching daily summary data:', error));
+    // });
+</script>
+{% endblock %}

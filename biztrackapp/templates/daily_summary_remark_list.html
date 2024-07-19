@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Daily Summary Remark List{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <style>
+        .dataTables_wrapper {
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-3">
+
+    {% for message in messages %}
+    <div class="alert alert-success mt-2 text-center" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Daily Summary Remark List</h5>
+            <a href="{% url 'admin_edit_daily_summary' %}" class="btn btn-primary float-right">Update daily summary</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="dailySummaryRemarkTable" class="table table-bordered table-striped nowrap" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Date</th>
+                            <th >Daily Summary</th>
+                            <th>Old Closing Balance</th>
+                            <th>Remark</th>
+                            <th>Created On</th>
+                            <th>Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for daily_summary_instance in daily_summary %}
+                        <tr>
+                            <td >{{ forloop.counter }}</td>
+                            <td>{{ daily_summary_instance.date|date:"Y-m-d" }}</td>
+                            <td >{{ daily_summary_instance.daily_summary_id }}</td>
+                            <td>{{ daily_summary_instance.closing_balance }}</td>
+                            <td>{{ daily_summary_instance.remarks }}</td>
+                            <td>{{ daily_summary_instance.created_on }}</td>
+                            <td><a href="{% url 'daily_summary_detail' daily_summary_instance.daily_summary_id  %}#remarks" class="btn btn-primary btn-sm">View</a></td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        $(document).ready(function() {
+          
+    const dataTable = new DataTable('#dailySummaryRemarkTable', {
+      responsive: true,
+      dom: 'lfrtip',
+      order: [[0, 'asc']],
+    //   buttons: [
+    //     {
+    //       text: 'Print',
+    //       extend: 'print',
+    //       exportOptions: {
+    //         stripHtml: false,
+    //         columns: [0, 1, 2, 3, 4]
+    //       }
+    //     },
+    //     {
+    //       text: 'Export PDF',
+    //       extend: 'pdf',
+    //       exportOptions: {
+    //         stripHtml: true,
+    //       },
+    //     }
+    //   ],
+      
+    });
+        });
+    </script>
+{% endblock %}

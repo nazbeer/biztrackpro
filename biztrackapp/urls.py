@@ -149,6 +149,42 @@ urlpatterns = [
     path('api/daily-summary-report/', DailySummaryReportAPIView.as_view(), name='daily_summary_report_api'),
     path('api/daily-summary-pdf/', DailySummaryPDFView.as_view(), name='daily_summary_pdf'),
 
+    #remark and admin privilage additions
+    path('admin_edit_daily_summary/<str:date>/', admin_edit_daily_summary_api, name='admin_edit_daily_summary_api'),
+    path('admin_edit_daily_summary/', admin_edit_daily_summary, name='admin_edit_daily_summary'),
+    path('admin_daily_summary_report/', daily_summary_remark_list, name='daily_summary_remark_list'),
+
+    #new addition for admin urls
+        
+    path('admin_daily_summary_update/<str:daily_summary_id>/', admin_daily_summary_update, name='admin_daily_summary_update'),
+
+    path('admin_edit_bank_sale/<int:pk>/',admin_edit_bank_sale,name='admin_edit_bank_sale' ),
+    path('admin_edit_credit_collection/<int:pk>/',admin_edit_credit_collection,name='admin_edit_credit_collection'),
+    path('admin_edit_miscellaneous_income/<int:pk>/',admin_edit_miscellaneous_income,name='admin_edit_miscellaneous_income'),
+    path('admin_edit_withdrawal/<int:pk>/',admin_edit_withdrawal,name='admin_edit_withdrawal'),
+    path('admin_edit_purchase/<int:pk>/',admin_edit_purchase,name='admin_edit_purchase'),
+    path('admin_edit_supplier_payment/<int:pk>/',admin_edit_supplier_payment,name='admin_edit_supplier_payment'),
+    path('admin_edit_expense/<int:pk>/',admin_edit_expense,name='admin_edit_expense'),
+    path('admin_edit_bank_deposit/<int:pk>/',admin_edit_bank_deposit,name='admin_edit_bank_deposit'),
+
+    path('admin_delete_bank_sale/<int:pk>/',admin_delete_bank_sale,name='admin_delete_bank_sale'),
+    path('admin_delete_credit_collection/<int:pk>/',admin_delete_credit_collection,name='admin_delete_credit_collection'),
+    path('admin_delete_miscellaneous_income/<int:pk>/',admin_delete_miscellaneous_income,name='admin_delete_miscellaneous_income'),
+    path('admin_delete_withdrawal/<int:pk>/',admin_delete_withdrawal,name='admin_delete_withdrawal'),
+    path('admin_delete_purchase/<int:pk>/',admin_delete_purchase,name='admin_delete_purchase'),
+    path('admin_delete_supplier_payment/<int:pk>/',admin_delete_supplier_payment,name='admin_delete_supplier_payment'),
+    path('admin_delete_expense/<int:pk>/',admin_delete_expense,name='admin_delete_expense'),
+    path('admin_delete_bank_deposit/<int:pk>/',admin_delete_bank_deposit,name='admin_delete_bank_deposit'),
+    path('admin_create_bank_sale/', admin_create_bank_sale, name='admin_create_bank_sale'),
+    path('admin_create_credit_collection/', admin_create_credit_collection, name='admin_create_credit_collection'),
+    path('admin_create_misc_income/', admin_create_misc_income, name='admin_create_misc_income'),
+    path('admin_create_withdrawal/', admin_create_withdrawal, name='admin_create_withdrawal'),
+    path('admin_create_purchase/', admin_create_purchase, name='admin_create_purchase'),
+    path('admin_create_supplier_payment/', admin_create_supplier_payment, name='admin_create_supplier_payment'),
+    path('admin_create_expense/', admin_create_expense, name='admin_create_expense'),
+    path('admin_create_bank_deposit/', admin_create_bank_deposit, name='admin_create_bank_deposit'),
+
+    path('admin_closing_balance/<str:daily_summary_id>/',admin_closing_balance,name ='admin_closing_balance'),
 
 
     # path('download-pdf-cc/', download_pdf_cc, name='download_pdf_cc'),
@@ -161,6 +197,7 @@ urlpatterns = [
     path('api/supplier-payment-report/', SupplierPaymentReportAPIView.as_view(), name='supplier_payment_report'),
     path('api/bank-statement/', BankStatementAPIView.as_view(), name='bank_statement'),
     path('api/customer-payment-report/', CustomerPaymentReportAPIView.as_view(), name='customer_payment_report'),
+    path('shop_bank_list/', shopBankListAPIView.as_view(), name='shop_bank_list'),
 
     #pdfapi
      path('api/expense-report-pdf/', ExpenseReportPDFView.as_view(), name='expense_report_pdf'),

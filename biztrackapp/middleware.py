@@ -24,11 +24,12 @@ class LoginRequiredMiddleware:
             reverse('passDS'),
             reverse('daily_summary_exists'),
             reverse('api_login'),
-            reverse('daily_summary_report_api')
+            reverse('daily_summary_report_api'),
+            reverse('shop_bank_list'),
         ]
 
     def __call__(self, request):
-        if not request.user.is_authenticated and request.path not in self.exempt_urls:
+        if not request.user.is_authenticated and request.path not in self.exempt_urls and not request.path.startswith('/admin/'):
             messages.error(request, 'Please login to continue')
             return redirect('login')
         response = self.get_response(request)

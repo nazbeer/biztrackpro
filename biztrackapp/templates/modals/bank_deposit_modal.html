@@ -18,7 +18,8 @@
                         <div class="form-group">
                             <input type="hidden" name="business_profile" value="{{ business_profile }}">
                             <input type="hidden" id="modal_daily_summary_id1" name="daily_summary_id">
-    
+                            <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
                             <label for="id_bank_deposit_bank">Deposit Bank</label>
                             <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500" required >
                               <option value="">-- Select Deposit Bank --</option>
@@ -71,7 +72,7 @@
                         <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="503" required>
                           <option value="">-- Payment Mode --</option>
                           {% for transaction_mode in bank_deposit_form.mode_of_transaction.field.queryset %}
-                            <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                            <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -95,3 +96,16 @@
         </div>
     </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      var dateInput = document.getElementById('id_deposit_date');
+      var today = new Date();
+      var day = String(today.getDate()).padStart(2, '0');
+      var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+      var year = today.getFullYear();
+
+      var todayDate = year + '-' + month + '-' + day;
+      dateInput.max = todayDate;
+  });
+</script>

@@ -13,9 +13,13 @@
   
   <form method="post">
     {% csrf_token %}
-
     <div class="form-group">
       <label for="name" class="mb-3"> Name:</label>
+      <input type="text" id="transaction_name" name="transaction_name" class="form-control mb-3" value="{{ form.transaction_name.value }}" required >
+
+    </div>
+    <div class="form-group">
+      <label for="name" class="mb-3"> Type:</label>
       <input type="text" id="name" name="name" class="form-control mb-3" value="{{ form.name.value }}" required readonly>
       <input type="hidden" name="business_profile" value="{{ form.business_profile.value }}">
     </div>

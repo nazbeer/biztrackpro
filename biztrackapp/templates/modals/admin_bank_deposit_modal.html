@@ -1,0 +1,111 @@
+
+<div class="modal fade" id="adminBankDepositModal" tabindex="499" aria-labelledby="adminBankDepositModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-primary">
+                <h5 class="modal-title text-white" id="adminBankDepositModalLabel">Add Bank Deposit</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <form id="adminBankDepositForm" method="post" action="{% url 'admin_create_bank_deposit' %}">
+                <div class="modal-body" >
+                  {% csrf_token %}
+                  <div id="form-errors" class="alert alert-danger d-none"></div>
+                  <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="hidden" name="business_profile" value="{{ daily_summary.business_profile }}">
+                            <input type="hidden" name="created_on" value="{{daily_summary.date}}">
+                            <input type="hidden" id="modal_daily_summary_id1" name="daily_summary_id">
+
+                            <label for="id_bank_deposit_bank">Deposit Bank</label>
+                            <select id="id_bank_deposit_bank" name="bank_deposit_bank" class="form-control" tabindex="500" required >
+                              <option value="">-- Select Deposit Bank --</option>
+                              {% for banks in bank_deposit_form.bank_deposit_bank.field.queryset %}
+                                <option value="{{ banks.id }}">{{ banks.bank.name }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                     
+                      <div class="form-group">
+                        <label for="id_amount">Amount</label>
+                        <input type="number" id="id_amount" name="amount" class="form-control" value="0" step="0.01" tabindex="502" required >
+                      </div>
+                      <div id="chequeDetails" class="d-none">
+                    
+                        <div class="form-group">
+                          <label for="id_cheque_no">Cheque Number</label>
+                          <select id="id_cheque_no" name="cheque_no" class="js-cheque-number-select2" data-tags="true" data-placeholder="Select Cheque Number" data-allow-clear="true" tabindex="504">
+                            <option value="">-- Select Cheque Number --</option>
+                            <option value="other">Other</option>
+                            <!-- Options will be dynamically populated via JavaScript -->
+                          </select>
+                        </div>
+                        
+                        <div class="form-group" id="cheque_no_input_container" style="display: none;">
+                          <label for="id_cheque_no_input">Enter Cheque Number</label>
+                          <input type="text" id="id_cheque_no_input" name="cheque_no" class="form-control" tabindex="504">
+                        </div>
+                    
+                      </div>
+                      <div class="form-group">
+                      <div id="bank_detail1" class="d-none">
+                        <label for="id_bank">Received Bank</label>
+                        <select id="id_bank" name="bank" class="form-control"  tabindex="506">
+                          <option value="">-- Select Bank --</option>
+                          {% for bank in bank_deposit_form.bank.field.queryset %}
+                            <option value="{{ bank.id }}">{{ bank.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_deposit_date">Deposit Date</label>
+                            <input type="date" id="id_deposit_date" name="deposit_date" class="form-control"  tabindex="501" required>
+                          </div>
+                      <div class="form-group">
+                        <label for="id_mode_of_transaction">Payment Mode</label>
+                        <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="503" required>
+                          <option value="">-- Payment Mode --</option>
+                          {% for transaction_mode in bank_deposit_form.mode_of_transaction.field.queryset %}
+                            <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div id="chequeDetails1" class="d-none">
+                      <div class="form-group">
+                        <label for="id_cheque_date">Cheque Date</label>
+                        <input type="date" id="id_cheque_date" name="cheque_date" class="form-control" tabindex="505" >
+                      </div>
+                      </div>
+                     
+                    </div>
+                  </div>
+                  <div id="adminBankDepositErrors" class="text-danger"></div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" tabindex="509">Close</button>
+                  <button type="submit" class="btn btn-primary" id="saveBankDeposit" tabindex="508">Save</button>
+              
+                </div>
+              </form>
+        </div>
+    </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      var dateInput = document.getElementById('id_deposit_date');
+      var today = new Date();
+      var day = String(today.getDate()).padStart(2, '0');
+      var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+      var year = today.getFullYear();
+
+      var todayDate = year + '-' + month + '-' + day;
+      dateInput.max = todayDate;
+  });
+</script>

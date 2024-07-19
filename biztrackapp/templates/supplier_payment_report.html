@@ -5,31 +5,31 @@
 {% block content %}
 <style>
     .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 5px;
-    align-items: center;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.button-group {
-    grid-column: span 3; 
-    text-align: right;
-}
-@media (max-width: 767px) {
-    .form-grid {
-        grid-template-columns: 1fr; /* Single column layout for mobile */
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 5px;
+        align-items: center;
     }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
     .button-group {
-        grid-column: span 1; /* Ensure button group spans single column */
-        text-align: center; /* Center the button on mobile */
+        grid-column: span 3;
+        text-align: right;
     }
-}
 
+    @media (max-width: 767px) {
+        .form-grid {
+            grid-template-columns: 1fr; /* Single column layout for mobile */
+        }
+        .button-group {
+            grid-column: span 1; /* Ensure button group spans single column */
+            text-align: center; /* Center the button on mobile */
+        }
+    }
 </style>
 <div class="container">
     <div class="card">
@@ -42,6 +42,7 @@
                     <label for="supplier_id">Supplier</label>
                     <select id="supplier_id" name="supplier_id" class="form-control" required>
                         <option value="">Select Supplier</option>
+                        <option value="-1">All Suppliers</option>
                         {% for supplier in suppliers %}
                             <option value="{{ supplier.id }}">{{ supplier.name }}</option>
                         {% endfor %}
@@ -71,7 +72,10 @@
                             <th style="text-align: right;background-color: #8a8a8a !important;">Opening Balance</th>
                             <th style="text-align: right;background-color: #8a8a8a !important;">Cash Purchase</th>
                             <th style="text-align: right;background-color: #8a8a8a !important;">Credit Purchase</th>
-                            <th style="text-align: right; background-color: #8a8a8a !important;">Total Purchases</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Bank Transfer Purchase</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Cheque Purchase</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Card Purchase</th>
+                            <th style="text-align: right;background-color: #8a8a8a !important;">Total Purchases</th>
                             <th style="text-align: right;background-color: #8a8a8a !important;">Supplier Payments</th>
                             <th style="text-align: right;background-color: #8a8a8a !important;">Closing Balance</th>
                         </tr>
@@ -107,14 +111,17 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     year: 'numeric'
                 });
                 let openingBalance = d.opening_balance;
-                const closingBalance = openingBalance + d.credit_purchase - d.supplier_payment;
+                const closingBalance = (openingBalance + d.credit_purchase + d.cash_purchase + d.bank_transfer_purchase + d.card_purchase + d.cheque_purchase) - d.supplier_payment;
                 const rowHTML = `
                     <tr>
                         <td>${formattedDate}</td>
                         <td style="text-align:right;">${openingBalance.toFixed(2)}</td>
                         <td style="text-align:right;">${d.cash_purchase.toFixed(2)}</td>
                         <td style="text-align:right;">${d.credit_purchase.toFixed(2)}</td>
-                        <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase).toFixed(2)}</td>
+                        <td style="text-align:right;">${d.bank_transfer_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.cheque_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${d.card_purchase.toFixed(2)}</td>
+                        <td style="text-align:right;">${(d.cash_purchase + d.credit_purchase + d.bank_transfer_purchase + d.cheque_purchase + d.card_purchase).toFixed(2)}</td>
                         <td style="text-align:right;">${d.supplier_payment.toFixed(2)}</td>
                         <td style="text-align:right;">${closingBalance.toFixed(2)}</td>
                     </tr>
@@ -129,6 +136,9 @@ document.getElementById('report-form').addEventListener('submit', function(event
                     <td style="background-color: #8a8a8a !important;color: #fff !important; text-align:right;">${data.summary.opening_balance.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_cash_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_credit_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_bank_transfer_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_cheque_purchases.toFixed(2)}</td>
+                    <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_card_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_purchases.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.total_supplier_payments.toFixed(2)}</td>
                     <td style="background-color: #8a8a8a !important;color: #fff !important;text-align:right;">${data.summary.closing_balance.toFixed(2)}</td>

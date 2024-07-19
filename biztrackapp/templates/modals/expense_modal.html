@@ -15,6 +15,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="id_expense_type">Expense Type</label>
+                                <input type="hidden" name="created_on" value="{{old_daily_summary_date}}">
+
                                 <input type="hidden" name="business_profile" value={{business_profile}}>
                                 <input type="hidden" id="modal_daily_summary_id7" name="daily_summary_id">
                                 <select id="id_expense_type" name="expense_type" class="form-control" tabindex="200" required>
@@ -53,7 +55,7 @@
                                 <select id="id_mode_of_transaction" name="mode_of_transaction" class="form-control text-capitalize" tabindex="201" required>
                                     <option value="">-- Payment Mode --</option>
                                     {% for transaction_mode in expense_form.mode_of_transaction.field.queryset %}
-                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.name }}</option>
+                                        <option value="{{ transaction_mode.id }}">{{ transaction_mode.transaction_name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

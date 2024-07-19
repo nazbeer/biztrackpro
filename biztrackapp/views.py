@@ -4846,7 +4846,7 @@ def admin_edit_bank_sale(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#1')
     else:
         form = BankSaleForm(instance=bank_sale,initial={},business_profile = bank_sale.business_profile)
-    return render(request, 'edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
+    return render(request, 'admin_edit_bank_sale.html', {'form': form, 'bank_sale': bank_sale})
 
 
 
@@ -4860,7 +4860,7 @@ def admin_edit_credit_collection(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#2')
     else:
         form = CreditCollectionForm(instance=credit_instance,initial={},business_profile = credit_instance.business_profile)
-    return render(request, 'edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
+    return render(request, 'admin_edit_credit_collection.html', {'form': form, 'credit_instance': credit_instance})
 
 
 def admin_edit_miscellaneous_income(request, pk):
@@ -4873,7 +4873,7 @@ def admin_edit_miscellaneous_income(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#3')
     else:
         form = MiscellaneousIncomeForm(instance=misc_instance,initial={},business_profile = misc_instance.business_profile)
-    return render(request, 'edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
+    return render(request, 'admin_edit_miscellaneous_income.html', {'form': form, 'misc_instance': misc_instance})
 
 def admin_edit_withdrawal(request, pk):
     withdrawal_instance = get_object_or_404(Withdrawal, pk=pk)
@@ -4885,7 +4885,7 @@ def admin_edit_withdrawal(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#4')
     else:
         form = WithdrawalForm(instance=withdrawal_instance,initial={},business_profile = withdrawal_instance.business_profile)
-    return render(request, 'edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
+    return render(request, 'admin_edit_withdrawal.html', {'form': form, 'withdrawal_instance': withdrawal_instance})
 
 def admin_edit_purchase(request, pk):
     purchase_instance = get_object_or_404(Purchase, pk=pk)
@@ -4897,7 +4897,7 @@ def admin_edit_purchase(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#5')
     else:
         form = PurchaseForm(instance=purchase_instance,initial={},business_profile = purchase_instance.business_profile)
-    return render(request, 'edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
+    return render(request, 'admin_edit_purchase.html', {'form': form, 'purchase_instance': purchase_instance})
 
 
 def admin_edit_supplier_payment(request, pk):
@@ -4910,7 +4910,7 @@ def admin_edit_supplier_payment(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#6')
     else:
         form = SupplierPaymentForm(instance=supplier_instance,initial={},business_profile = supplier_instance.business_profile)
-    return render(request, 'edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
+    return render(request, 'admin_edit_supplier_payment.html', {'form': form, 'supplier_instance': supplier_instance})
 
 def admin_edit_expense(request, pk):
     expense_instance = get_object_or_404(Expense, pk=pk)
@@ -4922,7 +4922,7 @@ def admin_edit_expense(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#7')
     else:
         form = ExpenseForm(instance=expense_instance,initial={},business_profile = expense_instance.business_profile)
-    return render(request, 'edit_expense.html', {'form': form, 'expense_instance': expense_instance})
+    return render(request, 'admin_edit_expense.html', {'form': form, 'expense_instance': expense_instance})
 
 def admin_edit_bank_deposit(request, pk):
     bank_deposit = get_object_or_404(BankDeposits, pk=pk)
@@ -4934,7 +4934,7 @@ def admin_edit_bank_deposit(request, pk):
             return redirect(reverse('admin_daily_summary_update', args=[daily_summary_id]) + '#8')
     else:
         form = BankDepositsForm(instance=bank_deposit,initial={},business_profile = bank_deposit.business_profile)
-    return render(request, 'edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
+    return render(request, 'admin_edit_bank_deposit.html', {'form': form, 'bank_deposit': bank_deposit})
 
 
 
